@@ -159,19 +159,46 @@ function renderRank(){
 let profitChart=null;
 function analystSummary(){
   const names=['王榮旭','張貽程','雷老闆'];
-  return names.map(name=>{let total=0,unrealized=0,realized=0;Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{const c=calc(t);total+=c.total;unrealized+=c.unreal;realized+=c.realized});return{name,total,unrealized,realized}});
+  return names.map(name=>{
+    let total=0,unrealized=0,realized=0,cost=0;
+    Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{
+      const c=calc(t);
+      total+=c.total; unrealized+=c.unreal; realized+=c.realized;
+      cost+=(+t.entryPrice||0)*(+t.shares||0);
+    });
+    const totalPerf=cost?total/cost*100:0;
+    return{name,total,unrealized,realized,totalPerf};
+  });
 }
 function renderCharts(){
   if(typeof Chart==='undefined')return;
   const d=analystSummary();
   const textColor='#f6f0df', gridColor='rgba(217,178,76,.12)';
-  const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:textColor,usePointStyle:true,pointStyle:'rectRounded',boxWidth:10,boxHeight:10,padding:18,font:{weight:'700'}}},tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`}}},scales:{x:{ticks:{color:textColor,font:{weight:'700'}},grid:{display:false}},y:{ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:(ctx)=>ctx.tick?.value===0?'rgba(255,255,255,.35)':gridColor,lineWidth:(ctx)=>ctx.tick?.value===0?2:1}}}};
+  const valueLabelPlugin={
+    id:'valueLabelPlugin',
+    afterDatasetsDraw(chart){
+      const {ctx}=chart; ctx.save(); ctx.textAlign='center';
+      ctx.font='700 11px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+      chart.data.datasets.forEach((dataset,di)=>{
+        chart.getDatasetMeta(di).data.forEach((bar,row)=>{
+          const value=Number(dataset.data[row]||0);
+          const money=`${value>=0?'+':''}${Math.round(value).toLocaleString('zh-TW')}元`;
+          const perf=Number(d[row]?.totalPerf||0);
+          const lines=di===2?[money,`${perf>=0?'+':''}${perf.toFixed(2)}%`]:[money];
+          ctx.fillStyle=value>=0?'#ff625c':'#3bd47d';
+          const y=value>=0?bar.y-9:bar.y+17;
+          lines.forEach((line,n)=>ctx.fillText(line,bar.x,y+n*14));
+        });
+      }); ctx.restore();
+    }
+  };
+  const common={responsive:true,maintainAspectRatio:false,layout:{padding:{top:38,bottom:24}},plugins:{legend:{position:'top',labels:{color:textColor,usePointStyle:true,pointStyle:'rectRounded',boxWidth:10,boxHeight:10,padding:18,font:{weight:'700'}}},tooltip:{callbacks:{label:(ctx)=>{const perf=d[ctx.dataIndex]?.totalPerf||0;return ctx.datasetIndex===2?`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元｜總績效 ${perf>=0?'+':''}${perf.toFixed(2)}%`:`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`;}}}},scales:{x:{ticks:{color:textColor,font:{weight:'700'}},grid:{display:false}},y:{grace:'20%',ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:(ctx)=>ctx.tick?.value===0?'rgba(255,255,255,.35)':gridColor,lineWidth:(ctx)=>ctx.tick?.value===0?2:1}}}};
   if(profitChart)profitChart.destroy();
   profitChart=new Chart(document.getElementById('profitChart'),{type:'bar',data:{labels:d.map(x=>x.name),datasets:[
     {label:'未實現損益',data:d.map(x=>x.unrealized),backgroundColor:'rgba(242,201,76,.88)',borderColor:'#f2c94c',borderWidth:1,borderRadius:6},
     {label:'已實現損益',data:d.map(x=>x.realized),backgroundColor:'rgba(45,156,219,.88)',borderColor:'#2d9cdb',borderWidth:1,borderRadius:6},
     {label:'總損益',data:d.map(x=>x.total),backgroundColor:'rgba(187,107,217,.90)',borderColor:'#bb6bd9',borderWidth:1,borderRadius:6}
-  ]},options:common});
+  ]},options:common,plugins:[valueLabelPlugin]});
   renderPodium(d);
 }
 

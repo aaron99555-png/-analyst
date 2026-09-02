@@ -186,6 +186,60 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v8: mobile 查詢與篩選 3欄等寬 */
+@media (max-width:700px){
+  #filterCard .formgrid,
+  .filter-card .formgrid,
+  .filters,
+  .filter-grid{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+    align-items:end;
+  }
+
+  #filterCard .formgrid > div,
+  .filter-card .formgrid > div,
+  .filters > div,
+  .filter-grid > div{
+    min-width:0 !important;
+    width:100% !important;
+    grid-column:auto !important;
+  }
+
+  #filterCard input,
+  #filterCard select,
+  .filter-card input,
+  .filter-card select,
+  .filters input,
+  .filters select,
+  .filter-grid input,
+  .filter-grid select{
+    width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box;
+  }
+
+  #filterCard label,
+  .filter-card label,
+  .filters label,
+  .filter-grid label{
+    font-size:11px !important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  #filterCard .form-actions,
+  .filter-card .form-actions,
+  .filters .form-actions,
+  .filter-grid .form-actions{
+    grid-column:span 3 !important;
+    width:100% !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -351,13 +405,23 @@ function renderCharts(){
           const perf=Number(d[row]?.totalPerf||0);
           const lines=di===2?[money,`${perf>=0?'+':''}${perf.toFixed(2)}%`]:[money];
           ctx.fillStyle=value>=0?'#ff625c':'#3bd47d';
-          const y=value>=0?bar.y-9:bar.y+17;
-          lines.forEach((line,n)=>ctx.fillText(line,bar.x,y+n*14));
+          // 標籤與柱體保持固定距離，避免文字壓在柱子上
+          const lineGap=14;
+          const labelGap=18;
+          if(value>=0){
+            // 正值：由柱頂往上排
+            const baseY=bar.y-labelGap-(lines.length-1)*lineGap;
+            lines.forEach((line,n)=>ctx.fillText(line,bar.x,baseY+n*lineGap));
+          }else{
+            // 負值：由柱底往下排
+            const baseY=bar.y+labelGap;
+            lines.forEach((line,n)=>ctx.fillText(line,bar.x,baseY+n*lineGap));
+          }
         });
       }); ctx.restore();
     }
   };
-  const common={responsive:true,maintainAspectRatio:false,layout:{padding:{top:window.innerWidth<=700?82:38,bottom:window.innerWidth<=700?58:24,left:window.innerWidth<=700?12:0,right:window.innerWidth<=700?12:0}},plugins:{legend:{position:'top',labels:{color:textColor,usePointStyle:true,pointStyle:'rectRounded',boxWidth:10,boxHeight:10,padding:18,font:{weight:'700'}}},tooltip:{callbacks:{label:(ctx)=>{const perf=d[ctx.dataIndex]?.totalPerf||0;return ctx.datasetIndex===2?`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元｜總績效 ${perf>=0?'+':''}${perf.toFixed(2)}%`:`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`;}}}},scales:{x:{ticks:{color:textColor,font:{weight:'700'}},grid:{display:false}},y:{grace:window.innerWidth<=700?'38%':'20%',ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:(ctx)=>ctx.tick?.value===0?'rgba(255,255,255,.35)':gridColor,lineWidth:(ctx)=>ctx.tick?.value===0?2:1}}}};
+  const common={responsive:true,maintainAspectRatio:false,layout:{padding:{top:window.innerWidth<=700?100:50,bottom:window.innerWidth<=700?78:36,left:window.innerWidth<=700?12:0,right:window.innerWidth<=700?12:0}},plugins:{legend:{position:'top',labels:{color:textColor,usePointStyle:true,pointStyle:'rectRounded',boxWidth:10,boxHeight:10,padding:18,font:{weight:'700'}}},tooltip:{callbacks:{label:(ctx)=>{const perf=d[ctx.dataIndex]?.totalPerf||0;return ctx.datasetIndex===2?`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元｜總績效 ${perf>=0?'+':''}${perf.toFixed(2)}%`:`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`;}}}},scales:{x:{ticks:{color:textColor,font:{weight:'700'}},grid:{display:false}},y:{grace:window.innerWidth<=700?'48%':'28%',ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:(ctx)=>ctx.tick?.value===0?'rgba(255,255,255,.35)':gridColor,lineWidth:(ctx)=>ctx.tick?.value===0?2:1}}}};
   if(profitChart)profitChart.destroy();
   profitChart=new Chart(document.getElementById('profitChart'),{type:'bar',data:{labels:d.map(x=>x.name),datasets:[
     {label:'未實現損益',data:d.map(x=>x.unrealized),backgroundColor:'rgba(242,201,76,.88)',borderColor:'#f2c94c',borderWidth:1,borderRadius:6},

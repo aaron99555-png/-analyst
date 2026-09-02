@@ -5,26 +5,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>分析師即時績效表</title>
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6f7a90;--line:#e5e9f2;--primary:#2458e6;--primary2:#153ea9;--green:#0f9f6e;--red:#dc3b45;--orange:#e88919;--shadow:0 8px 30px rgba(29,50,90,.08);--radius:18px}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;background:var(--bg);color:var(--text)}
-.app{max-width:1500px;margin:auto;padding:22px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand h1{margin:0;font-size:25px}.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:#edf1f7;color:#33415f}.btn:hover{filter:brightness(.98)}.btn.primary{background:var(--primary);color:#fff}.btn.danger{background:#fff1f1;color:var(--red)}.btn.green{background:#eaf9f3;color:var(--green)}
+:root{--bg:#0d0f12;--card:#15181d;--card2:#1b1f25;--text:#f4f0e6;--muted:#a7a08e;--line:#302b22;--primary:#c9a24b;--primary2:#8e6b27;--gold:#e2c36f;--green:#36b37e;--red:#ff5a66;--orange:#d79a3b;--shadow:0 10px 34px rgba(0,0,0,.28);--radius:18px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;background:radial-gradient(circle at top,#1a1812 0,#0d0f12 42%,#090b0d 100%);color:var(--text)}
+.app{max-width:1500px;margin:auto;padding:22px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand h1{margin:0;font-size:25px}.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #3a3326;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:#211e18;color:#e8dfc8}.btn:hover{filter:brightness(.98)}.btn.primary{background:linear-gradient(135deg,#e0bf67,#a87f31);color:#17130b;box-shadow:0 6px 18px rgba(201,162,75,.18)}.btn.danger{background:#2b191c;color:#ff8790;border-color:#4b272c}.btn.green{background:#17261f;color:#6ed5a6;border-color:#244437}
 .stats{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin-bottom:18px}.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}.stat .label{font-size:12px;color:var(--muted);margin-bottom:7px}.stat .value{font-size:23px;font-weight:800}.stat .sub{font-size:11px;color:var(--muted);margin-top:6px}.positive{color:var(--red)!important}.negative{color:var(--green)!important}.neutral{color:var(--text)!important}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:16px;margin:0}.panel-body{padding:16px 18px}
-.form-grid{display:grid;grid-template-columns:1.1fr .8fr 1.1fr 1fr .8fr .8fr .8fr .9fr .9fr 1.5fr auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin:0 0 5px}.field input,.field select{width:100%;height:39px;border:1px solid #d9dfeb;border-radius:9px;padding:0 10px;background:#fff;color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(36,88,230,.10)}
-.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.analyst-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.analyst-tab{border:1px solid #d9dfeb;background:#fff;color:#46536d;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.analyst-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}.toolbar input,.toolbar select{height:36px;border:1px solid #d9dfeb;border-radius:9px;padding:0 10px;background:#fff}.spacer{flex:1}.smallnote{font-size:11px;color:var(--muted)}
-.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:1250px}.table th{position:sticky;top:0;background:#f8faff;color:#65718a;font-size:11px;text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}.table td{padding:10px 9px;border-bottom:1px solid #edf0f5;font-size:13px;white-space:nowrap}.table tr:hover td{background:#fbfcff}.symbol{font-weight:800}.name{font-size:12px;color:var(--muted);margin-left:5px}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.pill.open{background:#eaf2ff;color:#2458e6}.pill.closed{background:#eef2f4;color:#65718a}.risk{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.risk.normal{background:#eef2f7;color:#667085}.risk.target{background:#fff0f1;color:#c92a35}.risk.near-target{background:#fff6e6;color:#b66a00}.risk.stop{background:#eaf9f3;color:#087a54}.risk.near-stop{background:#edf8f4;color:#0f8b66}.num{font-variant-numeric:tabular-nums;font-weight:700}.row-actions{display:flex;gap:5px}.iconbtn{border:0;background:#f1f4f8;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px}.iconbtn.exit{background:#fff5e8;color:#bd6a00}.iconbtn.delete{background:#fff0f1;color:#cc2d38}
-.rank-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}.rank-table{width:100%;border-collapse:collapse}.rank-table th,.rank-table td{padding:9px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}.rank-table th{color:var(--muted);font-size:11px}.barbox{height:8px;background:#eef1f6;border-radius:99px;overflow:hidden;min-width:110px}.bar{height:100%;background:var(--primary);border-radius:99px}.empty{padding:38px;text-align:center;color:var(--muted)}
-.modal{position:fixed;inset:0;background:rgba(18,27,47,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.show{display:flex}.dialog{width:min(520px,100%);background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(10,20,40,.25);overflow:hidden}.dialog h3{margin:0;padding:17px 20px;border-bottom:1px solid var(--line);font-size:17px}.dialog .content{padding:18px 20px}.dialog .footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line)}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-grid .field.full{grid-column:1/-1}
-.admin-only.hidden{display:none!important}.mode-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#eef2f7;color:#5c677d}.mode-badge.admin{background:#eaf9f3;color:var(--green)}.cloud-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#eef2f7;color:#5c677d}.cloud-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:#98a2b3}.cloud-badge.online{background:#eaf9f3;color:#087a54}.cloud-badge.online::before{background:#12b76a}.cloud-badge.syncing{background:#eef4ff;color:#2458e6}.cloud-badge.syncing::before{background:#2458e6;animation:pulse 1s infinite}.cloud-badge.error{background:#fff0f1;color:#c92a35}.cloud-badge.error::before{background:#dc3b45}@keyframes pulse{50%{opacity:.35}}.date-query{display:flex;align-items:end;gap:6px;flex-wrap:wrap}.date-query .field{min-width:135px}.date-query .field input{height:36px}.quick-range{display:flex;gap:6px;flex-wrap:wrap}.quick-range .btn{padding:8px 10px;font-size:12px}.analyst-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.analyst-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfcff}.analyst-card .head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.analyst-card .namex{font-weight:900}.analyst-card .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.analyst-card .metric{background:#fff;border:1px solid #edf0f5;border-radius:10px;padding:9px}.analyst-card .metric span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.analyst-card .metric b{font-size:14px}.row-alert td{background:#fffdf5!important}.row-stop td{background:#f4fbf8!important}.row-target td{background:#fff7f7!important}
-.toast{position:fixed;right:18px;bottom:18px;background:#182235;color:#fff;padding:11px 15px;border-radius:10px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;transform:none}
+.form-grid{display:grid;grid-template-columns:1.1fr .8fr 1.1fr 1fr .8fr .8fr .8fr .9fr .9fr 1.5fr auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin:0 0 5px}.field input,.field select{width:100%;height:39px;border:1px solid #3b3428;border-radius:9px;padding:0 10px;background:#111419;color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(201,162,75,.14)}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.analyst-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.analyst-tab{border:1px solid #3b3428;background:#16191e;color:#d7cfba;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.analyst-tab.active{background:linear-gradient(135deg,#e0bf67,#a87f31);border-color:#d5b35d;color:#17130b}.toolbar input,.toolbar select{height:36px;border:1px solid #3b3428;border-radius:9px;padding:0 10px;background:#111419;color:var(--text)}.spacer{flex:1}.smallnote{font-size:11px;color:var(--muted)}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:1250px}.table th{position:sticky;top:0;background:#1d1a14;color:#d9c996;font-size:11px;text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}.table td{padding:10px 9px;border-bottom:1px solid #29251e;font-size:13px;white-space:nowrap}.table tr:hover td{background:#1b1b18}.symbol{font-weight:800}.name{font-size:12px;color:var(--muted);margin-left:5px}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.pill.open{background:#2a2416;color:#e4c46f}.pill.closed{background:#22262c;color:#a7a08e}.risk{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.risk.normal{background:#22262c;color:#aaa28f}.risk.target{background:#35181d;color:#ff7a84}.risk.near-target{background:#302613;color:#e4b755}.risk.stop{background:#153026;color:#63d3a4}.risk.near-stop{background:#182922;color:#5fc49c}.num{font-variant-numeric:tabular-nums;font-weight:700}.row-actions{display:flex;gap:5px}.iconbtn{border:1px solid #383126;background:#211e18;color:#d9cfb8;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px}.iconbtn.exit{background:#302613;color:#e4b755;border-color:#5a451d}.iconbtn.delete{background:#35181d;color:#ff7a84;border-color:#57262e}
+.rank-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}.rank-table{width:100%;border-collapse:collapse}.rank-table th,.rank-table td{padding:9px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}.rank-table th{color:var(--muted);font-size:11px}.barbox{height:8px;background:#27231c;border-radius:99px;overflow:hidden;min-width:110px}.bar{height:100%;background:linear-gradient(90deg,#8e6b27,#e2c36f);border-radius:99px}.empty{padding:38px;text-align:center;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(18,27,47,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.show{display:flex}.dialog{width:min(520px,100%);background:#171a1f;border:1px solid #3a3326;border-radius:18px;box-shadow:0 30px 80px rgba(10,20,40,.25);overflow:hidden}.dialog h3{margin:0;padding:17px 20px;border-bottom:1px solid var(--line);font-size:17px}.dialog .content{padding:18px 20px}.dialog .footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line)}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-grid .field.full{grid-column:1/-1}
+.admin-only.hidden{display:none!important}.mode-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#211e18;color:#d8cfba;border:1px solid #3a3326}.mode-badge.admin{background:#2a2416;color:#e4c46f;border-color:#6c5729}.cloud-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#211e18;color:#cfc7b5;border:1px solid #3a3326}.cloud-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:#98a2b3}.cloud-badge.online{background:#153026;color:#63d3a4;border-color:#28513f}.cloud-badge.online::before{background:#12b76a}.cloud-badge.syncing{background:#2a2416;color:#e4c46f;border-color:#5b4924}.cloud-badge.syncing::before{background:#c9a24b;animation:pulse 1s infinite}.cloud-badge.error{background:#35181d;color:#ff7a84;border-color:#57262e}.cloud-badge.error::before{background:#dc3b45}@keyframes pulse{50%{opacity:.35}}.date-query{display:flex;align-items:end;gap:6px;flex-wrap:wrap}.date-query .field{min-width:135px}.date-query .field input{height:36px}.quick-range{display:flex;gap:6px;flex-wrap:wrap}.quick-range .btn{padding:8px 10px;font-size:12px}.analyst-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.analyst-card{border:1px solid #3a3326;border-radius:14px;padding:14px;background:linear-gradient(180deg,#1c1b17,#15181d)}.analyst-card .head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.analyst-card .namex{font-weight:900}.analyst-card .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.analyst-card .metric{background:#111419;border:1px solid #302b22;border-radius:10px;padding:9px}.analyst-card .metric span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.analyst-card .metric b{font-size:14px}.row-alert td{background:#292414!important}.row-stop td{background:#12241d!important}.row-target td{background:#2d171a!important}
+.toast{position:fixed;right:18px;bottom:18px;background:#2a2416;color:#f1dfaa;border:1px solid #665126;padding:11px 15px;border-radius:10px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;transform:none}
+.update-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.update-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border-radius:10px;background:#15130f;border:1px solid #3a3326;color:#d9cfb8;font-size:12px}.update-chip b{color:#e2c36f}.update-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:#c9a24b;box-shadow:0 0 10px rgba(201,162,75,.45)}
 @media(max-width:1100px){.stats{grid-template-columns:repeat(4,1fr)}.form-grid{grid-template-columns:repeat(3,1fr)}.form-grid .wide{grid-column:span 2}.rank-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.app{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr);gap:8px}.stat{padding:13px}.stat .value{font-size:20px}.panel-body{padding:12px}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.form-grid .addbtn{grid-column:1/-1}.actions{width:100%}.actions .btn{flex:1}.panel-head{align-items:flex-start;flex-direction:column}.toolbar{width:100%}.toolbar input,.toolbar select{max-width:100%;flex:1}.modal-grid{grid-template-columns:1fr}.modal-grid .field.full{grid-column:auto}.analyst-cards{grid-template-columns:1fr}.analyst-card .metrics{grid-template-columns:repeat(2,1fr)}.table{min-width:980px}.table th,.table td{padding:9px 7px}.table .mobile-hide{display:none}}
 </style>
+
+<style>
+/* Firebase 同步於背景運作，不顯示同步狀態 */
+#firebaseStatus, #firebase-status, #syncStatus, #sync-status,
+.firebase-status, .firebaseStatus, .sync-status, .syncStatus,
+[data-role="firebase-status"], [data-role="sync-status"] {
+  display:none !important;
+}
+</style>
+
+<style>
+#firebaseStatus,#firebase-status,#syncStatus,#sync-status,#cloudStatus,#cloud-status,
+.firebase-status,.firebaseStatus,.sync-status,.syncStatus,.cloud-status,.cloudStatus,
+[data-role="firebase-status"],[data-role="sync-status"],[data-status="firebase"],[data-status="sync"]{
+display:none!important;
+}
+</style>
+
+<style>
+/* 一般查看模式：隱藏 Firebase 同步狀態；管理者模式仍可查看 */
+body.viewer-mode #firebaseStatus,
+body.viewer-mode #firebase-status,
+body.viewer-mode #syncStatus,
+body.viewer-mode #sync-status,
+body.viewer-mode #cloudStatus,
+body.viewer-mode #cloud-status,
+body.viewer-mode .firebase-status,
+body.viewer-mode .firebaseStatus,
+body.viewer-mode .sync-status,
+body.viewer-mode .syncStatus,
+body.viewer-mode .cloud-status,
+body.viewer-mode .cloudStatus,
+body.viewer-mode [data-role="firebase-status"],
+body.viewer-mode [data-role="sync-status"],
+body.viewer-mode [data-status="firebase"],
+body.viewer-mode [data-status="sync"] { display:none !important; }
+</style>
+
+<style>
+body:not(.viewer-mode) #firebaseStatus,
+body:not(.viewer-mode) #firebase-status,
+body:not(.viewer-mode) #syncStatus,
+body:not(.viewer-mode) #sync-status,
+body:not(.viewer-mode) #cloudStatus,
+body:not(.viewer-mode) #cloud-status,
+body:not(.viewer-mode) .firebase-status,
+body:not(.viewer-mode) .firebaseStatus,
+body:not(.viewer-mode) .sync-status,
+body:not(.viewer-mode) .syncStatus,
+body:not(.viewer-mode) .cloud-status,
+body:not(.viewer-mode) .cloudStatus,
+body:not(.viewer-mode) [data-role="firebase-status"],
+body:not(.viewer-mode) [data-role="sync-status"],
+body:not(.viewer-mode) [data-status="firebase"],
+body:not(.viewer-mode) [data-status="sync"] { display:inline-flex !important; }
+</style>
+
 </head>
-<body>
+<body class="viewer-mode">
 <div class="app">
   <div class="topbar">
-    <div class="brand"><h1>分析師即時績效表</h1><p>進場追蹤・自動行情更新・出場結算・總績效統計｜開啟頁面自動更新，每 60 秒刷新持有中股票</p><p id="globalLastUpdate" style="font-weight:700;color:#46536d">最後行情更新：尚未更新</p></div>
+    <div class="brand"><h1>分析師即時績效表</h1><p>進場追蹤・自動行情更新・出場結算・總績效統計｜開啟頁面自動更新，每 60 秒刷新持有中股票</p><div class="update-strip"><span class="update-chip">資料更新：<b id="dataLastUpdate">尚未更新</b></span><span class="update-chip">行情更新：<b id="globalLastUpdate">尚未更新</b></span></div></div>
     <div class="actions">
       <span id="modeBadge" class="mode-badge">一般查看模式</span>
       <span id="cloudBadge" class="cloud-badge syncing" title="Firebase Realtime Database">Firebase 連線中</span>
@@ -102,7 +160,7 @@
 <div class="modal" id="priceModal"><div class="dialog"><h3>更新目前價格</h3><div class="content"><div class="modal-grid"><div class="field full"><label id="priceTitle">股票</label><input id="mCurrent" type="number" step="0.01" min="0"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('priceModal')">取消</button><button class="btn primary" onclick="savePrice()">更新</button></div></div></div>
 <div class="modal" id="exitModal"><div class="dialog"><h3>出場結算</h3><div class="content"><div class="modal-grid"><div class="field"><label>出場日期</label><input id="mExitDate" type="date"></div><div class="field"><label>出場價格</label><input id="mExitPrice" type="number" step="0.01" min="0"></div><div class="field full"><label>結算備註</label><input id="mExitNote" placeholder="停利／停損／策略結束"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('exitModal')">取消</button><button class="btn primary" onclick="settleTrade()">確認結算</button></div></div></div>
 <div class="modal" id="adminModal"><div class="dialog"><h3>管理者登入</h3><div class="content"><div class="modal-grid"><div class="field full"><label>管理者密碼</label><input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')adminLogin()"></div></div><div class="smallnote" style="margin-top:10px">一般模式僅能查詢與查看；登入後才開放新增、修改、更新價格、結算、刪除與資料匯出入。</div></div><div class="footer"><button class="btn" onclick="closeModal('adminModal')">取消</button><button class="btn primary" onclick="adminLogin()">登入</button></div></div></div>
-<div class="modal" id="editModal"><div class="dialog"><h3>修改交易資料</h3><div class="content"><div class="modal-grid"><div class="field"><label>分析師</label><select id="eAnalyst"><option>王榮旭</option><option>張貽程</option></select></div><div class="field"><label>股票名稱</label><input id="eName"></div><div class="field"><label>進場日期</label><input id="eDate" type="date"></div><div class="field"><label>進場價</label><input id="eEntry" type="number" step="0.01" min="0"></div><div class="field"><label>停損價</label><input id="eStop" type="number" step="0.01" min="0"></div><div class="field"><label>停利價</label><input id="eTarget" type="number" step="0.01" min="0"></div><div class="field"><label>張數</label><input id="eLots" type="number" step="0.001" min="0"></div><div class="field full"><label>備註</label><input id="eNote"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('editModal')">取消</button><button class="btn primary" onclick="saveEdit()">儲存修改</button></div></div></div>
+<div class="modal" id="editModal"><div class="dialog"><h3>修改交易資料</h3><div class="content"><div class="modal-grid"><div class="field"><label>分析師</label><select id="eAnalyst"><option>王榮旭</option><option>張貽程</option></select></div><div class="field"><label>股票名稱</label><input id="eName"></div><div class="field"><label>進場日期</label><input id="eDate" type="date"></div><div class="field"><label>進場價(收盤價)</label><input id="eEntry" type="number" step="0.01" min="0"></div><div class="field"><label>停損價</label><input id="eStop" type="number" step="0.01" min="0"></div><div class="field"><label>停利價</label><input id="eTarget" type="number" step="0.01" min="0"></div><div class="field"><label>張數</label><input id="eLots" type="number" step="0.001" min="0"></div><div class="field full"><label>備註</label><input id="eNote"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('editModal')">取消</button><button class="btn primary" onclick="saveEdit()">儲存修改</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -116,6 +174,8 @@ let cloudUpdatedAt=0;
 let cloudWriteTimer=null;
 let cloudPollBusy=false;
 let cloudInitialized=false;
+let dataUpdatedAt=Number(localStorage.getItem(KEY+'_dataUpdatedAt')||0);
+let marketUpdatedAt=Number(localStorage.getItem(KEY+'_marketUpdatedAt')||0);
 const ADMIN_SESSION_KEY='analystPerformance_admin_session';
 const ADMIN_HASH='23da13632336835a27300c1d1a2ac37d7258b696012bf43dde81315316bb0791';
 const isAdmin=()=>sessionStorage.getItem(ADMIN_SESSION_KEY)==='1';
@@ -130,6 +190,8 @@ const fmt2=n=>(Number(n)||0).toLocaleString('zh-TW',{minimumFractionDigits:2,max
 const pct=n=>`${n>=0?'+':''}${fmt2(n)}%`;
 const money=n=>`${n>=0?'+':''}$${fmt(Math.round(n))}`;
 const today=()=>new Date().toISOString().slice(0,10);
+function markDataUpdate(){dataUpdatedAt=Date.now();localStorage.setItem(KEY+'_dataUpdatedAt',String(dataUpdatedAt));}
+function markMarketUpdate(){marketUpdatedAt=Date.now();localStorage.setItem(KEY+'_marketUpdatedAt',String(marketUpdatedAt));}
 document.getElementById('fDate').value=today();
 function setCloudStatus(type,text){const el=document.getElementById('cloudBadge');if(!el)return;el.className=`cloud-badge ${type||''}`.trim();el.textContent=text;el.title=`Firebase：${FIREBASE_BASE}`;}
 function saveLocal(){localStorage.setItem(KEY,JSON.stringify(trades));render();}
@@ -157,7 +219,7 @@ async function pushCloud(){
  try{
    setCloudStatus('syncing','Firebase 同步中');
    const stamp=Date.now();
-   await firebaseRequest('PUT',{trades,updatedAt:stamp,version:1});
+   await firebaseRequest('PUT',{trades,updatedAt:stamp,dataUpdatedAt,marketUpdatedAt,version:2});
    cloudUpdatedAt=stamp;
    setCloudStatus('online','Firebase 已同步');
  }catch(e){
@@ -178,9 +240,13 @@ async function pullCloud({initial=false}={}){
    }
    const remoteStamp=Number(data.updatedAt||0);
    const remoteTrades=normalizeCloudTrades(data.trades);
+   const remoteDataUpdatedAt=Number(data.dataUpdatedAt||data.updatedAt||0);
+   const remoteMarketUpdatedAt=Number(data.marketUpdatedAt||0);
    if(initial||remoteStamp>cloudUpdatedAt){
      trades=remoteTrades;
      cloudUpdatedAt=remoteStamp;
+     dataUpdatedAt=remoteDataUpdatedAt; marketUpdatedAt=remoteMarketUpdatedAt;
+     localStorage.setItem(KEY+'_dataUpdatedAt',String(dataUpdatedAt)); localStorage.setItem(KEY+'_marketUpdatedAt',String(marketUpdatedAt));
      localStorage.setItem(KEY,JSON.stringify(trades));
      render();
    }
@@ -208,14 +274,14 @@ function addTrade(){
  if(!analyst||!code||!date||!entry||entry<=0){toast('請填寫分析師、股票代號、進場日期與進場價');return}
  if(lots<=0){toast('張數需大於 0');return}
  trades.unshift({id:crypto.randomUUID?crypto.randomUUID():Date.now()+Math.random(),analyst,code,name,entryDate:date,entryPrice:entry,stopLoss,takeProfit,lots,currentPrice:cur,note,status:'open',updatedAt:new Date().toISOString(),exitDate:'',exitPrice:null,exitNote:''});
- fCode.value='';fName.value='';fEntry.value='';fStop.value='';fTarget.value='';fCurrent.value='';fNote.value=''; save(); toast('已新增交易');
+ fCode.value='';fName.value='';fEntry.value='';fStop.value='';fTarget.value='';fCurrent.value='';fNote.value=''; markDataUpdate(); save(); toast('已新增交易');
 }
 function renderFilters(){const sel=document.getElementById('analystFilter'),old=sel.value;const fixed=['王榮旭','張貽程'];sel.innerHTML='<option value="all">全部分析師</option>'+fixed.map(a=>`<option value="${a}">${a}</option>`).join('');sel.value=fixed.includes(old)?old:'all';syncAnalystTabs();}
 function setAnalystFilter(name){document.getElementById('analystFilter').value=name;syncAnalystTabs();render();}
 function syncAnalystTabs(){const v=document.getElementById('analystFilter').value;document.querySelectorAll('.analyst-tab').forEach(b=>b.classList.toggle('active',b.dataset.analyst===v));}
 function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function formatUpdateDate(v){if(!v)return '尚未更新';const d=new Date(v);if(Number.isNaN(d.getTime()))return '尚未更新';return d.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
-function renderGlobalUpdate(){const dates=trades.map(t=>t.updatedAt).filter(Boolean).map(v=>new Date(v)).filter(d=>!Number.isNaN(d.getTime()));const latest=dates.length?new Date(Math.max(...dates.map(d=>d.getTime()))):null;const el=document.getElementById('globalLastUpdate');if(el)el.textContent=`最後行情更新：${latest?formatUpdateDate(latest):'尚未更新'}`;}
+function renderGlobalUpdate(){const marketEl=document.getElementById('globalLastUpdate'),dataEl=document.getElementById('dataLastUpdate');if(marketEl)marketEl.textContent=marketUpdatedAt?formatUpdateDate(marketUpdatedAt):'尚未更新';if(dataEl)dataEl.textContent=dataUpdatedAt?formatUpdateDate(dataUpdatedAt):'尚未更新';}
 function render(){renderFilters();renderStats();renderAnalystCards();renderTable();renderRank();renderGlobalUpdate();}
 function holdRangeMatch(t){const from=document.getElementById('holdFrom')?.value||'';const to=document.getElementById('holdTo')?.value||'';if(!from&&!to)return true;const start=String(t.entryDate||'');const end=t.status==='closed'&&t.exitDate?String(t.exitDate):'9999-12-31';return (!to||start<=to)&&(!from||end>=from);}
 function clearHoldRange(){holdFrom.value='';holdTo.value='';render();}
@@ -227,16 +293,36 @@ function analystScopedTrades(){const af=document.getElementById('analystFilter')
 function renderStats(){const scoped=analystScopedTrades();let totalProfit=0,totalCost=0,closed=0,wins=0,realized=0,unrealized=0;scoped.forEach(t=>{const c=getCalc(t);totalProfit+=c.profit;totalCost+=c.cost;if(t.status==='closed'){closed++;realized+=c.profit;if(c.profit>0)wins++;}else unrealized+=c.profit});const open=scoped.length-closed,ret=totalCost?totalProfit/totalCost*100:0,wr=closed?wins/closed*100:0;
  sTotal.textContent=scoped.length;sOpen.textContent=open;sClosed.textContent=closed;sRealized.textContent=money(realized);sRealized.className='value '+(realized>0?'positive':realized<0?'negative':'neutral');sUnrealized.textContent=money(unrealized);sUnrealized.className='value '+(unrealized>0?'positive':unrealized<0?'negative':'neutral');sProfit.textContent=money(totalProfit);sProfit.className='value '+(totalProfit>0?'positive':totalProfit<0?'negative':'neutral');sReturn.textContent=pct(ret);sReturn.className='value '+(ret>0?'positive':ret<0?'negative':'neutral');sWinRate.textContent=fmt2(wr)+'%';}
 function filtered(){const q=search.value.trim().toLowerCase(),st=statusFilter.value,rf=riskFilter.value,af=analystFilter.value,sort=sortBy.value;let a=trades.filter(t=>(st==='all'||t.status===st)&&(rf==='all'||getRiskState(t)===rf)&&(af==='all'||t.analyst===af)&&holdRangeMatch(t)&&(!q||[t.analyst,t.code,t.name,t.note,t.stopLoss,t.takeProfit].join(' ').toLowerCase().includes(q)));a.sort((x,y)=>{const X=getCalc(x),Y=getCalc(y);if(sort==='returnDesc')return Y.ret-X.ret;if(sort==='returnAsc')return X.ret-Y.ret;if(sort==='profitDesc')return Y.profit-X.profit;return String(y.entryDate).localeCompare(String(x.entryDate))});return a;}
-function renderTable(){const a=filtered();if(!a.length){tableArea.innerHTML='<div class="empty">目前沒有符合條件的交易紀錄</div>';return}tableArea.innerHTML=`<table class="table"><thead><tr><th>分析師</th><th>股票</th><th>狀態</th><th>風險</th><th>進場日期</th><th>進場價</th><th>停損</th><th>停利</th><th>目前／出場價</th><th class="mobile-hide">張數</th><th class="mobile-hide">價差</th><th>績效</th><th>損益金額</th><th class="mobile-hide">出場日期</th><th class="mobile-hide">更新日期</th><th>備註</th>${isAdmin()?'<th>操作</th>':''}</tr></thead><tbody>${a.map(rowHTML).join('')}</tbody></table>`}
-function rowHTML(t){const c=getCalc(t),diff=c.price-Number(t.entryPrice),cl=c.profit>0?'positive':c.profit<0?'negative':'neutral',risk=getRiskState(t);const ops=isAdmin()?`<td><div class="row-actions"><button type="button" class="iconbtn" data-action="edit" data-id="${esc(t.id)}">修改</button>${t.status==='open'?`<button type="button" class="iconbtn" data-action="price" data-id="${esc(t.id)}">更新價</button><button type="button" class="iconbtn exit" data-action="exit" data-id="${esc(t.id)}">結算</button>`:''}<button type="button" class="iconbtn delete" data-action="delete" data-id="${esc(t.id)}">刪除</button></div></td>`:'';const rowClass=risk==='stop'?'row-stop':risk==='target'?'row-target':(risk==='near-stop'||risk==='near-target')?'row-alert':'';return `<tr class="${rowClass}"><td><b>${esc(t.analyst)}</b></td><td><span class="symbol">${esc(t.code)}</span><span class="name">${esc(t.name)}</span></td><td><span class="pill ${t.status}">${t.status==='open'?'持有中':'已結算'}</span></td><td><span class="risk ${risk}">${riskLabel(risk)}</span></td><td>${esc(t.entryDate)}</td><td class="num">${fmt2(t.entryPrice)}</td><td class="num negative">${Number(t.stopLoss)>0?fmt2(t.stopLoss):'—'}</td><td class="num positive">${Number(t.takeProfit)>0?fmt2(t.takeProfit):'—'}</td><td class="num">${fmt2(c.price)}</td><td class="num mobile-hide">${fmt2(t.lots)}</td><td class="num ${cl} mobile-hide">${diff>=0?'+':''}${fmt2(diff)}</td><td class="num ${cl}">${pct(c.ret)}</td><td class="num ${cl}">${money(c.profit)}</td><td class="mobile-hide">${t.exitDate||'—'}</td><td class="mobile-hide">${formatUpdateDate(t.updatedAt)}</td><td title="${esc(t.note||t.exitNote)}">${esc((t.note||t.exitNote||'—').slice(0,18))}</td>${ops}</tr>`}
+function renderTable(){const a=filtered();if(!a.length){tableArea.innerHTML='<div class="empty">目前沒有符合條件的交易紀錄</div>';return}tableArea.innerHTML=`<table class="table"><thead><tr><th>分析師</th><th>股票</th><th>狀態</th><th>風險</th><th>進場日期</th><th>進場價(收盤價)</th><th>停損</th><th>停利</th><th>目前／出場價</th><th class="mobile-hide">張數</th><th class="mobile-hide">價差</th><th>績效</th><th>損益金額</th><th class="mobile-hide">出場日期</th><th class="mobile-hide">行情更新</th><th>備註</th>${isAdmin()?'<th>操作</th>':''}</tr></thead><tbody>${a.map(rowHTML).join('')}</tbody></table>`}
+function rowHTML(t){const c=getCalc(t),diff=c.price-Number(t.entryPrice),cl=c.profit>0?'positive':c.profit<0?'negative':'neutral',risk=getRiskState(t);const ops=isAdmin()?`<td><div class="row-actions"><button type="button" class="iconbtn" data-action="edit" data-id="${esc(t.id)}">修改</button>${t.status==='open'?`<button type="button" class="iconbtn" data-action="price" data-id="${esc(t.id)}">更新價</button><button type="button" class="iconbtn exit" data-action="exit" data-id="${esc(t.id)}">結算</button>`:''}<button type="button" class="iconbtn delete" data-action="delete" data-id="${esc(t.id)}">刪除</button></div></td>`:'';const rowClass=risk==='stop'?'row-stop':risk==='target'?'row-target':(risk==='near-stop'||risk==='near-target')?'row-alert':'';return `<tr class="${rowClass}"><td><b>${esc(t.analyst)}</b></td><td><span class="symbol">${esc(t.code)}</span><span class="name">${esc(t.name)}</span></td><td><span class="pill ${t.status}">${t.status==='open'?'持有中':'已結算'}</span></td><td><span class="risk ${risk}">${riskLabel(risk)}</span></td><td>${esc(t.entryDate)}</td><td class="num">${fmt2(t.entryPrice)}</td><td class="num negative">${Number(t.stopLoss)>0?fmt2(t.stopLoss):'—'}</td><td class="num positive">${Number(t.takeProfit)>0?fmt2(t.takeProfit):'—'}</td><td class="num">${fmt2(c.price)}</td><td class="num mobile-hide">${fmt2(t.lots)}</td><td class="num ${cl} mobile-hide">${diff>=0?'+':''}${fmt2(diff)}</td><td class="num ${cl}">${pct(c.ret)}</td><td class="num ${cl}">${money(c.profit)}</td><td class="mobile-hide">${t.exitDate||'—'}</td><td class="mobile-hide">${formatUpdateDate(t.priceUpdatedAt||t.updatedAt)}</td><td title="${esc(t.note||t.exitNote)}">${esc((t.note||t.exitNote||'—').slice(0,18))}</td>${ops}</tr>`}
 function renderRank(){const base=analystScopedTrades(),map={};base.forEach(t=>{const c=getCalc(t);if(!map[t.analyst])map[t.analyst]={name:t.analyst,n:0,open:0,closed:0,wins:0,cost:0,profit:0};const a=map[t.analyst];a.n++;a.cost+=c.cost;a.profit+=c.profit;if(t.status==='open')a.open++;else{a.closed++;if(c.profit>0)a.wins++}});let arr=Object.values(map).map(a=>({...a,ret:a.cost?a.profit/a.cost*100:0,winRate:a.closed?a.wins/a.closed*100:0})).sort((a,b)=>b.ret-a.ret);if(!arr.length){rankArea.innerHTML='<div class="empty">新增交易後會顯示分析師排行</div>';summaryArea.innerHTML='';return}const max=Math.max(...arr.map(a=>Math.abs(a.ret)),1);rankArea.innerHTML=`<table class="rank-table"><thead><tr><th>排名</th><th>分析師</th><th>交易</th><th>報酬率</th><th>總損益</th><th>績效</th></tr></thead><tbody>${arr.map((a,i)=>`<tr><td>${i+1}</td><td><b>${esc(a.name)}</b></td><td>${a.n} 筆</td><td class="${a.ret>=0?'positive':'negative'}"><b>${pct(a.ret)}</b></td><td class="${a.profit>=0?'positive':'negative'}">${money(a.profit)}</td><td><div class="barbox"><div class="bar" style="width:${Math.min(100,Math.abs(a.ret)/max*100)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
  const best=arr[0],closed=base.filter(t=>t.status==='closed'),closedProfit=closed.reduce((s,t)=>s+getCalc(t).profit,0),openProfit=base.filter(t=>t.status==='open').reduce((s,t)=>s+getCalc(t).profit,0);summaryArea.innerHTML=`<tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${pct(best.ret)}</td></tr><tr><td>已實現損益</td><td class="${closedProfit>=0?'positive':'negative'}"><b>${money(closedProfit)}</b></td></tr><tr><td>未實現損益</td><td class="${openProfit>=0?'positive':'negative'}"><b>${money(openProfit)}</b></td></tr><tr><td>${document.getElementById('analystFilter').value==='all'?'分析師人數':'目前篩選'}</td><td>${document.getElementById('analystFilter').value==='all'?arr.length:esc(document.getElementById('analystFilter').value)}</td></tr>`}
 function openEdit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>String(x.id)===String(id));if(!t)return;eAnalyst.value=t.analyst||'王榮旭';eName.value=t.name||'';eDate.value=t.entryDate||'';eEntry.value=t.entryPrice||'';eStop.value=t.stopLoss||'';eTarget.value=t.takeProfit||'';eLots.value=t.lots||1;eNote.value=t.note||'';editModal.classList.add('show')}
-function saveEdit(){if(!requireAdmin())return;const t=trades.find(x=>String(x.id)===String(activeId));if(!t)return;const entry=Number(eEntry.value),lots=Number(eLots.value);if(!eDate.value||!entry||entry<=0||!lots||lots<=0){toast('請確認進場日期、進場價與張數');return;}t.analyst=eAnalyst.value;t.name=eName.value.trim();t.entryDate=eDate.value;t.entryPrice=entry;t.stopLoss=Number(eStop.value||0);t.takeProfit=Number(eTarget.value||0);t.lots=lots;t.note=eNote.value.trim();t.updatedAt=new Date().toISOString();closeModal('editModal');save();toast('交易資料已更新')}
+function saveEdit(){if(!requireAdmin())return;const t=trades.find(x=>String(x.id)===String(activeId));if(!t)return;const entry=Number(eEntry.value),lots=Number(eLots.value);if(!eDate.value||!entry||entry<=0||!lots||lots<=0){toast('請確認進場日期、進場價與張數');return;}t.analyst=eAnalyst.value;t.name=eName.value.trim();t.entryDate=eDate.value;t.entryPrice=entry;t.stopLoss=Number(eStop.value||0);t.takeProfit=Number(eTarget.value||0);t.lots=lots;t.note=eNote.value.trim();t.updatedAt=new Date().toISOString();closeModal('editModal');markDataUpdate();save();toast('交易資料已更新')}
+async function refreshSinglePrice(id){
+ if(!requireAdmin())return;
+ const t=trades.find(x=>String(x.id)===String(id));
+ if(!t)return;
+ toast(`正在更新 ${t.code} 最新價格…`);
+ try{
+   const q=await getTaiwanStockPrice(t.code);
+   t.currentPrice=q.price;
+   if(!t.name&&q.name)t.name=q.name;
+   t.priceSource=q.source;
+   t.priceUpdatedAt=new Date().toISOString();
+   t.updatedAt=t.priceUpdatedAt;
+   markMarketUpdate();
+   save();
+   toast(`${t.code} 已更新為 ${fmt2(q.price)}`);
+ }catch(e){
+   toast(`${t.code} 即時行情更新失敗，請手動輸入`);
+   openPrice(id);
+ }
+}
 function openPrice(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>x.id==id);priceTitle.textContent=`${t.code} ${t.name||''}｜目前價格`;mCurrent.value=t.currentPrice||t.entryPrice;priceModal.classList.add('show');setTimeout(()=>mCurrent.focus(),50)}
-function savePrice(){if(!requireAdmin())return;const v=Number(mCurrent.value);if(!v||v<=0)return toast('請輸入有效價格');const t=trades.find(x=>x.id==activeId);t.currentPrice=v;t.updatedAt=new Date().toISOString();closeModal('priceModal');save();toast('價格已更新')}
+function savePrice(){if(!requireAdmin())return;const v=Number(mCurrent.value);if(!v||v<=0)return toast('請輸入有效價格');const t=trades.find(x=>x.id==activeId);t.currentPrice=v;t.updatedAt=new Date().toISOString();t.priceUpdatedAt=new Date().toISOString();markMarketUpdate();closeModal('priceModal');save();toast('價格已更新')}
 function openExit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>x.id==id);mExitDate.value=today();mExitPrice.value=t.currentPrice||t.entryPrice;mExitNote.value='';exitModal.classList.add('show')}
-function settleTrade(){if(!requireAdmin())return;const p=Number(mExitPrice.value),d=mExitDate.value;if(!p||p<=0||!d)return toast('請輸入出場日期與價格');const t=trades.find(x=>x.id==activeId);t.status='closed';t.exitDate=d;t.exitPrice=p;t.exitNote=mExitNote.value.trim();t.currentPrice=p;t.updatedAt=new Date().toISOString();closeModal('exitModal');save();toast('已完成結算')}
+function settleTrade(){if(!requireAdmin())return;const p=Number(mExitPrice.value),d=mExitDate.value;if(!p||p<=0||!d)return toast('請輸入出場日期與價格');const t=trades.find(x=>x.id==activeId);t.status='closed';t.exitDate=d;t.exitPrice=p;t.exitNote=mExitNote.value.trim();t.currentPrice=p;t.updatedAt=new Date().toISOString();markDataUpdate();closeModal('exitModal');save();toast('已完成結算')}
 function closeModal(id){document.getElementById(id).classList.remove('show');activeId=null}
 function delTrade(id){
  if(!requireAdmin())return;
@@ -246,6 +332,7 @@ function delTrade(id){
  const label=`${t.analyst||''} ${t.code||''} ${t.name||''}`.trim();
  if(!window.confirm(`確定刪除${label?`「${label}」`:''}這筆交易紀錄？\n刪除後無法復原。`))return;
  trades.splice(idx,1);
+ markDataUpdate();
  save();
  toast('已刪除交易紀錄');
 }
@@ -296,17 +383,19 @@ async function updateOpenPrices(silent=false){
      t.currentPrice=q.price;
      if(!t.name&&q.name)t.name=q.name;
      t.priceSource=q.source;
-     t.updatedAt=new Date().toISOString();
+     t.priceUpdatedAt=new Date().toISOString();
+     t.updatedAt=t.priceUpdatedAt;
      ok++;
    }catch(e){fail++;t.priceSource='更新失敗';}
  }
  updatingPrices=false;
+ if(ok)markMarketUpdate();
  if(isAdmin())save();else saveLocal();
  if(!silent)toast(ok?`已自動更新 ${ok} 筆${fail?`，${fail} 筆失敗`:''}`:`自動行情連線失敗，仍可使用「更新價」手動輸入`);
 }
 let autoRefreshStarted=false;function startAutoPriceRefresh(){if(autoRefreshStarted)return;autoRefreshStarted=true;setTimeout(()=>updateOpenPrices(true),800);setInterval(()=>{if(document.visibilityState==='visible')updateOpenPrices(true)},60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')updateOpenPrices(true)});}
 function exportJSON(){if(!requireAdmin())return;const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`分析師績效備份_${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
-function importJSON(e){if(!requireAdmin())return;const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);if(!Array.isArray(j))throw 0;if(!confirm(`將匯入 ${j.length} 筆資料並覆蓋目前資料，是否繼續？`))return;trades=j;save();toast('匯入完成')}catch{toast('JSON 格式錯誤')}e.target.value=''};rd.readAsText(f)}
+function importJSON(e){if(!requireAdmin())return;const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);if(!Array.isArray(j))throw 0;if(!confirm(`將匯入 ${j.length} 筆資料並覆蓋目前資料，是否繼續？`))return;trades=j;markDataUpdate();save();toast('匯入完成')}catch{toast('JSON 格式錯誤')}e.target.value=''};rd.readAsText(f)}
 function exportCSV(){if(!requireAdmin())return;const rows=[['分析師','股票代號','股票名稱','狀態','進場日期','進場價','停損價','停利價','目前/出場價','張數','績效%','損益金額','出場日期','備註']];trades.forEach(t=>{const c=getCalc(t);rows.push([t.analyst,t.code,t.name,t.status==='open'?'持有中':'已結算',t.entryDate,t.entryPrice,t.stopLoss||'',t.takeProfit||'',c.price,t.lots,c.ret.toFixed(2),c.profit.toFixed(0),t.exitDate||'',t.note||t.exitNote||''])});const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`分析師績效_${today()}.csv`;a.click();URL.revokeObjectURL(a.href)}
 document.getElementById('tableArea').addEventListener('click',e=>{
  const btn=e.target.closest('button[data-action]');
@@ -316,7 +405,7 @@ document.getElementById('tableArea').addEventListener('click',e=>{
  const id=btn.dataset.id;
  if(btn.dataset.action==='delete')delTrade(id);
  else if(btn.dataset.action==='edit')openEdit(id);
- else if(btn.dataset.action==='price')openPrice(id);
+ else if(btn.dataset.action==='price')refreshSinglePrice(id);
  else if(btn.dataset.action==='exit')openExit(id);
 });
 ['priceModal','exitModal','adminModal','editModal'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
@@ -327,4 +416,3 @@ startAutoPriceRefresh();
 </script>
 </body>
 </html>
-

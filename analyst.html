@@ -119,6 +119,11 @@ body:not(.viewer-mode) [data-status="sync"] { display:inline-flex !important; }
 }
 </style>
 
+<style>
+.leaderboard-controls{display:flex;gap:8px;flex-wrap:wrap}
+.leader-sort-btn.active{background:linear-gradient(135deg,#e2c36f,#a77c2f)!important;color:#17120a!important;border-color:#e2c36f!important;font-weight:800}
+@media(max-width:600px){.leaderboard-head{align-items:flex-start;flex-direction:column}.leaderboard-controls{width:100%}.leader-sort-btn{flex:1}}
+</style>
 </head>
 <body class="viewer-mode">
 <div class="app">
@@ -141,7 +146,10 @@ body:not(.viewer-mode) [data-status="sync"] { display:inline-flex !important; }
   <div class="leaderboard-panel">
     <div class="leaderboard-head">
       <h2>🏆 績效排行榜</h2>
-      <div class="smallnote">依目前日期區間計算，總報酬率高者排名在前</div>
+      <div class="leaderboard-controls">
+        <button type="button" class="btn leader-sort-btn active" data-rank-mode="total" onclick="setRankMode('total')">總損益排行</button>
+        <button type="button" class="btn leader-sort-btn" data-rank-mode="realized" onclick="setRankMode('realized')">已實現損益排行</button>
+      </div>
     </div>
     <div id="leaderboardArea" class="leaderboard-grid"></div>
   </div>
@@ -339,26 +347,40 @@ function setQuickRange(type){const d=new Date(),iso=x=>x.toISOString().slice(0,1
 function getRiskState(t){if(t.status!=='open')return 'normal';const c=getCalc(t),p=c.price,stop=Number(t.stopLoss||0),target=Number(t.takeProfit||0);if(stop>0&&p<=stop)return 'stop';if(target>0&&p>=target)return 'target';if(stop>0&&p>stop&&p<=stop*1.03)return 'near-stop';if(target>0&&p<target&&p>=target*0.97)return 'near-target';return 'normal';}
 function riskLabel(state){return ({target:'已達停利','near-target':'接近停利',stop:'已達停損','near-stop':'接近停損',normal:'正常'})[state]||'正常';}
 function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=['王榮旭','張貽程','金玉峰雷老闆'];host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
+let leaderboardRankMode='total';
+function setRankMode(mode){
+ leaderboardRankMode=mode==='realized'?'realized':'total';
+ document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
+ renderLeaderboard();
+}
 function renderLeaderboard(){
  const host=document.getElementById('leaderboardArea'); if(!host)return;
  const names=['王榮旭','張貽程','金玉峰雷老闆'];
  const arr=names.map(name=>{
    const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));
-   let cost=0,profit=0,closed=0,wins=0,open=0;
-   list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});
-   return {name,n:list.length,open,closed,profit,ret:cost?profit/cost*100:0,winRate:closed?wins/closed*100:0};
- }).sort((a,b)=>b.ret-a.ret || b.profit-a.profit);
+   let cost=0,totalProfit=0,realizedProfit=0,unrealizedProfit=0,closed=0,wins=0,open=0;
+   list.forEach(t=>{
+     const c=getCalc(t); cost+=c.cost; totalProfit+=c.profit;
+     if(t.status==='open'){open++;unrealizedProfit+=c.profit;}
+     else{closed++;realizedProfit+=c.profit;if(c.profit>0)wins++;}
+   });
+   return {name,n:list.length,open,closed,totalProfit,realizedProfit,unrealizedProfit,
+     ret:cost?totalProfit/cost*100:0,winRate:closed?wins/closed*100:0};
+ });
+ const rankKey=leaderboardRankMode==='realized'?'realizedProfit':'totalProfit';
+ arr.sort((a,b)=>b[rankKey]-a[rankKey] || b.totalProfit-a.totalProfit);
  if(!arr.some(a=>a.n)){host.innerHTML='<div class="leader-empty" style="grid-column:1/-1">新增交易後會顯示績效排行榜</div>';return;}
  host.innerHTML=arr.map((a,i)=>`<div class="leader-card ${i===0?'first':''}">
-   <div class="leader-rank">${i===0?'🥇':'🥈'}</div>
+   <div class="leader-rank">${i===0?'🥇':i===1?'🥈':'🥉'}</div>
    <div class="leader-name">${esc(a.name)}</div>
    <div class="leader-metrics">
-     <div class="leader-metric"><span>總報酬</span><b class="${a.ret>=0?'positive':'negative'}">${pct(a.ret)}</b></div>
-     <div class="leader-metric"><span>總損益</span><b class="${a.profit>=0?'positive':'negative'}">${money(a.profit)}</b></div>
+     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'已實現損益':'總損益'}</span><b class="${a[rankKey]>=0?'positive':'negative'}">${money(a[rankKey])}</b></div>
+     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'總損益':'已實現損益'}</span><b class="${(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)>=0?'positive':'negative'}">${money(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)}</b></div>
+     <div class="leader-metric"><span>未實現損益</span><b class="${a.unrealizedProfit>=0?'positive':'negative'}">${money(a.unrealizedProfit)}</b></div>
      <div class="leader-metric"><span>勝率</span><b>${fmt2(a.winRate)}%</b></div>
-     <div class="leader-metric"><span>持有／結算</span><b>${a.open} / ${a.closed}</b></div>
    </div>
  </div>`).join('');
+ document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
 }
 function analystScopedTrades(){const af=document.getElementById('analystFilter').value;return trades.filter(t=>(af==='all'||t.analyst===af)&&holdRangeMatch(t));}
 function renderStats(){const scoped=analystScopedTrades();let totalProfit=0,totalCost=0,closed=0,wins=0,realized=0,unrealized=0;scoped.forEach(t=>{const c=getCalc(t);totalProfit+=c.profit;totalCost+=c.cost;if(t.status==='closed'){closed++;realized+=c.profit;if(c.profit>0)wins++;}else unrealized+=c.profit});const open=scoped.length-closed,ret=totalCost?totalProfit/totalCost*100:0,wr=closed?wins/closed*100:0;

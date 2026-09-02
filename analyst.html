@@ -29,6 +29,146 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 .podium-wrap{height:270px;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:10px 6px 0}.podium-item{flex:1;max-width:180px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end}.podium-person{padding:0 4px 10px}.podium-medal{font-size:30px;line-height:1}.podium-name{font-weight:900;font-size:17px;margin-top:4px}.podium-profit{font-size:14px;font-weight:900;margin-top:4px}.podium-step{border:1px solid rgba(244,215,125,.28);border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:14px;background:linear-gradient(180deg,rgba(217,178,76,.20),rgba(120,80,10,.10));box-shadow:inset 0 1px rgba(255,255,255,.08)}.podium-step .place{font-size:28px;font-weight:1000;color:var(--gold2)}.podium-item.p1{order:2}.podium-item.p2{order:1}.podium-item.p3{order:3}.podium-item.p1 .podium-step{height:150px;background:linear-gradient(180deg,rgba(244,215,125,.32),rgba(138,95,12,.13))}.podium-item.p2 .podium-step{height:112px}.podium-item.p3 .podium-step{height:86px}.podium-note{text-align:center;color:var(--muted);font-size:11px;margin-top:6px}
 @media(max-width:850px){.chart-grid{grid-template-columns:1fr}.chart-box{min-height:290px}.chart-wrap{height:240px}.podium-wrap{height:250px}}
 @media(max-width:520px){.podium-wrap{gap:5px;padding-left:0;padding-right:0}.podium-name{font-size:14px}.podium-profit{font-size:12px}.podium-medal{font-size:24px}.podium-item.p1 .podium-step{height:130px}.podium-item.p2 .podium-step{height:98px}.podium-item.p3 .podium-step{height:76px}}
+
+/* v3: podium details + mobile rank layout */
+.podium-perf{
+  margin-top:4px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+.podium-counts{
+  margin-top:5px;
+  font-size:12px;
+  color:#cfc7b6;
+  white-space:nowrap;
+}
+.podium-counts span{color:#8f846f}
+
+/* Ranking cards: stable columns on desktop */
+.rank-list{
+  display:grid;
+  gap:10px;
+}
+.rank-item{
+  min-width:0;
+}
+.rank-item .rank-metrics{
+  min-width:0;
+}
+
+@media (max-width: 700px){
+  .rank-list{gap:12px}
+  .rank-item{
+    display:block !important;
+    padding:14px 14px 12px !important;
+    border-radius:14px;
+  }
+  .rank-item .rank-head,
+  .rank-item > div:first-child{
+    margin-bottom:10px;
+  }
+  .rank-item .rank-metrics,
+  .rank-item > div:last-child{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+    width:100%;
+  }
+  .rank-item .rank-metrics > div,
+  .rank-item > div:last-child > div{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-width:0;
+    padding:8px 10px;
+    border:1px solid rgba(217,178,76,.12);
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+  }
+  .rank-item .k{
+    white-space:nowrap;
+    font-size:12px;
+  }
+  .rank-value{
+    font-size:15px !important;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .podium-wrap{
+    gap:6px !important;
+    align-items:flex-end;
+  }
+  .podium-item{
+    min-width:0;
+  }
+  .podium-person{
+    padding:0 2px;
+  }
+  .podium-name{
+    font-size:13px !important;
+    white-space:nowrap;
+  }
+  .podium-profit{
+    font-size:12px !important;
+    white-space:nowrap;
+  }
+  .podium-perf{
+    font-size:11px;
+    white-space:nowrap;
+  }
+  .podium-counts{
+    font-size:10px;
+    line-height:1.35;
+    white-space:normal;
+  }
+}
+
+
+@media (max-width:700px){
+  .rank-row{
+    grid-template-columns:38px 1fr !important;
+    gap:8px 10px !important;
+    padding:12px !important;
+    align-items:center;
+  }
+  .rank-row .rank-no{
+    grid-row:1 / span 2;
+    align-self:start;
+    margin-top:2px;
+  }
+  .rank-row .rank-name{
+    grid-column:2;
+    font-size:15px;
+    margin-bottom:2px;
+  }
+  .rank-row > div:nth-child(3),
+  .rank-row > div:nth-child(4),
+  .rank-row > div:nth-child(5){
+    grid-column:2;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:8px 10px;
+    border:1px solid rgba(217,178,76,.13);
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+    min-width:0;
+  }
+  .rank-row .k{
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .rank-row .rank-value{
+    font-size:14px;
+    white-space:nowrap;
+    text-align:right;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -160,14 +300,15 @@ let profitChart=null;
 function analystSummary(){
   const names=['王榮旭','張貽程','雷老闆'];
   return names.map(name=>{
-    let total=0,unrealized=0,realized=0,cost=0;
+    let total=0,unrealized=0,realized=0,cost=0,openCount=0,closedCount=0;
     Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{
       const c=calc(t);
       total+=c.total; unrealized+=c.unreal; realized+=c.realized;
       cost+=(+t.entryPrice||0)*(+t.shares||0);
+      if(c.open) openCount++; else closedCount++;
     });
     const totalPerf=cost?total/cost*100:0;
-    return{name,total,unrealized,realized,totalPerf};
+    return{name,total,unrealized,realized,totalPerf,openCount,closedCount};
   });
 }
 function renderCharts(){
@@ -207,7 +348,16 @@ function renderPodium(data){
   const medals=['🥇','🥈','🥉'];
   const el=document.getElementById('podium');
   if(!el)return;
-  el.innerHTML=sorted.slice(0,3).map((r,i)=>`<div class="podium-item p${i+1}"><div class="podium-person"><div class="podium-medal">${medals[i]}</div><div class="podium-name">${esc(r.name)}</div><div class="podium-profit ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div></div><div class="podium-step"><div class="place">${i+1}</div></div></div>`).join('');
+  el.innerHTML=sorted.slice(0,3).map((r,i)=>`<div class="podium-item p${i+1}">
+    <div class="podium-person">
+      <div class="podium-medal">${medals[i]}</div>
+      <div class="podium-name">${esc(r.name)}</div>
+      <div class="podium-profit ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div>
+      <div class="podium-perf ${r.totalPerf>=0?'pos':'neg'}">總績效 ${pct(r.totalPerf)}</div>
+      <div class="podium-counts">持股 ${r.openCount} 檔 <span>｜</span> 結算 ${r.closedCount} 檔</div>
+    </div>
+    <div class="podium-step"><div class="place">${i+1}</div></div>
+  </div>`).join('');
 }
 
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}

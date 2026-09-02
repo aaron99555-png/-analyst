@@ -240,6 +240,15 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v9: 分析師總績效持股/結算統計 */
+.title-with-badge{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.settled-badge{border-color:rgba(255,255,255,.16)}
+@media(max-width:700px){
+  .holdings-title .title-with-badge{gap:6px}
+  .holdings-title .holdings-badge{font-size:11px;padding:4px 7px;white-space:nowrap}
+}
+
 </style>
 </head>
 <body>
@@ -299,7 +308,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 
     <section class="card span12">
       <div class="section-title holdings-title">
-        <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span></div>
+        <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span><span class="holdings-badge settled-badge">已結算 <b id="mClosed">0</b> 檔</span></div>
         <span class="status" id="countText">0 筆</span>
       </div>
       <div class="table-wrap"><table><thead><tr>
@@ -363,6 +372,7 @@ function render(){
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="17" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
+  setMetric('#mClosed',rows.length-openN,false);
   renderRank(); renderCharts(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}

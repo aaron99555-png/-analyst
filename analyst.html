@@ -134,7 +134,7 @@ function render(){
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
-    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td>${fmt(t.currentPrice||t.entryPrice)}</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions"><button class="mini" data-up="${id}">更新價</button><button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
+    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td>${fmt(t.currentPrice||t.entryPrice)}</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${c.open?`<button class="mini" data-up="${id}">更新價</button><button class="mini primary" data-settle="${id}">結算</button>`:''}<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="17" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false); setMetric('#mUnrealized',unreal,true); setMetric('#mRealized',realized,true); setMetric('#mTotal',unreal+realized,true);
@@ -152,6 +152,7 @@ function bindRows(){
   $$('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
   $$('[data-del]').forEach(b=>b.onclick=()=>deleteTrade(b.dataset.del));
   $$('[data-up]').forEach(b=>b.onclick=()=>refreshOne(b.dataset.up));
+  $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
 function setAdmin(v){isAdmin=v; localStorage.setItem('analystAdmin',v?'1':'0'); $$('.admin-only').forEach(x=>x.classList.toggle('hidden',!v)); $$('.admin-col').forEach(x=>x.classList.toggle('hidden',!v)); $('#adminBtn').classList.toggle('hidden',v); $('#logoutBtn').classList.toggle('hidden',!v); render()}
@@ -171,6 +172,32 @@ function startEdit(id){const t=trades[id]; if(!t||!isAdmin)return; editingId=id;
 function clearForm(){editingId=null;$('#formTitle').textContent='新增交易';['symbol','stockName','entryPrice','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value='');$('#shares').value=1000;$('#entryDate').value=today()}
 $('#cancelEditBtn').onclick=clearForm;
 async function deleteTrade(id){if(!isAdmin)return;if(confirm('確定刪除此筆資料？'))await remove(ref(db,`analystPerformance/trades/${id}`))}
+
+async function settleTrade(id){
+  if(!isAdmin)return;
+  const t=trades[id];
+  if(!t)return;
+  const c=calc(t);
+  if(!c.open)return alert('此筆已完成結算');
+  const defaultPrice=Number(t.currentPrice||t.entryPrice||0);
+  const priceText=prompt(`結算 ${t.symbol} ${t.stockName||''}\n請輸入出場價格：`, defaultPrice || '');
+  if(priceText===null)return;
+  const exitPrice=Number(priceText);
+  if(!(exitPrice>0))return alert('請輸入正確的出場價格');
+  const dateText=prompt('請輸入出場日期（YYYY-MM-DD）：', today());
+  if(dateText===null)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dateText))return alert('出場日期格式請使用 YYYY-MM-DD');
+  const realized=(exitPrice-(Number(t.entryPrice)||0))*(Number(t.shares)||0);
+  if(!confirm(`確認結算？\n\n${t.analyst}｜${t.symbol} ${t.stockName||''}\n進場價：${fmt(t.entryPrice)}\n出場價：${fmt(exitPrice)}\n已實現損益：${fmtMoney(realized)}\n績效：${pct((exitPrice-(Number(t.entryPrice)||0))/(Number(t.entryPrice)||1)*100)}`))return;
+  await update(ref(db,`analystPerformance/trades/${id}`),{
+    exitDate:dateText,
+    exitPrice,
+    currentPrice:exitPrice,
+    settledAt:nowText(),
+    updatedAt:nowText()
+  });
+}
+
 
 ['fAnalyst','fFrom','fTo','fStatus','fKeyword'].forEach(id=>$('#'+id).addEventListener(id==='fKeyword'?'input':'change',render));
 $('#clearFilterBtn').onclick=()=>{$('#fAnalyst').value='';$('#fStatus').value='';$('#fKeyword').value='';$('#fFrom').value='2026-09-01';$('#fTo').value=today();render()};

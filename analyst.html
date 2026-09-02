@@ -1,561 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>分析師即時績效表</title>
 <style>
-:root{--bg:#0d0f12;--card:#15181d;--card2:#1b1f25;--text:#f4f0e6;--muted:#a7a08e;--line:#302b22;--primary:#c9a24b;--primary2:#8e6b27;--gold:#e2c36f;--green:#36b37e;--red:#ff5a66;--orange:#d79a3b;--shadow:0 10px 34px rgba(0,0,0,.28);--radius:18px}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif;background:radial-gradient(circle at top,#1a1812 0,#0d0f12 42%,#090b0d 100%);color:var(--text)}
-.app{max-width:1500px;margin:auto;padding:22px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand h1{margin:0;font-size:25px}.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #3a3326;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:#211e18;color:#e8dfc8}.btn:hover{filter:brightness(.98)}.btn.primary{background:linear-gradient(135deg,#e0bf67,#a87f31);color:#17130b;box-shadow:0 6px 18px rgba(201,162,75,.18)}.btn.danger{background:#2b191c;color:#ff8790;border-color:#4b272c}.btn.green{background:#17261f;color:#6ed5a6;border-color:#244437}
-.stats{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin-bottom:18px}.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}.stat .label{font-size:12px;color:var(--muted);margin-bottom:7px}.stat .value{font-size:23px;font-weight:800}.stat .sub{font-size:11px;color:var(--muted);margin-top:6px}.positive{color:var(--red)!important}.negative{color:var(--green)!important}.neutral{color:var(--text)!important}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:16px;margin:0}.panel-body{padding:16px 18px}
-.form-grid{display:grid;grid-template-columns:1.1fr .8fr 1.1fr 1fr .8fr .8fr .8fr .9fr .9fr 1.5fr auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin:0 0 5px}.field input,.field select{width:100%;height:39px;border:1px solid #3b3428;border-radius:9px;padding:0 10px;background:#111419;color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(201,162,75,.14)}
-.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.analyst-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.analyst-tab{border:1px solid #3b3428;background:#16191e;color:#d7cfba;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.analyst-tab.active{background:linear-gradient(135deg,#e0bf67,#a87f31);border-color:#d5b35d;color:#17130b}.toolbar input,.toolbar select{height:36px;border:1px solid #3b3428;border-radius:9px;padding:0 10px;background:#111419;color:var(--text)}.spacer{flex:1}.smallnote{font-size:11px;color:var(--muted)}
-.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:1250px}.table th{position:sticky;top:0;background:#1d1a14;color:#d9c996;font-size:11px;text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}.table td{padding:10px 9px;border-bottom:1px solid #29251e;font-size:13px;white-space:nowrap}.table tr:hover td{background:#1b1b18}.symbol{font-weight:800}.name{font-size:12px;color:var(--muted);margin-left:5px}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.pill.open{background:#2a2416;color:#e4c46f}.pill.closed{background:#22262c;color:#a7a08e}.risk{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.risk.normal{background:#22262c;color:#aaa28f}.risk.target{background:#35181d;color:#ff7a84}.risk.near-target{background:#302613;color:#e4b755}.risk.stop{background:#153026;color:#63d3a4}.risk.near-stop{background:#182922;color:#5fc49c}.num{font-variant-numeric:tabular-nums;font-weight:700}.row-actions{display:flex;gap:5px}.iconbtn{border:1px solid #383126;background:#211e18;color:#d9cfb8;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px}.iconbtn.exit{background:#302613;color:#e4b755;border-color:#5a451d}.iconbtn.delete{background:#35181d;color:#ff7a84;border-color:#57262e}
-.rank-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}.rank-table{width:100%;border-collapse:collapse}.rank-table th,.rank-table td{padding:9px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}.rank-table th{color:var(--muted);font-size:11px}.barbox{height:8px;background:#27231c;border-radius:99px;overflow:hidden;min-width:110px}.bar{height:100%;background:linear-gradient(90deg,#8e6b27,#e2c36f);border-radius:99px}.empty{padding:38px;text-align:center;color:var(--muted)}
-.modal{position:fixed;inset:0;background:rgba(18,27,47,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.show{display:flex}.dialog{width:min(520px,100%);background:#171a1f;border:1px solid #3a3326;border-radius:18px;box-shadow:0 30px 80px rgba(10,20,40,.25);overflow:hidden}.dialog h3{margin:0;padding:17px 20px;border-bottom:1px solid var(--line);font-size:17px}.dialog .content{padding:18px 20px}.dialog .footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line)}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-grid .field.full{grid-column:1/-1}
-.admin-only.hidden{display:none!important}.mode-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#211e18;color:#d8cfba;border:1px solid #3a3326}.mode-badge.admin{background:#2a2416;color:#e4c46f;border-color:#6c5729}.cloud-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#211e18;color:#cfc7b5;border:1px solid #3a3326}.cloud-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:#98a2b3}.cloud-badge.online{background:#153026;color:#63d3a4;border-color:#28513f}.cloud-badge.online::before{background:#12b76a}.cloud-badge.syncing{background:#2a2416;color:#e4c46f;border-color:#5b4924}.cloud-badge.syncing::before{background:#c9a24b;animation:pulse 1s infinite}.cloud-badge.error{background:#35181d;color:#ff7a84;border-color:#57262e}.cloud-badge.error::before{background:#dc3b45}@keyframes pulse{50%{opacity:.35}}.date-query{display:flex;align-items:end;gap:6px;flex-wrap:wrap}.date-query .field{min-width:135px}.date-query .field input{height:36px}.quick-range{display:flex;gap:6px;flex-wrap:wrap}.quick-range .btn{padding:8px 10px;font-size:12px}.analyst-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.analyst-card{border:1px solid #3a3326;border-radius:14px;padding:14px;background:linear-gradient(180deg,#1c1b17,#15181d)}.analyst-card .head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.analyst-card .namex{font-weight:900}.analyst-card .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.analyst-card .metric{background:#111419;border:1px solid #302b22;border-radius:10px;padding:9px}.analyst-card .metric span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.analyst-card .metric b{font-size:14px}.row-alert td{background:#292414!important}.row-stop td{background:#12241d!important}.row-target td{background:#2d171a!important}
-.toast{position:fixed;right:18px;bottom:18px;background:#2a2416;color:#f1dfaa;border:1px solid #665126;padding:11px 15px;border-radius:10px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;transform:none}
-.update-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.update-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border-radius:10px;background:#15130f;border:1px solid #3a3326;color:#d9cfb8;font-size:12px}.update-chip b{color:#e2c36f}.update-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:#c9a24b;box-shadow:0 0 10px rgba(201,162,75,.45)}
-@media(max-width:1100px){.stats{grid-template-columns:repeat(4,1fr)}.form-grid{grid-template-columns:repeat(3,1fr)}.form-grid .wide{grid-column:span 2}.rank-grid{grid-template-columns:1fr}}
-@media(max-width:700px){.app{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr);gap:8px}.stat{padding:13px}.stat .value{font-size:20px}.panel-body{padding:12px}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}.form-grid .addbtn{grid-column:1/-1}.actions{width:100%}.actions .btn{flex:1}.panel-head{align-items:flex-start;flex-direction:column}.toolbar{width:100%}.toolbar input,.toolbar select{max-width:100%;flex:1}.modal-grid{grid-template-columns:1fr}.modal-grid .field.full{grid-column:auto}.analyst-cards{grid-template-columns:1fr}.analyst-card .metrics{grid-template-columns:repeat(2,1fr)}.table{min-width:980px}.table th,.table td{padding:9px 7px}.table .mobile-hide{display:none}}
-</style>
-
-<style>
-/* Firebase 同步於背景運作，不顯示同步狀態 */
-#firebaseStatus, #firebase-status, #syncStatus, #sync-status,
-.firebase-status, .firebaseStatus, .sync-status, .syncStatus,
-[data-role="firebase-status"], [data-role="sync-status"] {
-  display:none !important;
+:root{
+  --bg:#0d0b08;--panel:#17120c;--panel2:#21190f;--gold:#d9b24c;--gold2:#f4d77d;--text:#f6f0df;
+  --muted:#b8aa87;--line:#3b2e18;--green:#45d483;--red:#ff6b6b;--blue:#7bb8ff;--shadow:0 12px 36px rgba(0,0,0,.28)
 }
-</style>
-
-<style>
-#firebaseStatus,#firebase-status,#syncStatus,#sync-status,#cloudStatus,#cloud-status,
-.firebase-status,.firebaseStatus,.sync-status,.syncStatus,.cloud-status,.cloudStatus,
-[data-role="firebase-status"],[data-role="sync-status"],[data-status="firebase"],[data-status="sync"]{
-display:none!important;
-}
-</style>
-
-<style>
-/* 一般查看模式：隱藏 Firebase 同步狀態；管理者模式仍可查看 */
-body.viewer-mode #cloudBadge,
-body.viewer-mode #firebaseStatus,
-body.viewer-mode #firebase-status,
-body.viewer-mode #syncStatus,
-body.viewer-mode #sync-status,
-body.viewer-mode #cloudStatus,
-body.viewer-mode #cloud-status,
-body.viewer-mode .firebase-status,
-body.viewer-mode .firebaseStatus,
-body.viewer-mode .sync-status,
-body.viewer-mode .syncStatus,
-body.viewer-mode .cloud-status,
-body.viewer-mode .cloudStatus,
-body.viewer-mode [data-role="firebase-status"],
-body.viewer-mode [data-role="sync-status"],
-body.viewer-mode [data-status="firebase"],
-body.viewer-mode [data-status="sync"] { display:none !important; }
-</style>
-
-<style>
-body:not(.viewer-mode) #firebaseStatus,
-body:not(.viewer-mode) #firebase-status,
-body:not(.viewer-mode) #syncStatus,
-body:not(.viewer-mode) #sync-status,
-body:not(.viewer-mode) #cloudStatus,
-body:not(.viewer-mode) #cloud-status,
-body:not(.viewer-mode) .firebase-status,
-body:not(.viewer-mode) .firebaseStatus,
-body:not(.viewer-mode) .sync-status,
-body:not(.viewer-mode) .syncStatus,
-body:not(.viewer-mode) .cloud-status,
-body:not(.viewer-mode) .cloudStatus,
-body:not(.viewer-mode) [data-role="firebase-status"],
-body:not(.viewer-mode) [data-role="sync-status"],
-body:not(.viewer-mode) [data-status="firebase"],
-body:not(.viewer-mode) [data-status="sync"] { display:inline-flex !important; }
-</style>
-
-
-<style>
-/* 首頁績效排行榜 */
-.leaderboard-panel{
-  margin:18px 0;
-  background:linear-gradient(135deg,rgba(205,170,93,.15),rgba(18,18,18,.96) 45%,rgba(8,8,8,.98));
-  border:1px solid rgba(218,186,112,.35);
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 18px 45px rgba(0,0,0,.22);
-}
-.leaderboard-head{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:18px 20px;border-bottom:1px solid rgba(218,186,112,.18)
-}
-.leaderboard-head h2{margin:0;font-size:20px;color:#f2d28b;letter-spacing:.5px}
-.leaderboard-head .smallnote{color:#aa9b7c}
-.leaderboard-grid{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:16px
-}
-.leader-card{
-  position:relative;padding:18px;border-radius:15px;
-  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)
-}
-.leader-card.first{border-color:rgba(242,210,139,.58);background:linear-gradient(135deg,rgba(242,210,139,.14),rgba(255,255,255,.025))}
-.leader-rank{
-  position:absolute;right:14px;top:12px;font-weight:900;font-size:28px;color:rgba(242,210,139,.9)
-}
-.leader-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:14px}
-.leader-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.leader-metric{padding:10px;border-radius:10px;background:rgba(0,0,0,.2)}
-.leader-metric span{display:block;font-size:12px;color:#9f9f9f;margin-bottom:4px}
-.leader-metric b{font-size:16px}
-.leader-empty{padding:24px;text-align:center;color:#999}
-@media(max-width:780px){
- .leaderboard-grid{grid-template-columns:1fr}
- .leader-metrics{grid-template-columns:repeat(2,1fr)}
-}
-</style>
-
-<style>
-.leaderboard-controls{display:flex;gap:8px;flex-wrap:wrap}
-.leader-sort-btn.active{background:linear-gradient(135deg,#e2c36f,#a77c2f)!important;color:#17120a!important;border-color:#e2c36f!important;font-weight:800}
-@media(max-width:600px){.leaderboard-head{align-items:flex-start;flex-direction:column}.leaderboard-controls{width:100%}.leader-sort-btn{flex:1}}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,"Noto Sans TC",system-ui,-apple-system,sans-serif;background:
+radial-gradient(circle at 10% 0%,rgba(217,178,76,.12),transparent 24%),linear-gradient(180deg,#0d0b08,#110d09 60%,#0a0907);color:var(--text)}
+.wrap{max-width:1500px;margin:auto;padding:22px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--gold2),#8d6512);display:grid;place-items:center;color:#241905;font-size:22px;font-weight:900;box-shadow:0 0 0 1px rgba(255,255,255,.05),0 8px 30px rgba(217,178,76,.18)}
+h1{margin:0;font-size:24px}.sub{color:var(--muted);font-size:13px;margin-top:3px}.actions{display:flex;flex-wrap:wrap;gap:8px}
+button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:700}button:hover{border-color:var(--gold)}button.primary{background:linear-gradient(135deg,#8b6515,var(--gold));color:#171006;border:none}.danger{color:#ffdada;border-color:#693434}.ghost{background:transparent}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(33,25,15,.97),rgba(20,15,10,.98));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.span12{grid-column:span 12}.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}.metric{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric .box{padding:14px;border-radius:14px;background:#130f0a;border:1px solid #302514}.k{color:var(--muted);font-size:12px}.v{font-size:24px;font-weight:900;margin-top:5px}.pos{color:var(--green)}.neg{color:var(--red)}
+.filters,.formgrid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;align-items:end}label{font-size:12px;color:var(--muted);display:block;margin:0 0 5px}input,select,textarea{width:100%;background:#0f0c08;border:1px solid #3a2d18;color:var(--text);border-radius:10px;padding:9px 10px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:82px;resize:vertical}.form-actions{display:flex;gap:8px;align-items:end;height:100%}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:1250px;background:#100d09}th,td{padding:10px 9px;border-bottom:1px solid #2a2114;text-align:left;font-size:13px;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#20180f;color:#f5dc95;font-size:12px}tr:hover td{background:#171109}.stock{font-weight:800}.muted{color:var(--muted)}.pill{display:inline-flex;padding:4px 8px;border-radius:999px;border:1px solid #4c3a1d;background:#1a140c;font-size:12px}.pill.open{color:#9ad0ff}.pill.closed{color:#9ce6b6}.row-actions{display:flex;gap:6px}.mini{padding:6px 8px;font-size:12px}.hidden{display:none!important}
+.rank-list{display:grid;gap:10px}.rank-row{display:grid;grid-template-columns:42px 1fr 120px 120px;gap:10px;align-items:center;padding:11px;border-radius:12px;background:#130f0a;border:1px solid #332715}.rank-no{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6c4c0b,var(--gold));font-weight:900;color:#1c1305}.rank-name{font-weight:900}.rank-value{text-align:right;font-weight:900}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.section-title h2{font-size:17px;margin:0}.status{font-size:12px;color:var(--muted)}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.65);z-index:50}.modal.show{display:grid}.modal-card{width:min(460px,92vw);background:#17120c;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.6)}
+@media(max-width:1050px){.span8,.span4,.span6{grid-column:span 12}.metric{grid-template-columns:repeat(2,1fr)}.filters,.formgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.wrap{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.metric{grid-template-columns:1fr 1fr}.filters,.formgrid{grid-template-columns:1fr}.rank-row{grid-template-columns:36px 1fr;}.rank-value{text-align:left}.mobile-hide{display:none}}
 </style>
 </head>
-<body class="viewer-mode">
-<div class="app">
+<body>
+<div class="wrap">
   <div class="topbar">
-    <div class="brand"><h1>分析師即時績效表</h1><p>進場追蹤・自動行情更新・出場結算・總績效統計｜開啟頁面自動更新，每 60 秒刷新持有中股票</p><div class="update-strip"><span class="update-chip">資料更新：<b id="dataLastUpdate">尚未更新</b></span><span class="update-chip">行情更新：<b id="globalLastUpdate">尚未更新</b></span></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>分析師即時績效表</h1><div class="sub">王榮旭・張貽程・雷老闆｜即時追蹤、出場結算、績效排行</div></div></div>
     <div class="actions">
-      <span id="modeBadge" class="mode-badge">一般查看模式</span>
-      <span id="cloudBadge" class="cloud-badge syncing" title="Firebase Realtime Database">Firebase 連線中</span>
-      <button id="adminLoginBtn" class="btn primary" onclick="openAdminLogin()">管理者登入</button>
-      <button id="adminLogoutBtn" class="btn danger" onclick="adminLogout()" style="display:none">登出管理者</button>
-      <button class="btn green admin-only" onclick="updateOpenPrices()">更新全部價格</button>
-      <button class="btn admin-only" onclick="exportCSV()">匯出 CSV</button>
-      <button class="btn admin-only" onclick="document.getElementById('importFile').click()">匯入資料</button>
-      <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
-      <button class="btn admin-only" onclick="exportJSON()">備份 JSON</button>
+      <button id="refreshAllBtn">更新全部股價</button>
+      <button id="adminBtn" class="primary">管理者登入</button>
+      <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>
   </div>
 
-
-  <div class="leaderboard-panel">
-    <div class="leaderboard-head">
-      <h2>🏆 績效排行榜</h2>
-      <div class="leaderboard-controls">
-        <button type="button" class="btn leader-sort-btn active" data-rank-mode="total" onclick="setRankMode('total')">總損益排行</button>
-        <button type="button" class="btn leader-sort-btn" data-rank-mode="realized" onclick="setRankMode('realized')">已實現損益排行</button>
+  <div class="grid">
+    <section class="card span12">
+      <div class="metric">
+        <div class="box"><div class="k">目前持股</div><div class="v" id="mOpen">0</div></div>
+        <div class="box"><div class="k">未實現損益</div><div class="v" id="mUnrealized">0</div></div>
+        <div class="box"><div class="k">已實現損益</div><div class="v" id="mRealized">0</div></div>
+        <div class="box"><div class="k">總損益</div><div class="v" id="mTotal">0</div></div>
       </div>
-    </div>
-    <div id="leaderboardArea" class="leaderboard-grid"></div>
-  </div>
+    </section>
 
-  <div class="stats">
-    <div class="stat"><div class="label">總紀錄</div><div class="value" id="sTotal">0</div><div class="sub">篩選後交易筆數</div></div>
-    <div class="stat"><div class="label">持有中</div><div class="value" id="sOpen">0</div><div class="sub">尚未結算</div></div>
-    <div class="stat"><div class="label">已結算</div><div class="value" id="sClosed">0</div><div class="sub">完成出場</div></div>
-    
-    
-    
-    
-    
-  </div>
-
-  <div class="panel admin-only" id="addTradePanel">
-    <div class="panel-head"><h2>新增分析師交易</h2><div class="smallnote">台股張數＝1,000 股；也可直接輸入股數</div></div>
-    <div class="panel-body">
-      <div class="form-grid">
-        <div class="field"><label>分析師 *</label><select id="fAnalyst"><option value="王榮旭">王榮旭</option><option value="張貽程">張貽程</option><option value="金玉峰雷老闆">金玉峰雷老闆</option></select></div>
-        <div class="field"><label>股票代號 *</label><input id="fCode" inputmode="numeric" placeholder="2330"></div>
-        <div class="field"><label>股票名稱</label><input id="fName" placeholder="台積電"></div>
-        <div class="field"><label>進場日期 *</label><input id="fDate" type="date"></div>
-        <div class="field"><label>進場價 *</label><input id="fEntry" type="number" step="0.01" min="0" placeholder="0.00"></div>
-        <div class="field"><label>停損價</label><input id="fStop" type="number" step="0.01" min="0" placeholder="選填"></div>
-        <div class="field"><label>停利價</label><input id="fTarget" type="number" step="0.01" min="0" placeholder="選填"></div>
-        <div class="field"><label>張數</label><input id="fLots" type="number" step="0.001" min="0" value="1"></div>
-        <div class="field"><label>目前價</label><input id="fCurrent" type="number" step="0.01" min="0" placeholder="可稍後更新"></div>
-        <div class="field wide"><label>備註</label><input id="fNote" placeholder="推薦原因／節目／策略"></div>
-        <button class="btn primary addbtn" style="height:39px" onclick="addTrade()">新增</button>
+    <section class="card span8">
+      <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">更新日期：—</span></div>
+      <div class="filters">
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>王榮旭</option><option>張貽程</option><option>雷老闆</option></select></div>
+        <div><label>持股起日</label><input id="fFrom" type="date"></div>
+        <div><label>持股迄日</label><input id="fTo" type="date"></div>
+        <div><label>狀態</label><select id="fStatus"><option value="">全部</option><option value="open">持有中</option><option value="closed">已結算</option></select></div>
+        <div><label>股票代號 / 名稱</label><input id="fKeyword" placeholder="例如 2330 / 台積電"></div>
+        <div class="form-actions"><button id="clearFilterBtn" class="ghost">清除篩選</button></div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="panel">
-    <div class="panel-head">
-      <h2>即時績效明細</h2>
-      <div class="toolbar">
-        <input id="search" placeholder="搜尋分析師／股票" oninput="render()">
-        <select id="statusFilter" onchange="render()"><option value="all">全部狀態</option><option value="open">持有中</option><option value="closed">已結算</option></select>
-        <select id="riskFilter" onchange="render()"><option value="all">全部風險</option><option value="target">已達停利</option><option value="near-target">接近停利</option><option value="stop">已達停損</option><option value="near-stop">接近停損</option><option value="normal">正常</option></select>
-        <select id="analystFilter" onchange="syncAnalystTabs();render()"><option value="all">全部分析師</option><option value="王榮旭">王榮旭</option><option value="張貽程">張貽程</option></select>
-        <div class="date-query">
-          <div class="field"><label>持股起日</label><input id="holdFrom" type="date" onchange="render()"></div>
-          <div class="field"><label>持股迄日</label><input id="holdTo" type="date" onchange="render()"></div>
-          <button class="btn" type="button" onclick="clearHoldRange()">清除日期</button>
-        </div>
-        <div class="quick-range"><button class="btn" type="button" onclick="setQuickRange('today')">今日持股</button><button class="btn" type="button" onclick="setQuickRange('7d')">近7日</button><button class="btn" type="button" onclick="setQuickRange('30d')">近30日</button><button class="btn" type="button" onclick="setQuickRange('month')">本月</button></div>
-        <select id="sortBy" onchange="render()"><option value="dateDesc">最新進場</option><option value="returnDesc">績效最高</option><option value="returnAsc">績效最低</option><option value="profitDesc">獲利最高</option></select>
-      </div>
-    </div>
-    <div class="panel-body" style="padding-bottom:0"><div class="analyst-tabs"><button class="analyst-tab active" data-analyst="all" onclick="setAnalystFilter('all')">全部分析師</button><button class="analyst-tab" data-analyst="王榮旭" onclick="setAnalystFilter('王榮旭')">王榮旭</button><button class="analyst-tab" data-analyst="張貽程" onclick="setAnalystFilter('張貽程')">張貽程</button><button class="analyst-tab" data-analyst="金玉峰雷老闆" onclick="setAnalystFilter('金玉峰雷老闆')">金玉峰雷老闆</button></div><div id="analystCards" class="analyst-cards"></div></div><div class="table-wrap" id="tableArea"></div>
-  </div>
+    <section class="card span4">
+      <div class="section-title"><h2>績效排行榜</h2><span class="status">總損益 / 已實現損益</span></div>
+      <div id="rankList" class="rank-list"></div>
+    </section>
 
-  <div class="panel">
-    <div class="panel-head"><h2>分析師總績效</h2><div class="smallnote">依各分析師全部持倉與已結算交易彙總</div></div>
-    <div class="panel-body rank-grid">
-      <div id="rankArea"></div>
-      <div>
-        <table class="rank-table"><thead><tr><th>項目</th><th>數值</th></tr></thead><tbody id="summaryArea"></tbody></table>
+    <section class="card span12 admin-only hidden" id="entryCard">
+      <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
+      <div class="formgrid">
+        <div><label>分析師</label><select id="analyst"><option>王榮旭</option><option>張貽程</option><option>雷老闆</option></select></div>
+        <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
+        <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
+        <div><label>入場日期</label><input id="entryDate" type="date"></div>
+        <div><label>進場價(收盤價)</label><input id="entryPrice" type="number" step="0.01"></div>
+        <div><label>股數</label><input id="shares" type="number" step="1" value="1000"></div>
+        <div><label>停損價</label><input id="stopLoss" type="number" step="0.01"></div>
+        <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
+        <div><label>出場日期</label><input id="exitDate" type="date"></div>
+        <div><label>出場價格</label><input id="exitPrice" type="number" step="0.01"></div>
+        <div style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
+        <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
-    </div>
+    </section>
+
+    <section class="card span12">
+      <div class="section-title"><h2>分析師總績效</h2><span class="status" id="countText">0 筆</span></div>
+      <div class="table-wrap"><table><thead><tr>
+        <th>分析師</th><th>股票</th><th>入場日期</th><th>進場價(收盤價)</th><th>目前價</th><th>更新日期</th><th>股數</th><th>績效%</th><th>目前損益</th><th>停損</th><th>停利</th><th>出場日期</th><th>出場價</th><th>已實現損益</th><th>狀態</th><th>備註</th><th class="admin-col hidden">操作</th>
+      </tr></thead><tbody id="tbody"></tbody></table></div>
+    </section>
   </div>
 </div>
 
-<div class="modal" id="priceModal"><div class="dialog"><h3>更新目前價格</h3><div class="content"><div class="modal-grid"><div class="field full"><label id="priceTitle">股票</label><input id="mCurrent" type="number" step="0.01" min="0"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('priceModal')">取消</button><button class="btn primary" onclick="savePrice()">更新</button></div></div></div>
-<div class="modal" id="exitModal"><div class="dialog"><h3>出場結算</h3><div class="content"><div class="modal-grid"><div class="field"><label>出場日期</label><input id="mExitDate" type="date"></div><div class="field"><label>出場價格</label><input id="mExitPrice" type="number" step="0.01" min="0"></div><div class="field full"><label>結算備註</label><input id="mExitNote" placeholder="停利／停損／策略結束"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('exitModal')">取消</button><button class="btn primary" onclick="settleTrade()">確認結算</button></div></div></div>
-<div class="modal" id="adminModal"><div class="dialog"><h3>管理者登入</h3><div class="content"><div class="modal-grid"><div class="field full"><label>管理者密碼</label><input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')adminLogin()"></div></div><div class="smallnote" style="margin-top:10px">一般模式僅能查詢與查看；登入後才開放新增、修改、更新價格、結算、刪除與資料匯出入。</div></div><div class="footer"><button class="btn" onclick="closeModal('adminModal')">取消</button><button class="btn primary" onclick="adminLogin()">登入</button></div></div></div>
-<div class="modal" id="editModal"><div class="dialog"><h3>修改交易資料</h3><div class="content"><div class="modal-grid"><div class="field"><label>分析師</label><select id="eAnalyst"><option>王榮旭</option><option>張貽程</option></select></div><div class="field"><label>股票名稱</label><input id="eName"></div><div class="field"><label>進場日期</label><input id="eDate" type="date"></div><div class="field"><label>進場價(收盤價)</label><input id="eEntry" type="number" step="0.01" min="0"></div><div class="field"><label>停損價</label><input id="eStop" type="number" step="0.01" min="0"></div><div class="field"><label>停利價</label><input id="eTarget" type="number" step="0.01" min="0"></div><div class="field"><label>張數</label><input id="eLots" type="number" step="0.001" min="0"></div><div class="field full"><label>備註</label><input id="eNote"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('editModal')">取消</button><button class="btn primary" onclick="saveEdit()">儲存修改</button></div></div></div>
-<div class="toast" id="toast"></div>
+<div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
-<script>
-const KEY='analystPerformance_v1';
-const FIREBASE_BASE='https://analyst-277bd-default-rtdb.firebaseio.com';
-const FIREBASE_NODE='analystPerformanceDashboard';
-const FIREBASE_URL=`${FIREBASE_BASE}/${FIREBASE_NODE}.json`;
-let trades=JSON.parse(localStorage.getItem(KEY)||'[]');
-let activeId=null;
-let cloudUpdatedAt=0;
-let cloudWriteTimer=null;
-let cloudPollBusy=false;
-let cloudInitialized=false;
-let dataUpdatedAt=Number(localStorage.getItem(KEY+'_dataUpdatedAt')||0);
-let marketUpdatedAt=Number(localStorage.getItem(KEY+'_marketUpdatedAt')||0);
-const ADMIN_SESSION_KEY='analystPerformance_admin_session';
-const ADMIN_HASH='23da13632336835a27300c1d1a2ac37d7258b696012bf43dde81315316bb0791';
-const isAdmin=()=>sessionStorage.getItem(ADMIN_SESSION_KEY)==='1';
-async function sha256(text){const data=new TextEncoder().encode(text);const hash=await crypto.subtle.digest('SHA-256',data);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');}
-function openAdminLogin(){adminPassword.value='';adminModal.classList.add('show');setTimeout(()=>adminPassword.focus(),50)}
-async function adminLogin(){const v=adminPassword.value;if(!v){toast('請輸入管理者密碼');return;}const h=await sha256(v);if(h!==ADMIN_HASH){toast('管理者密碼錯誤');adminPassword.select();return;}sessionStorage.setItem(ADMIN_SESSION_KEY,'1');closeModal('adminModal');applyAdminMode();render();if(cloudInitialized&&trades.length)scheduleCloudSave();toast('已進入管理者模式')}
-function adminLogout(){sessionStorage.removeItem(ADMIN_SESSION_KEY);applyAdminMode();render();toast('已切換為一般查看模式')}
-function requireAdmin(){if(isAdmin())return true;toast('此功能僅限管理者使用');return false;}
-function applyAdminMode(){const admin=isAdmin();document.querySelectorAll('.admin-only').forEach(el=>el.classList.toggle('hidden',!admin));adminLoginBtn.style.display=admin?'none':'';adminLogoutBtn.style.display=admin?'':'none';modeBadge.textContent=admin?'管理者模式':'一般查看模式';modeBadge.classList.toggle('admin',admin);}
-const fmt=n=>new Intl.NumberFormat('zh-TW',{maximumFractionDigits:0}).format(Number(n)||0);
-const fmt2=n=>(Number(n)||0).toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2});
-const pct=n=>`${n>=0?'+':''}${fmt2(n)}%`;
-const money=n=>`${n>=0?'+':''}$${fmt(Math.round(n))}`;
-const today=()=>new Date().toISOString().slice(0,10);
-function markDataUpdate(){dataUpdatedAt=Date.now();localStorage.setItem(KEY+'_dataUpdatedAt',String(dataUpdatedAt));}
-function markMarketUpdate(){marketUpdatedAt=Date.now();localStorage.setItem(KEY+'_marketUpdatedAt',String(marketUpdatedAt));}
-document.getElementById('fDate').value=today();
-function setCloudStatus(type,text){const el=document.getElementById('cloudBadge');if(!el)return;el.className=`cloud-badge ${type||''}`.trim();el.textContent=text;el.title=`Firebase：${FIREBASE_BASE}`;}
-function saveLocal(){localStorage.setItem(KEY,JSON.stringify(trades));render();}
-function save(){saveLocal();scheduleCloudSave();}
-function scheduleCloudSave(){
- if(!cloudInitialized)return;
- clearTimeout(cloudWriteTimer);
- cloudWriteTimer=setTimeout(()=>pushCloud(),250);
-}
-async function firebaseRequest(method='GET',body){
- const opt={method,cache:'no-store',headers:{'Accept':'application/json','Content-Type':'application/json'}};
- if(body!==undefined)opt.body=JSON.stringify(body);
- const r=await fetch(FIREBASE_URL,opt);
- const text=await r.text();
- if(!r.ok)throw new Error(`${r.status} ${text||r.statusText}`);
- try{return text?JSON.parse(text):null;}catch{return null;}
-}
-function normalizeCloudTrades(v){
- if(Array.isArray(v))return v;
- if(v&&typeof v==='object')return Object.values(v).filter(x=>x&&typeof x==='object');
- return [];
-}
-async function pushCloud(){
- if(!navigator.onLine){setCloudStatus('error','Firebase 離線');return;}
- try{
-   setCloudStatus('syncing','Firebase 同步中');
-   const stamp=Date.now();
-   await firebaseRequest('PUT',{trades,updatedAt:stamp,dataUpdatedAt,marketUpdatedAt,version:2});
-   cloudUpdatedAt=stamp;
-   setCloudStatus('online','Firebase 已同步');
- }catch(e){
-   console.error('Firebase 儲存失敗',e);
-   setCloudStatus('error','Firebase 儲存失敗');
- }
-}
-async function pullCloud({initial=false}={}){
- if(cloudPollBusy||!navigator.onLine)return;
- cloudPollBusy=true;
- try{
-   if(initial)setCloudStatus('syncing','Firebase 連線中');
-   const data=await firebaseRequest('GET');
-   if(!data){
-     cloudInitialized=true;
-     if(trades.length&&isAdmin()){await pushCloud();}else setCloudStatus('online','Firebase 已連線');
-     return;
-   }
-   const remoteStamp=Number(data.updatedAt||0);
-   const remoteTrades=normalizeCloudTrades(data.trades);
-   const remoteDataUpdatedAt=Number(data.dataUpdatedAt||data.updatedAt||0);
-   const remoteMarketUpdatedAt=Number(data.marketUpdatedAt||0);
-   if(initial||remoteStamp>cloudUpdatedAt){
-     trades=remoteTrades;
-     cloudUpdatedAt=remoteStamp;
-     dataUpdatedAt=remoteDataUpdatedAt; marketUpdatedAt=remoteMarketUpdatedAt;
-     localStorage.setItem(KEY+'_dataUpdatedAt',String(dataUpdatedAt)); localStorage.setItem(KEY+'_marketUpdatedAt',String(marketUpdatedAt));
-     localStorage.setItem(KEY,JSON.stringify(trades));
-     render();
-   }
-   cloudInitialized=true;
-   setCloudStatus('online','Firebase 已同步');
- }catch(e){
-   console.error('Firebase 讀取失敗',e);
-   cloudInitialized=true;
-   setCloudStatus('error',String(e).includes('Permission denied')||String(e).includes('401')?'Firebase 權限未開放':'Firebase 連線失敗');
- }finally{cloudPollBusy=false;}
-}
-async function initFirebaseSync(){
- await pullCloud({initial:true});
- setInterval(()=>{if(document.visibilityState==='visible')pullCloud();},5000);
- window.addEventListener('online',()=>pullCloud({initial:true}));
- window.addEventListener('offline',()=>setCloudStatus('error','Firebase 離線'));
- document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullCloud();});
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
+
+const FIREBASE_DB_URL='https://analyst-277bd-default-rtdb.firebaseio.com/';
+const firebaseConfig={ databaseURL:FIREBASE_DB_URL };
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const tradesRef=ref(db,'analystPerformance/trades');
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let trades={}; let isAdmin=false; let editingId=null;
+const ADMIN_PASSWORD='51685168';
+const fmt=n=>Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2});
+const fmtMoney=n=>(Number(n||0)>=0?'+':'')+fmt(n);
+const pct=n=>(Number(n||0)>=0?'+':'')+Number(n||0).toFixed(2)+'%';
+const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'});
+const nowText=()=>new Date().toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false});
+
+$('#entryDate').value=today(); $('#fFrom').value='2026-09-01'; $('#fTo').value=today();
+
+function calc(t){
+  const entry=+t.entryPrice||0, shares=+t.shares||0, current=+t.currentPrice||entry, exit=+t.exitPrice||0;
+  const open=!exit;
+  const unreal=open?(current-entry)*shares:0;
+  const realized=!open?(exit-entry)*shares:0;
+  const perf=entry?((open?current:exit)-entry)/entry*100:0;
+  return {open,unreal,realized,total:unreal+realized,perf};
 }
 
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800)}
-function getCalc(t){const price=t.status==='closed'?Number(t.exitPrice):Number(t.currentPrice||t.entryPrice);const shares=Number(t.lots||0)*1000;const cost=Number(t.entryPrice)*shares;const profit=(price-Number(t.entryPrice))*shares;const ret=Number(t.entryPrice)?(price/Number(t.entryPrice)-1)*100:0;return{price,shares,cost,profit,ret};}
-function addTrade(){
- if(!requireAdmin())return;
- const analyst=fAnalyst.value,code=fCode.value.trim(),name=fName.value.trim(),date=fDate.value,entry=Number(fEntry.value),lots=Number(fLots.value||0),cur=Number(fCurrent.value||entry),stopLoss=Number(fStop.value||0),takeProfit=Number(fTarget.value||0),note=fNote.value.trim();
- if(!analyst||!code||!date||!entry||entry<=0){toast('請填寫分析師、股票代號、進場日期與進場價');return}
- if(lots<=0){toast('張數需大於 0');return}
- trades.unshift({id:crypto.randomUUID?crypto.randomUUID():Date.now()+Math.random(),analyst,code,name,entryDate:date,entryPrice:entry,stopLoss,takeProfit,lots,currentPrice:cur,note,status:'open',updatedAt:new Date().toISOString(),exitDate:'',exitPrice:null,exitNote:''});
- fCode.value='';fName.value='';fEntry.value='';fStop.value='';fTarget.value='';fCurrent.value='';fNote.value=''; markDataUpdate(); save(); toast('已新增交易');
+function filteredEntries(){
+  const a=$('#fAnalyst').value, from=$('#fFrom').value, to=$('#fTo').value, st=$('#fStatus').value, kw=$('#fKeyword').value.trim().toLowerCase();
+  return Object.entries(trades).filter(([id,t])=>{
+    const c=calc(t); const d=t.entryDate||'';
+    return (!a||t.analyst===a)&&(!from||d>=from)&&(!to||d<=to)&&(!st||(st==='open'?c.open:!c.open))&&(!kw||String(t.symbol||'').toLowerCase().includes(kw)||String(t.stockName||'').toLowerCase().includes(kw));
+  }).sort((a,b)=>(b[1].entryDate||'').localeCompare(a[1].entryDate||''));
 }
-function renderFilters(){const sel=document.getElementById('analystFilter'),old=sel.value;const fixed=['王榮旭','張貽程','金玉峰雷老闆'];sel.innerHTML='<option value="all">全部分析師</option>'+fixed.map(a=>`<option value="${a}">${a}</option>`).join('');sel.value=fixed.includes(old)?old:'all';syncAnalystTabs();}
-function setAnalystFilter(name){document.getElementById('analystFilter').value=name;syncAnalystTabs();render();}
-function syncAnalystTabs(){const v=document.getElementById('analystFilter').value;document.querySelectorAll('.analyst-tab').forEach(b=>b.classList.toggle('active',b.dataset.analyst===v));}
-function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
-function formatUpdateDate(v){if(!v)return '尚未更新';const d=new Date(v);if(Number.isNaN(d.getTime()))return '尚未更新';return d.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
-function renderGlobalUpdate(){const marketEl=document.getElementById('globalLastUpdate'),dataEl=document.getElementById('dataLastUpdate');if(marketEl)marketEl.textContent=marketUpdatedAt?formatUpdateDate(marketUpdatedAt):'尚未更新';if(dataEl)dataEl.textContent=dataUpdatedAt?formatUpdateDate(dataUpdatedAt):'尚未更新';}
-function render(){renderFilters();renderLeaderboard();renderStats();renderAnalystCards();renderTable();renderRank();renderGlobalUpdate();}
-function holdRangeMatch(t){const from=document.getElementById('holdFrom')?.value||'';const to=document.getElementById('holdTo')?.value||'';if(!from&&!to)return true;const start=String(t.entryDate||'');const end=t.status==='closed'&&t.exitDate?String(t.exitDate):'9999-12-31';return (!to||start<=to)&&(!from||end>=from);}
-function clearHoldRange(){holdFrom.value='';holdTo.value='';render();}
-function setQuickRange(type){const d=new Date(),iso=x=>x.toISOString().slice(0,10);let from='',to=iso(d);if(type==='today')from=to;else if(type==='7d'){const x=new Date(d);x.setDate(x.getDate()-6);from=iso(x);}else if(type==='30d'){const x=new Date(d);x.setDate(x.getDate()-29);from=iso(x);}else if(type==='month'){from=`${to.slice(0,7)}-01`;}holdFrom.value=from;holdTo.value=to;render();}
-function getRiskState(t){if(t.status!=='open')return 'normal';const c=getCalc(t),p=c.price,stop=Number(t.stopLoss||0),target=Number(t.takeProfit||0);if(stop>0&&p<=stop)return 'stop';if(target>0&&p>=target)return 'target';if(stop>0&&p>stop&&p<=stop*1.03)return 'near-stop';if(target>0&&p<target&&p>=target*0.97)return 'near-target';return 'normal';}
-function riskLabel(state){return ({target:'已達停利','near-target':'接近停利',stop:'已達停損','near-stop':'接近停損',normal:'正常'})[state]||'正常';}
-function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=['王榮旭','張貽程','金玉峰雷老闆'];host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
-let leaderboardRankMode='total';
-function setRankMode(mode){
- leaderboardRankMode=mode==='realized'?'realized':'total';
- document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
- renderLeaderboard();
+
+function render(){
+  const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
+  let html='', openN=0, unreal=0, realized=0;
+  rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
+    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td>${fmt(t.currentPrice||t.entryPrice)}</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions"><button class="mini" data-up="${id}">更新價</button><button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
+  });
+  $('#tbody').innerHTML=html||`<tr><td colspan="17" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
+  setMetric('#mOpen',openN,false); setMetric('#mUnrealized',unreal,true); setMetric('#mRealized',realized,true); setMetric('#mTotal',unreal+realized,true);
+  renderRank(); bindRows();
 }
-function renderLeaderboard(){
- const host=document.getElementById('leaderboardArea'); if(!host)return;
- const names=['王榮旭','張貽程','金玉峰雷老闆'];
- const arr=names.map(name=>{
-   const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));
-   let cost=0,totalProfit=0,realizedProfit=0,unrealizedProfit=0,closed=0,wins=0,open=0;
-   list.forEach(t=>{
-     const c=getCalc(t); cost+=c.cost; totalProfit+=c.profit;
-     if(t.status==='open'){open++;unrealizedProfit+=c.profit;}
-     else{closed++;realizedProfit+=c.profit;if(c.profit>0)wins++;}
-   });
-   return {name,n:list.length,open,closed,totalProfit,realizedProfit,unrealizedProfit,
-     ret:cost?totalProfit/cost*100:0,winRate:closed?wins/closed*100:0};
- });
- const rankKey=leaderboardRankMode==='realized'?'realizedProfit':'totalProfit';
- arr.sort((a,b)=>b[rankKey]-a[rankKey] || b.totalProfit-a.totalProfit);
- if(!arr.some(a=>a.n)){host.innerHTML='<div class="leader-empty" style="grid-column:1/-1">新增交易後會顯示績效排行榜</div>';return;}
- host.innerHTML=arr.map((a,i)=>`<div class="leader-card ${i===0?'first':''}">
-   <div class="leader-rank">${i===0?'🥇':i===1?'🥈':'🥉'}</div>
-   <div class="leader-name">${esc(a.name)}</div>
-   <div class="leader-metrics">
-     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'已實現損益':'總損益'}</span><b class="${a[rankKey]>=0?'positive':'negative'}">${money(a[rankKey])}</b></div>
-     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'總損益':'已實現損益'}</span><b class="${(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)>=0?'positive':'negative'}">${money(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)}</b></div>
-     <div class="leader-metric"><span>未實現損益</span><b class="${a.unrealizedProfit>=0?'positive':'negative'}">${money(a.unrealizedProfit)}</b></div>
-     <div class="leader-metric"><span>勝率</span><b>${fmt2(a.winRate)}%</b></div>
-   </div>
- </div>`).join('');
- document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
+function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}
+function renderRank(){
+  const names=['王榮旭','張貽程','雷老闆'];
+  const data=names.map(name=>{let total=0,realized=0;Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{const c=calc(t);total+=c.total;realized+=c.realized});return{name,total,realized}}).sort((a,b)=>b.total-a.total);
+  $('#rankList').innerHTML=data.map((r,i)=>`<div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${r.name}</div><div><div class="k">總損益</div><div class="rank-value ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div></div><div><div class="k">已實現</div><div class="rank-value ${r.realized>=0?'pos':'neg'}">${fmtMoney(r.realized)}</div></div></div>`).join('');
 }
-function analystScopedTrades(){const af=document.getElementById('analystFilter').value;return trades.filter(t=>(af==='all'||t.analyst===af)&&holdRangeMatch(t));}
-function renderStats(){const scoped=analystScopedTrades();let totalProfit=0,totalCost=0,closed=0,wins=0,realized=0,unrealized=0;scoped.forEach(t=>{const c=getCalc(t);totalProfit+=c.profit;totalCost+=c.cost;if(t.status==='closed'){closed++;realized+=c.profit;if(c.profit>0)wins++;}else unrealized+=c.profit});const open=scoped.length-closed,ret=totalCost?totalProfit/totalCost*100:0,wr=closed?wins/closed*100:0;
- sTotal.textContent=scoped.length;sOpen.textContent=open;sClosed.textContent=closed;sRealized.textContent=money(realized);sRealized.className='value '+(realized>0?'positive':realized<0?'negative':'neutral');sUnrealized.textContent=money(unrealized);sUnrealized.className='value '+(unrealized>0?'positive':unrealized<0?'negative':'neutral');sProfit.textContent=money(totalProfit);sProfit.className='value '+(totalProfit>0?'positive':totalProfit<0?'negative':'neutral');sReturn.textContent=pct(ret);sReturn.className='value '+(ret>0?'positive':ret<0?'negative':'neutral');sWinRate.textContent=fmt2(wr)+'%';}
-function filtered(){const q=search.value.trim().toLowerCase(),st=statusFilter.value,rf=riskFilter.value,af=analystFilter.value,sort=sortBy.value;let a=trades.filter(t=>(st==='all'||t.status===st)&&(rf==='all'||getRiskState(t)===rf)&&(af==='all'||t.analyst===af)&&holdRangeMatch(t)&&(!q||[t.analyst,t.code,t.name,t.note,t.stopLoss,t.takeProfit].join(' ').toLowerCase().includes(q)));a.sort((x,y)=>{const X=getCalc(x),Y=getCalc(y);if(sort==='returnDesc')return Y.ret-X.ret;if(sort==='returnAsc')return X.ret-Y.ret;if(sort==='profitDesc')return Y.profit-X.profit;return String(y.entryDate).localeCompare(String(x.entryDate))});return a;}
-function renderTable(){const a=filtered();if(!a.length){tableArea.innerHTML='<div class="empty">目前沒有符合條件的交易紀錄</div>';return}tableArea.innerHTML=`<table class="table"><thead><tr><th>分析師</th><th>股票</th><th>狀態</th><th>風險</th><th>進場日期</th><th>進場價(收盤價)</th><th>停損</th><th>停利</th><th>目前／出場價</th><th class="mobile-hide">張數</th><th class="mobile-hide">價差</th><th>績效</th><th>損益金額</th><th class="mobile-hide">出場日期</th><th class="mobile-hide">行情更新</th><th>備註</th>${isAdmin()?'<th>操作</th>':''}</tr></thead><tbody>${a.map(rowHTML).join('')}</tbody></table>`}
-function rowHTML(t){const c=getCalc(t),diff=c.price-Number(t.entryPrice),cl=c.profit>0?'positive':c.profit<0?'negative':'neutral',risk=getRiskState(t);const ops=isAdmin()?`<td><div class="row-actions"><button type="button" class="iconbtn" data-action="edit" data-id="${esc(t.id)}">修改</button>${t.status==='open'?`<button type="button" class="iconbtn" data-action="price" data-id="${esc(t.id)}">更新價</button><button type="button" class="iconbtn exit" data-action="exit" data-id="${esc(t.id)}">結算</button>`:''}<button type="button" class="iconbtn delete" data-action="delete" data-id="${esc(t.id)}">刪除</button></div></td>`:'';const rowClass=risk==='stop'?'row-stop':risk==='target'?'row-target':(risk==='near-stop'||risk==='near-target')?'row-alert':'';return `<tr class="${rowClass}"><td><b>${esc(t.analyst)}</b></td><td><span class="symbol">${esc(t.code)}</span><span class="name">${esc(t.name)}</span></td><td><span class="pill ${t.status}">${t.status==='open'?'持有中':'已結算'}</span></td><td><span class="risk ${risk}">${riskLabel(risk)}</span></td><td>${esc(t.entryDate)}</td><td class="num">${fmt2(t.entryPrice)}</td><td class="num negative">${Number(t.stopLoss)>0?fmt2(t.stopLoss):'—'}</td><td class="num positive">${Number(t.takeProfit)>0?fmt2(t.takeProfit):'—'}</td><td class="num">${fmt2(c.price)}</td><td class="num mobile-hide">${fmt2(t.lots)}</td><td class="num ${cl} mobile-hide">${diff>=0?'+':''}${fmt2(diff)}</td><td class="num ${cl}">${pct(c.ret)}</td><td class="num ${cl}">${money(c.profit)}</td><td class="mobile-hide">${t.exitDate||'—'}</td><td class="mobile-hide">${formatUpdateDate(t.priceUpdatedAt||t.updatedAt)}</td><td title="${esc(t.note||t.exitNote)}">${esc((t.note||t.exitNote||'—').slice(0,18))}</td>${ops}</tr>`}
-function renderRank(){const base=analystScopedTrades(),map={};base.forEach(t=>{const c=getCalc(t);if(!map[t.analyst])map[t.analyst]={name:t.analyst,n:0,open:0,closed:0,wins:0,cost:0,profit:0};const a=map[t.analyst];a.n++;a.cost+=c.cost;a.profit+=c.profit;if(t.status==='open')a.open++;else{a.closed++;if(c.profit>0)a.wins++}});let arr=Object.values(map).map(a=>({...a,ret:a.cost?a.profit/a.cost*100:0,winRate:a.closed?a.wins/a.closed*100:0})).sort((a,b)=>b.ret-a.ret);if(!arr.length){rankArea.innerHTML='<div class="empty">新增交易後會顯示分析師排行</div>';summaryArea.innerHTML='';return}const max=Math.max(...arr.map(a=>Math.abs(a.ret)),1);rankArea.innerHTML=`<table class="rank-table"><thead><tr><th>排名</th><th>分析師</th><th>交易</th><th>報酬率</th><th>總損益</th><th>績效</th></tr></thead><tbody>${arr.map((a,i)=>`<tr><td>${i+1}</td><td><b>${esc(a.name)}</b></td><td>${a.n} 筆</td><td class="${a.ret>=0?'positive':'negative'}"><b>${pct(a.ret)}</b></td><td class="${a.profit>=0?'positive':'negative'}">${money(a.profit)}</td><td><div class="barbox"><div class="bar" style="width:${Math.min(100,Math.abs(a.ret)/max*100)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
- const best=arr[0],closed=base.filter(t=>t.status==='closed'),closedProfit=closed.reduce((s,t)=>s+getCalc(t).profit,0),openProfit=base.filter(t=>t.status==='open').reduce((s,t)=>s+getCalc(t).profit,0);summaryArea.innerHTML=`<tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${pct(best.ret)}</td></tr><tr><td>已實現損益</td><td class="${closedProfit>=0?'positive':'negative'}"><b>${money(closedProfit)}</b></td></tr><tr><td>未實現損益</td><td class="${openProfit>=0?'positive':'negative'}"><b>${money(openProfit)}</b></td></tr><tr><td>${document.getElementById('analystFilter').value==='all'?'分析師人數':'目前篩選'}</td><td>${document.getElementById('analystFilter').value==='all'?arr.length:esc(document.getElementById('analystFilter').value)}</td></tr>`}
-function openEdit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>String(x.id)===String(id));if(!t)return;eAnalyst.value=t.analyst||'王榮旭';eName.value=t.name||'';eDate.value=t.entryDate||'';eEntry.value=t.entryPrice||'';eStop.value=t.stopLoss||'';eTarget.value=t.takeProfit||'';eLots.value=t.lots||1;eNote.value=t.note||'';editModal.classList.add('show')}
-function saveEdit(){if(!requireAdmin())return;const t=trades.find(x=>String(x.id)===String(activeId));if(!t)return;const entry=Number(eEntry.value),lots=Number(eLots.value);if(!eDate.value||!entry||entry<=0||!lots||lots<=0){toast('請確認進場日期、進場價與張數');return;}t.analyst=eAnalyst.value;t.name=eName.value.trim();t.entryDate=eDate.value;t.entryPrice=entry;t.stopLoss=Number(eStop.value||0);t.takeProfit=Number(eTarget.value||0);t.lots=lots;t.note=eNote.value.trim();t.updatedAt=new Date().toISOString();closeModal('editModal');markDataUpdate();save();toast('交易資料已更新')}
-async function refreshSinglePrice(id){
- if(!requireAdmin())return;
- const t=trades.find(x=>String(x.id)===String(id));
- if(!t)return;
- toast(`正在更新 ${t.code} 最新價格…`);
- try{
-   const q=await getTaiwanStockPrice(t.code);
-   t.currentPrice=q.price;
-   if(!t.name&&q.name)t.name=q.name;
-   t.priceSource=q.source;
-   t.priceUpdatedAt=q.quoteTime||new Date().toISOString();
-   t.updatedAt=new Date().toISOString();
-   markMarketUpdate();
-   save();
-   toast(`${t.code} 已更新為 ${fmt2(q.price)}`);
- }catch(e){
-   toast(`${t.code} 即時行情更新失敗，請手動輸入`);
-   openPrice(id);
- }
+function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
+function bindRows(){
+  $$('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
+  $$('[data-del]').forEach(b=>b.onclick=()=>deleteTrade(b.dataset.del));
+  $$('[data-up]').forEach(b=>b.onclick=()=>refreshOne(b.dataset.up));
 }
-function openPrice(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>x.id==id);priceTitle.textContent=`${t.code} ${t.name||''}｜目前價格`;mCurrent.value=t.currentPrice||t.entryPrice;priceModal.classList.add('show');setTimeout(()=>mCurrent.focus(),50)}
-function savePrice(){if(!requireAdmin())return;const v=Number(mCurrent.value);if(!v||v<=0)return toast('請輸入有效價格');const t=trades.find(x=>x.id==activeId);t.currentPrice=v;t.updatedAt=new Date().toISOString();t.priceUpdatedAt=new Date().toISOString();markMarketUpdate();closeModal('priceModal');save();toast('價格已更新')}
-function openExit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>x.id==id);mExitDate.value=today();mExitPrice.value=t.currentPrice||t.entryPrice;mExitNote.value='';exitModal.classList.add('show')}
-function settleTrade(){if(!requireAdmin())return;const p=Number(mExitPrice.value),d=mExitDate.value;if(!p||p<=0||!d)return toast('請輸入出場日期與價格');const t=trades.find(x=>x.id==activeId);t.status='closed';t.exitDate=d;t.exitPrice=p;t.exitNote=mExitNote.value.trim();t.currentPrice=p;t.updatedAt=new Date().toISOString();markDataUpdate();closeModal('exitModal');save();toast('已完成結算')}
-function closeModal(id){document.getElementById(id).classList.remove('show');activeId=null}
-function delTrade(id){
- if(!requireAdmin())return;
- const idx=trades.findIndex(t=>String(t.id)===String(id));
- if(idx<0){toast('找不到這筆交易');return;}
- const t=trades[idx];
- const label=`${t.analyst||''} ${t.code||''} ${t.name||''}`.trim();
- if(!window.confirm(`確定刪除${label?`「${label}」`:''}這筆交易紀錄？\n刪除後無法復原。`))return;
- trades.splice(idx,1);
- markDataUpdate();
- save();
- toast('已刪除交易紀錄');
+
+function setAdmin(v){isAdmin=v; localStorage.setItem('analystAdmin',v?'1':'0'); $$('.admin-only').forEach(x=>x.classList.toggle('hidden',!v)); $$('.admin-col').forEach(x=>x.classList.toggle('hidden',!v)); $('#adminBtn').classList.toggle('hidden',v); $('#logoutBtn').classList.toggle('hidden',!v); render()}
+if(localStorage.getItem('analystAdmin')==='1')setAdmin(true);
+
+$('#adminBtn').onclick=()=>{$('#loginModal').classList.add('show');$('#adminPwd').focus()}; $('#closeLogin').onclick=()=>$('#loginModal').classList.remove('show');
+$('#doLogin').onclick=()=>{if($('#adminPwd').value===ADMIN_PASSWORD){setAdmin(true);$('#loginModal').classList.remove('show');$('#adminPwd').value=''}else alert('密碼錯誤')};
+$('#logoutBtn').onclick=()=>setAdmin(false);
+
+$('#saveBtn').onclick=async()=>{
+  if(!isAdmin)return; const data={analyst:$('#analyst').value,symbol:$('#symbol').value.trim(),stockName:$('#stockName').value.trim(),entryDate:$('#entryDate').value,entryPrice:+$('#entryPrice').value||0,shares:+$('#shares').value||0,stopLoss:+$('#stopLoss').value||0,takeProfit:+$('#takeProfit').value||0,exitDate:$('#exitDate').value,exitPrice:+$('#exitPrice').value||0,note:$('#note').value.trim(),updatedAt:nowText()};
+  if(!data.symbol||!data.entryDate||!data.entryPrice)return alert('請至少填寫股票代號、入場日期與進場價');
+  if(editingId){ await update(ref(db,`analystPerformance/trades/${editingId}`),data); } else { const r=push(tradesRef); await set(r,{...data,currentPrice:data.entryPrice,priceUpdatedAt:'尚未更新'}); }
+  clearForm();
+};
+function startEdit(id){const t=trades[id]; if(!t||!isAdmin)return; editingId=id; $('#formTitle').textContent='修改交易'; ['analyst','symbol','stockName','entryDate','entryPrice','shares','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value=t[k]??''); $('#entryCard').scrollIntoView({behavior:'smooth'})}
+function clearForm(){editingId=null;$('#formTitle').textContent='新增交易';['symbol','stockName','entryPrice','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value='');$('#shares').value=1000;$('#entryDate').value=today()}
+$('#cancelEditBtn').onclick=clearForm;
+async function deleteTrade(id){if(!isAdmin)return;if(confirm('確定刪除此筆資料？'))await remove(ref(db,`analystPerformance/trades/${id}`))}
+
+['fAnalyst','fFrom','fTo','fStatus','fKeyword'].forEach(id=>$('#'+id).addEventListener(id==='fKeyword'?'input':'change',render));
+$('#clearFilterBtn').onclick=()=>{$('#fAnalyst').value='';$('#fStatus').value='';$('#fKeyword').value='';$('#fFrom').value='2026-09-01';$('#fTo').value=today();render()};
+
+// ---- 股價更新：台股官方即時行情優先，Yahoo / Stooq 備援 ----
+async function fetchTWSE(sym){
+  const channels=[`tse_${sym}.tw`,`otc_${sym}.tw`];
+  for(const ch of channels){
+    const u=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${encodeURIComponent(ch)}&json=1&delay=0&_=${Date.now()}`;
+    try{
+      const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'});
+      if(!r.ok)continue;
+      const j=await r.json(); const d=j?.msgArray?.[0];
+      if(!d)continue;
+      const raw=(d.z && d.z!=='-')?d.z:(d.y && d.y!=='-')?d.y:null;
+      const price=Number(raw);
+      if(price>0)return {price,source:ch.startsWith('tse_')?'TWSE':'TPEx'};
+    }catch(e){}
+  }
+  throw new Error('TWSE/TPEx failed');
 }
-function normalizePrice(v){const n=Number(String(v??'').replace(/,/g,''));return Number.isFinite(n)&&n>0?n:0;}
-async function fetchJSON(url,timeout=7000){
- const candidates=[
-   url,
-   `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-   `https://corsproxy.io/?${encodeURIComponent(url)}`
- ];
- let lastErr;
- for(const target of candidates){
-   const controller=new AbortController();
-   const timer=setTimeout(()=>controller.abort(),timeout);
-   try{
-     const r=await fetch(target,{cache:'no-store',signal:controller.signal,headers:{'Accept':'application/json,text/plain,*/*'}});
-     clearTimeout(timer);
-     if(!r.ok)throw new Error(`HTTP ${r.status}`);
-     const txt=await r.text();
-     const j=JSON.parse(txt);
-     return j;
-   }catch(e){clearTimeout(timer);lastErr=e;}
- }
- throw lastErr||new Error('行情連線失敗');
+async function fetchYahoo(sym){
+  const candidates=[`${sym}.TW`,`${sym}.TWO`,sym];
+  for(const s of candidates){
+    const urls=[
+      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?interval=1m&range=1d`,
+      `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?interval=1m&range=1d`
+    ];
+    for(const u of urls){try{const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'}); if(!r.ok)continue; const j=await r.json(); const meta=j?.chart?.result?.[0]?.meta; const p=meta?.regularMarketPrice??meta?.previousClose; if(p)return {price:+p,source:'Yahoo Finance'};}catch(e){}}
+  }
+  throw new Error('Yahoo failed');
 }
-function twseQuoteTime(z){
- if(z?.tlong){const n=Number(z.tlong);if(Number.isFinite(n)&&n>0)return new Date(n).toISOString();}
- if(z?.d&&z?.t&&/^\d{8}$/.test(z.d)){
-   const s=`${z.d.slice(0,4)}-${z.d.slice(4,6)}-${z.d.slice(6,8)}T${z.t}+08:00`;
-   const d=new Date(s);if(!Number.isNaN(d.getTime()))return d.toISOString();
- }
- return '';
+async function fetchStooq(sym){
+  const code=`${sym}.tw`;
+  const u=`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`;
+  const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'}); if(!r.ok)throw new Error('Stooq failed'); const txt=await r.text(); const lines=txt.trim().split(/\r?\n/); if(lines.length<2)throw new Error('Stooq empty'); const arr=lines[1].split(','); const close=+arr[6]; if(!close)throw new Error('Stooq no price'); return {price:close,source:'Stooq'};
 }
-async function fetchTWSE(code,market,allowPrevious=false){
- const ch=`${market}_${encodeURIComponent(code)}.tw`;
- const url=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${ch}&json=1&delay=0&_=${Date.now()}`;
- const j=await fetchJSON(url),z=j?.msgArray?.find(x=>String(x?.c)===String(code))||j?.msgArray?.[0];
- if(!z||String(z.c)!==String(code))throw new Error('TWSE 查無股票');
- const last=normalizePrice(z?.z);
- if(last)return {price:last,name:z?.n||'',source:market==='tse'?'TWSE 最新成交':'TPEx 最新成交',quoteTime:twseQuoteTime(z)};
- if(allowPrevious){
-   const prev=normalizePrice(z?.y);
-   if(prev)return {price:prev,name:z?.n||'',source:market==='tse'?'TWSE 前收':'TPEx 前收',quoteTime:twseQuoteTime(z),previous:true};
- }
- throw new Error('TWSE 尚無最新成交');
+async function getLatestPrice(symbol){
+  try{return await fetchTWSE(symbol)}
+  catch(e0){try{return await fetchYahoo(symbol)}
+  catch(e1){try{return await fetchStooq(symbol)}
+  catch(e2){throw new Error('所有行情來源皆失敗')}}}
 }
-async function fetchYahoo(code,suffix){
- const symbol=`${encodeURIComponent(code)}.${suffix}`;
- const url=`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d&includePrePost=false&_=${Date.now()}`;
- const j=await fetchJSON(url),r=j?.chart?.result?.[0],m=r?.meta||{};
- if(!r)throw new Error('Yahoo 查無股票');
- const closes=r?.indicators?.quote?.[0]?.close||[];
- const timestamps=r?.timestamp||[];
- let price=normalizePrice(m.regularMarketPrice),quoteTime='';
- if(m.regularMarketTime){const d=new Date(Number(m.regularMarketTime)*1000);if(!Number.isNaN(d.getTime()))quoteTime=d.toISOString();}
- if(!price){
-   for(let i=closes.length-1;i>=0;i--){
-     const p=normalizePrice(closes[i]);
-     if(p){price=p;if(timestamps[i])quoteTime=new Date(Number(timestamps[i])*1000).toISOString();break;}
-   }
- }
- if(!price)throw new Error('Yahoo 無最新成交');
- return {price,name:m.shortName||m.longName||'',source:`Yahoo .${suffix} 最新成交`,quoteTime};
-}
-async function getTaiwanStockPrice(code){
- code=String(code||'').trim();
- if(!/^[0-9A-Za-z]{2,10}$/.test(code))throw new Error('股票代號格式錯誤');
- const providers=[
-   ()=>fetchTWSE(code,'tse',false),
-   ()=>fetchTWSE(code,'otc',false),
-   ()=>fetchYahoo(code,'TW'),
-   ()=>fetchYahoo(code,'TWO'),
-   ()=>fetchTWSE(code,'tse',true),
-   ()=>fetchTWSE(code,'otc',true)
- ];
- let lastErr;
- for(const provider of providers){
-   try{
-     const q=await provider();
-     if(q&&normalizePrice(q.price))return q;
-   }catch(e){lastErr=e;}
- }
- throw lastErr||new Error('無可用行情');
-}
-let updatingPrices=false;
-async function updateOpenPrices(silent=false){
- if(!silent&&!isAdmin()){toast('更新行情僅限管理者');return;}
- if(updatingPrices)return;
- const open=trades.filter(t=>t.status==='open');
- if(!open.length){if(!silent)toast('目前沒有持有中交易');return;}
- updatingPrices=true;
- let ok=0,fail=0; const byCode=new Map();
- if(!silent)toast(`正在更新 ${open.length} 筆持有中股票…`);
- for(const t of open){
-   try{
-     let q=byCode.get(t.code);
-     if(!q){q=await getTaiwanStockPrice(t.code);byCode.set(t.code,q);}
-     t.currentPrice=q.price;
-     if(!t.name&&q.name)t.name=q.name;
-     t.priceSource=q.source;
-     t.priceUpdatedAt=q.quoteTime||new Date().toISOString();
-     t.updatedAt=new Date().toISOString();
-     ok++;
-   }catch(e){fail++;t.priceSource='更新失敗';}
- }
- updatingPrices=false;
- if(ok)markMarketUpdate();
- if(isAdmin())save();else saveLocal();
- if(!silent)toast(ok?`已自動更新 ${ok} 筆${fail?`，${fail} 筆失敗`:''}`:`即時行情來源皆連線失敗，請稍後再試或使用「更新價」手動輸入`);
-}
-let autoRefreshStarted=false;function startAutoPriceRefresh(){if(autoRefreshStarted)return;autoRefreshStarted=true;setTimeout(()=>updateOpenPrices(true),800);setInterval(()=>{if(document.visibilityState==='visible')updateOpenPrices(true)},60000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')updateOpenPrices(true)});}
-function exportJSON(){if(!requireAdmin())return;const blob=new Blob([JSON.stringify(trades,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`分析師績效備份_${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
-function importJSON(e){if(!requireAdmin())return;const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);if(!Array.isArray(j))throw 0;if(!confirm(`將匯入 ${j.length} 筆資料並覆蓋目前資料，是否繼續？`))return;trades=j;markDataUpdate();save();toast('匯入完成')}catch{toast('JSON 格式錯誤')}e.target.value=''};rd.readAsText(f)}
-function exportCSV(){if(!requireAdmin())return;const rows=[['分析師','股票代號','股票名稱','狀態','進場日期','進場價','停損價','停利價','目前/出場價','張數','績效%','損益金額','出場日期','備註']];trades.forEach(t=>{const c=getCalc(t);rows.push([t.analyst,t.code,t.name,t.status==='open'?'持有中':'已結算',t.entryDate,t.entryPrice,t.stopLoss||'',t.takeProfit||'',c.price,t.lots,c.ret.toFixed(2),c.profit.toFixed(0),t.exitDate||'',t.note||t.exitNote||''])});const csv='\ufeff'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`分析師績效_${today()}.csv`;a.click();URL.revokeObjectURL(a.href)}
-document.getElementById('tableArea').addEventListener('click',e=>{
- const btn=e.target.closest('button[data-action]');
- if(!btn)return;
- e.preventDefault();
- e.stopPropagation();
- const id=btn.dataset.id;
- if(btn.dataset.action==='delete')delTrade(id);
- else if(btn.dataset.action==='edit')openEdit(id);
- else if(btn.dataset.action==='price')refreshSinglePrice(id);
- else if(btn.dataset.action==='exit')openExit(id);
-});
-['priceModal','exitModal','adminModal','editModal'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
-applyAdminMode();
-render();
-initFirebaseSync();
-startAutoPriceRefresh();
+async function refreshOne(id){if(!isAdmin)return; const t=trades[id]; if(!t)return; const btn=document.querySelector(`[data-up="${id}"]`); if(btn){btn.disabled=true;btn.textContent='更新中'}; try{const q=await getLatestPrice(t.symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source}); $('#lastRefresh').textContent=`更新日期：${nowText()}`;}catch(e){alert(`${t.symbol} 股價更新失敗。\n建議：若瀏覽器阻擋跨網域，可改由 Cloudflare Worker / 自有 API Proxy 轉接 Yahoo Finance。`)}finally{if(btn){btn.disabled=false;btn.textContent='更新價'}}}
+$('#refreshAllBtn').onclick=async()=>{if(!isAdmin)return alert('更新股價屬管理操作，請先登入管理者'); const ids=Object.keys(trades).filter(id=>calc(trades[id]).open); $('#refreshAllBtn').disabled=true; $('#refreshAllBtn').textContent='更新中…'; let fail=0; for(const id of ids){try{const q=await getLatestPrice(trades[id].symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source})}catch(e){fail++}} $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（${fail} 筆失敗）`:''}`; $('#refreshAllBtn').disabled=false; $('#refreshAllBtn').textContent='更新全部股價';};
+
+onValue(tradesRef,snap=>{trades=snap.val()||{};render()});
 </script>
-</body>
-</html>
+</body></html>

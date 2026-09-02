@@ -24,6 +24,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 @media(max-width:1050px){.span8,.span4,.span6{grid-column:span 12}.metric{grid-template-columns:repeat(2,1fr)}.filters,.formgrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.wrap{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.metric{grid-template-columns:1fr 1fr}.filters,.formgrid{grid-template-columns:1fr}.rank-row{grid-template-columns:36px 1fr;}.rank-value{text-align:left}.mobile-hide{display:none}}
 
+.title-with-badge{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.holdings-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(244,215,125,.18),rgba(184,132,24,.10));border:1px solid rgba(244,215,125,.30);color:var(--gold2);font-size:12px;font-weight:800;box-shadow:inset 0 1px rgba(255,255,255,.04)}.holdings-badge b{font-size:15px;color:#fff}.holdings-title{margin-bottom:10px}
 .chart-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:14px}.chart-box{background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:16px;padding:16px;min-height:330px}.chart-box h3{margin:0 0 8px;font-size:15px;color:var(--gold2)}.chart-wrap{position:relative;height:265px}.refresh-hero{background:linear-gradient(135deg,#f4d77d,#b88418)!important;color:#211604!important;font-weight:900!important;box-shadow:0 6px 18px rgba(217,178,76,.22)}
 .podium-wrap{height:270px;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:10px 6px 0}.podium-item{flex:1;max-width:180px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end}.podium-person{padding:0 4px 10px}.podium-medal{font-size:30px;line-height:1}.podium-name{font-weight:900;font-size:17px;margin-top:4px}.podium-profit{font-size:14px;font-weight:900;margin-top:4px}.podium-step{border:1px solid rgba(244,215,125,.28);border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:14px;background:linear-gradient(180deg,rgba(217,178,76,.20),rgba(120,80,10,.10));box-shadow:inset 0 1px rgba(255,255,255,.08)}.podium-step .place{font-size:28px;font-weight:1000;color:var(--gold2)}.podium-item.p1{order:2}.podium-item.p2{order:1}.podium-item.p3{order:3}.podium-item.p1 .podium-step{height:150px;background:linear-gradient(180deg,rgba(244,215,125,.32),rgba(138,95,12,.13))}.podium-item.p2 .podium-step{height:112px}.podium-item.p3 .podium-step{height:86px}.podium-note{text-align:center;color:var(--muted);font-size:11px;margin-top:6px}
 @media(max-width:850px){.chart-grid{grid-template-columns:1fr}.chart-box{min-height:290px}.chart-wrap{height:240px}.podium-wrap{height:250px}}
@@ -42,12 +43,6 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   </div>
 
   <div class="grid">
-    <section class="card span12">
-      <div class="metric">
-        <div class="box"><div class="k">目前持股</div><div class="v" id="mOpen">0</div></div>
-      </div>
-    </section>
-
     <section class="card span8">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">更新日期：—</span></div>
       <div class="filters">
@@ -92,7 +87,10 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     </section>
 
     <section class="card span12">
-      <div class="section-title"><h2>分析師總績效</h2><span class="status" id="countText">0 筆</span></div>
+      <div class="section-title holdings-title">
+        <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span></div>
+        <span class="status" id="countText">0 筆</span>
+      </div>
       <div class="table-wrap"><table><thead><tr>
         <th>分析師</th><th>股票</th><th>入場日期</th><th>進場價(收盤價)</th><th>目前價</th><th>更新日期</th><th>股數</th><th>績效%</th><th>目前損益</th><th>停損</th><th>停利</th><th>出場日期</th><th>出場價</th><th>已實現損益</th><th>狀態</th><th>備註</th><th class="admin-col hidden">操作</th>
       </tr></thead><tbody id="tbody"></tbody></table></div>
@@ -167,12 +165,12 @@ function renderCharts(){
   if(typeof Chart==='undefined')return;
   const d=analystSummary();
   const textColor='#f6f0df', gridColor='rgba(217,178,76,.12)';
-  const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor}},tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`}}},scales:{x:{ticks:{color:textColor},grid:{color:gridColor}},y:{ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:gridColor}}}};
+  const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:textColor,usePointStyle:true,pointStyle:'rectRounded',boxWidth:10,boxHeight:10,padding:18,font:{weight:'700'}}},tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`}}},scales:{x:{ticks:{color:textColor,font:{weight:'700'}},grid:{display:false}},y:{ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:(ctx)=>ctx.tick?.value===0?'rgba(255,255,255,.35)':gridColor,lineWidth:(ctx)=>ctx.tick?.value===0?2:1}}}};
   if(profitChart)profitChart.destroy();
   profitChart=new Chart(document.getElementById('profitChart'),{type:'bar',data:{labels:d.map(x=>x.name),datasets:[
-    {label:'未實現損益',data:d.map(x=>x.unrealized),backgroundColor:d.map(x=>x.unrealized>=0?'rgba(255,120,120,.62)':'rgba(82,210,132,.62)')},
-    {label:'已實現損益',data:d.map(x=>x.realized),backgroundColor:d.map(x=>x.realized>=0?'rgba(210,50,50,.78)':'rgba(25,145,78,.78)')},
-    {label:'總損益',data:d.map(x=>x.total),backgroundColor:d.map(x=>x.total>=0?'rgba(255,80,80,.78)':'rgba(44,190,105,.78)')}
+    {label:'未實現損益',data:d.map(x=>x.unrealized),backgroundColor:'rgba(242,201,76,.88)',borderColor:'#f2c94c',borderWidth:1,borderRadius:6},
+    {label:'已實現損益',data:d.map(x=>x.realized),backgroundColor:'rgba(45,156,219,.88)',borderColor:'#2d9cdb',borderWidth:1,borderRadius:6},
+    {label:'總損益',data:d.map(x=>x.total),backgroundColor:'rgba(187,107,217,.90)',borderColor:'#bb6bd9',borderWidth:1,borderRadius:6}
   ]},options:common});
   renderPodium(d);
 }

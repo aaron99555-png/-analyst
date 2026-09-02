@@ -16,13 +16,18 @@ radial-gradient(circle at 10% 0%,rgba(217,178,76,.12),transparent 24%),linear-gr
 h1{margin:0;font-size:24px}.sub{color:var(--muted);font-size:13px;margin-top:3px}.actions{display:flex;flex-wrap:wrap;gap:8px}
 button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:700}button:hover{border-color:var(--gold)}button.primary{background:linear-gradient(135deg,#8b6515,var(--gold));color:#171006;border:none}.danger{color:#ffdada;border-color:#693434}.ghost{background:transparent}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(33,25,15,.97),rgba(20,15,10,.98));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-.span12{grid-column:span 12}.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}.metric{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric .box{padding:14px;border-radius:14px;background:#130f0a;border:1px solid #302514}.k{color:var(--muted);font-size:12px}.v{font-size:24px;font-weight:900;margin-top:5px}.pos{color:var(--red)}.neg{color:var(--green)}
+.span12{grid-column:span 12}.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}.metric{display:grid;grid-template-columns:minmax(220px,320px);gap:12px}.metric .box{padding:18px 20px;border-radius:16px;background:linear-gradient(135deg,#171109,#21180d);border:1px solid #4b3818;position:relative;overflow:hidden}.metric .box:after{content:'';position:absolute;width:90px;height:90px;border-radius:50%;right:-22px;top:-28px;background:rgba(217,178,76,.08)}.k{color:var(--muted);font-size:12px}.v{font-size:28px;font-weight:900;margin-top:5px}.pos{color:var(--red)}.neg{color:var(--green)}
 .filters,.formgrid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;align-items:end}label{font-size:12px;color:var(--muted);display:block;margin:0 0 5px}input,select,textarea{width:100%;background:#0f0c08;border:1px solid #3a2d18;color:var(--text);border-radius:10px;padding:9px 10px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:82px;resize:vertical}.form-actions{display:flex;gap:8px;align-items:end;height:100%}
 .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:1250px;background:#100d09}th,td{padding:10px 9px;border-bottom:1px solid #2a2114;text-align:left;font-size:13px;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#20180f;color:#f5dc95;font-size:12px}tr:hover td{background:#171109}.stock{font-weight:800}.muted{color:var(--muted)}.pill{display:inline-flex;padding:4px 8px;border-radius:999px;border:1px solid #4c3a1d;background:#1a140c;font-size:12px}.pill.open{color:#9ad0ff}.pill.closed{color:#9ce6b6}.row-actions{display:flex;gap:6px}.mini{padding:6px 8px;font-size:12px}.hidden{display:none!important}
 .rank-list{display:grid;gap:10px}.rank-row{display:grid;grid-template-columns:42px 1fr 120px 120px 120px;gap:10px;align-items:center;padding:11px;border-radius:12px;background:#130f0a;border:1px solid #332715}.rank-no{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#6c4c0b,var(--gold));font-weight:900;color:#1c1305}.rank-name{font-weight:900}.rank-value{text-align:right;font-weight:900}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.section-title h2{font-size:17px;margin:0}.status{font-size:12px;color:var(--muted)}
 .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.65);z-index:50}.modal.show{display:grid}.modal-card{width:min(460px,92vw);background:#17120c;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.6)}
 @media(max-width:1050px){.span8,.span4,.span6{grid-column:span 12}.metric{grid-template-columns:repeat(2,1fr)}.filters,.formgrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.wrap{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.metric{grid-template-columns:1fr 1fr}.filters,.formgrid{grid-template-columns:1fr}.rank-row{grid-template-columns:36px 1fr;}.rank-value{text-align:left}.mobile-hide{display:none}}
+
+.chart-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:14px}.chart-box{background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:16px;padding:16px;min-height:330px}.chart-box h3{margin:0 0 8px;font-size:15px;color:var(--gold2)}.chart-wrap{position:relative;height:265px}.refresh-hero{background:linear-gradient(135deg,#f4d77d,#b88418)!important;color:#211604!important;font-weight:900!important;box-shadow:0 6px 18px rgba(217,178,76,.22)}
+.podium-wrap{height:270px;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:10px 6px 0}.podium-item{flex:1;max-width:180px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end}.podium-person{padding:0 4px 10px}.podium-medal{font-size:30px;line-height:1}.podium-name{font-weight:900;font-size:17px;margin-top:4px}.podium-profit{font-size:14px;font-weight:900;margin-top:4px}.podium-step{border:1px solid rgba(244,215,125,.28);border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:14px;background:linear-gradient(180deg,rgba(217,178,76,.20),rgba(120,80,10,.10));box-shadow:inset 0 1px rgba(255,255,255,.08)}.podium-step .place{font-size:28px;font-weight:1000;color:var(--gold2)}.podium-item.p1{order:2}.podium-item.p2{order:1}.podium-item.p3{order:3}.podium-item.p1 .podium-step{height:150px;background:linear-gradient(180deg,rgba(244,215,125,.32),rgba(138,95,12,.13))}.podium-item.p2 .podium-step{height:112px}.podium-item.p3 .podium-step{height:86px}.podium-note{text-align:center;color:var(--muted);font-size:11px;margin-top:6px}
+@media(max-width:850px){.chart-grid{grid-template-columns:1fr}.chart-box{min-height:290px}.chart-wrap{height:240px}.podium-wrap{height:250px}}
+@media(max-width:520px){.podium-wrap{gap:5px;padding-left:0;padding-right:0}.podium-name{font-size:14px}.podium-profit{font-size:12px}.podium-medal{font-size:24px}.podium-item.p1 .podium-step{height:130px}.podium-item.p2 .podium-step{height:98px}.podium-item.p3 .podium-step{height:76px}}
 </style>
 </head>
 <body>
@@ -30,7 +35,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   <div class="topbar">
     <div class="brand"><div class="logo">績</div><div><h1>分析師即時績效表</h1><div class="sub">王榮旭・張貽程・雷老闆｜即時追蹤、出場結算、績效排行</div></div></div>
     <div class="actions">
-      <button id="refreshAllBtn">更新全部股價</button>
+      <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部價格</button>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>
@@ -40,9 +45,6 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span12">
       <div class="metric">
         <div class="box"><div class="k">目前持股</div><div class="v" id="mOpen">0</div></div>
-        <div class="box"><div class="k">未實現損益</div><div class="v" id="mUnrealized">0</div></div>
-        <div class="box"><div class="k">已實現損益</div><div class="v" id="mRealized">0</div></div>
-        <div class="box"><div class="k">總損益</div><div class="v" id="mTotal">0</div></div>
       </div>
     </section>
 
@@ -59,8 +61,16 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     </section>
 
     <section class="card span4">
-      <div class="section-title"><h2>績效排行榜</h2><span class="status">總損益 / 未實現損益 / 已實現損益</span></div>
+      <div class="section-title"><h2>績效排行榜</h2><span class="status">未實現損益 / 已實現損益 / 總損益</span></div>
       <div id="rankList" class="rank-list"></div>
+    </section>
+
+    <section class="card span12">
+      <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
+      <div class="chart-grid">
+        <div class="chart-box"><h3>分析師損益比較</h3><div class="chart-wrap"><canvas id="profitChart"></canvas></div></div>
+        <div class="chart-box"><h3>分析師總損益排行｜頒獎階梯</h3><div id="podium" class="podium-wrap"></div><div class="podium-note">依總損益由高至低排列｜賺錢紅色・賠錢綠色</div></div>
+      </div>
     </section>
 
     <section class="card span12 admin-only hidden" id="entryCard">
@@ -92,6 +102,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
@@ -137,15 +148,43 @@ function render(){
     html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td>${fmt(t.currentPrice||t.entryPrice)}</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${c.open?`<button class="mini" data-up="${id}">更新價</button><button class="mini primary" data-settle="${id}">結算</button>`:''}<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="17" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
-  setMetric('#mOpen',openN,false); setMetric('#mUnrealized',unreal,true); setMetric('#mRealized',realized,true); setMetric('#mTotal',unreal+realized,true);
-  renderRank(); bindRows();
+  setMetric('#mOpen',openN,false);
+  renderRank(); renderCharts(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}
 function renderRank(){
   const names=['王榮旭','張貽程','雷老闆'];
   const data=names.map(name=>{let total=0,unrealized=0,realized=0;Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{const c=calc(t);total+=c.total;unrealized+=c.unreal;realized+=c.realized});return{name,total,unrealized,realized}}).sort((a,b)=>b.total-a.total);
-  $('#rankList').innerHTML=data.map((r,i)=>`<div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${r.name}</div><div><div class="k">總損益</div><div class="rank-value ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div></div><div><div class="k">未實現</div><div class="rank-value ${r.unrealized>=0?'pos':'neg'}">${fmtMoney(r.unrealized)}</div></div><div><div class="k">已實現</div><div class="rank-value ${r.realized>=0?'pos':'neg'}">${fmtMoney(r.realized)}</div></div></div>`).join('');
+  $('#rankList').innerHTML=data.map((r,i)=>`<div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${r.name}</div><div><div class="k">未實現損益</div><div class="rank-value ${r.unrealized>=0?'pos':'neg'}">${fmtMoney(r.unrealized)}</div></div><div><div class="k">已實現損益</div><div class="rank-value ${r.realized>=0?'pos':'neg'}">${fmtMoney(r.realized)}</div></div><div><div class="k">總損益</div><div class="rank-value ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div></div></div>`).join('');
 }
+
+let profitChart=null;
+function analystSummary(){
+  const names=['王榮旭','張貽程','雷老闆'];
+  return names.map(name=>{let total=0,unrealized=0,realized=0;Object.values(trades).filter(t=>t.analyst===name).forEach(t=>{const c=calc(t);total+=c.total;unrealized+=c.unreal;realized+=c.realized});return{name,total,unrealized,realized}});
+}
+function renderCharts(){
+  if(typeof Chart==='undefined')return;
+  const d=analystSummary();
+  const textColor='#f6f0df', gridColor='rgba(217,178,76,.12)';
+  const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:textColor}},tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset.label||''} ${Number(ctx.raw||0).toLocaleString('zh-TW',{maximumFractionDigits:0})} 元`}}},scales:{x:{ticks:{color:textColor},grid:{color:gridColor}},y:{ticks:{color:textColor,callback:v=>Number(v).toLocaleString('zh-TW')},grid:{color:gridColor}}}};
+  if(profitChart)profitChart.destroy();
+  profitChart=new Chart(document.getElementById('profitChart'),{type:'bar',data:{labels:d.map(x=>x.name),datasets:[
+    {label:'未實現損益',data:d.map(x=>x.unrealized),backgroundColor:d.map(x=>x.unrealized>=0?'rgba(255,120,120,.62)':'rgba(82,210,132,.62)')},
+    {label:'已實現損益',data:d.map(x=>x.realized),backgroundColor:d.map(x=>x.realized>=0?'rgba(210,50,50,.78)':'rgba(25,145,78,.78)')},
+    {label:'總損益',data:d.map(x=>x.total),backgroundColor:d.map(x=>x.total>=0?'rgba(255,80,80,.78)':'rgba(44,190,105,.78)')}
+  ]},options:common});
+  renderPodium(d);
+}
+
+function renderPodium(data){
+  const sorted=[...data].sort((a,b)=>b.total-a.total);
+  const medals=['🥇','🥈','🥉'];
+  const el=document.getElementById('podium');
+  if(!el)return;
+  el.innerHTML=sorted.slice(0,3).map((r,i)=>`<div class="podium-item p${i+1}"><div class="podium-person"><div class="podium-medal">${medals[i]}</div><div class="podium-name">${esc(r.name)}</div><div class="podium-profit ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div></div><div class="podium-step"><div class="place">${i+1}</div></div></div>`).join('');
+}
+
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 
 function bindRows(){
@@ -242,7 +281,7 @@ async function getLatestPrice(symbol){
   catch(e2){throw new Error('所有行情來源皆失敗')}}}
 }
 async function refreshOne(id){if(!isAdmin)return; const t=trades[id]; if(!t)return; const btn=document.querySelector(`[data-up="${id}"]`); if(btn){btn.disabled=true;btn.textContent='更新中'}; try{const q=await getLatestPrice(t.symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source}); $('#lastRefresh').textContent=`更新日期：${nowText()}`;}catch(e){alert(`${t.symbol} 股價更新失敗。\n建議：若瀏覽器阻擋跨網域，可改由 Cloudflare Worker / 自有 API Proxy 轉接 Yahoo Finance。`)}finally{if(btn){btn.disabled=false;btn.textContent='更新價'}}}
-$('#refreshAllBtn').onclick=async()=>{if(!isAdmin)return alert('更新股價屬管理操作，請先登入管理者'); const ids=Object.keys(trades).filter(id=>calc(trades[id]).open); $('#refreshAllBtn').disabled=true; $('#refreshAllBtn').textContent='更新中…'; let fail=0; for(const id of ids){try{const q=await getLatestPrice(trades[id].symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source})}catch(e){fail++}} $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（${fail} 筆失敗）`:''}`; $('#refreshAllBtn').disabled=false; $('#refreshAllBtn').textContent='更新全部股價';};
+$('#refreshAllBtn').onclick=async()=>{if(!isAdmin)return alert('更新股價屬管理操作，請先登入管理者'); const ids=Object.keys(trades).filter(id=>calc(trades[id]).open); $('#refreshAllBtn').disabled=true; $('#refreshAllBtn').textContent='更新中…'; let fail=0; for(const id of ids){try{const q=await getLatestPrice(trades[id].symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source})}catch(e){fail++}} $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（${fail} 筆失敗）`:''}`; $('#refreshAllBtn').disabled=false; $('#refreshAllBtn').textContent='⟳ 一鍵更新全部價格';};
 
 onValue(tradesRef,snap=>{trades=snap.val()||{};render()});
 </script>

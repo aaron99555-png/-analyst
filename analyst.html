@@ -480,6 +480,44 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   margin-bottom:10px;
 }
 
+
+/* v29：股價更新確認視窗 */
+.price-confirm-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:55vh;
+  overflow:auto;
+  margin-top:10px;
+}
+.price-confirm-row{
+  display:grid;
+  grid-template-columns:110px 1fr 110px;
+  gap:8px;
+  align-items:center;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px;
+}
+.price-confirm-stock b{display:block}
+.price-confirm-stock span,
+.price-confirm-source{font-size:11px;color:var(--muted)}
+.price-confirm-row input{
+  width:100%;
+  box-sizing:border-box;
+}
+.price-confirm-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+@media(max-width:700px){
+  .price-confirm-row{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -568,6 +606,24 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<div class="modal hidden" id="priceConfirmModal">
+  <div class="modal-card" style="max-width:760px">
+    <div class="section-title">
+      <h2>確認更新股價</h2>
+      <span class="status">可直接修改為手動價格</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6">
+      系統抓到的價格僅供確認，<b>正確價位一律以收盤為基準</b>。你可以直接採用，也可以手動修改後再儲存。
+    </div>
+    <div id="priceConfirmList" class="price-confirm-list"></div>
+    <div class="price-confirm-actions">
+      <button id="priceConfirmCancel" class="ghost">取消</button>
+      <button id="priceConfirmSave" class="primary">確認寫入</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
@@ -1046,18 +1102,96 @@ async function writeValidatedPrice(id,q){
   });
 }
 
+
+function openPriceConfirm(items){
+  return new Promise(resolve=>{
+    const modal=$('#priceConfirmModal');
+    const list=$('#priceConfirmList');
+    const save=$('#priceConfirmSave');
+    const cancel=$('#priceConfirmCancel');
+
+    list.innerHTML=items.map((x,i)=>`
+      <div class="price-confirm-row">
+        <div class="price-confirm-stock">
+          <b>${esc(x.symbol)} ${esc(x.stockName||'')}</b>
+          <span>原價 ${fmt(x.oldPrice||0)}</span>
+        </div>
+        <div>
+          <input type="number" step="0.01" min="0" data-price-index="${i}" value="${Number(x.price||0)}">
+          <div class="price-confirm-source">${esc(x.source||'手動')}</div>
+        </div>
+        <div class="price-confirm-source">${x.mode==='intraday'?'盤中即時':'收盤價'}</div>
+      </div>
+    `).join('');
+
+    modal.classList.remove('hidden');
+
+    const done=(val)=>{
+      modal.classList.add('hidden');
+      save.onclick=null;
+      cancel.onclick=null;
+      resolve(val);
+    };
+
+    cancel.onclick=()=>done(null);
+    save.onclick=()=>{
+      const result=items.map((x,i)=>{
+        const input=list.querySelector(`[data-price-index="${i}"]`);
+        const price=Number(input?.value);
+        return {...x,price};
+      }).filter(x=>Number.isFinite(x.price)&&x.price>0);
+      done(result);
+    };
+  });
+}
+
+async function writeManualOrFetchedPrice(id,item){
+  const tr=trades[id];
+  if(!tr)throw new Error('找不到交易資料');
+  await update(ref(db,`analystPerformance/trades/${id}`),{
+    currentPrice:item.price,
+    priceUpdatedAt:nowText(),
+    priceSource:item.source||'手動確認'
+  });
+}
+
 async function refreshOne(id){
   if(!isAdmin)return;
   const tr=trades[id];
   if(!tr)return;
   const btn=document.querySelector(`[data-up="${id}"]`);
-  if(btn){btn.disabled=true;btn.textContent='更新中'}
+  if(btn){btn.disabled=true;btn.textContent='抓價中'}
   try{
-    const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
-    await writeValidatedPrice(id,q);
-    $('#lastRefresh').textContent=`收盤價更新：${nowText()}`;
+    let item;
+    try{
+      const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
+      item={
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:q.price,
+        source:q.source,
+        mode:q.mode
+      };
+    }catch(e){
+      item={
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:Number(tr.currentPrice||tr.entryPrice||0),
+        source:'行情抓取失敗，可手動輸入',
+        mode:'manual'
+      };
+    }
+
+    const confirmed=await openPriceConfirm([item]);
+    if(!confirmed)return;
+    await writeManualOrFetchedPrice(id,confirmed[0]);
+    $('#lastRefresh').textContent=`價格更新：${nowText()}`;
   }catch(e){
-    alert(`${tr.symbol} 收盤價更新失敗。\n${e?.message||'行情來源暫時無法使用'}\n\n系統已保留原價格，不會寫入可疑數值。`);
+    alert(`${tr.symbol} 更新失敗。\n${e?.message||'請確認輸入價格'}`);
   }finally{
     if(btn){btn.disabled=false;btn.textContent='更新價'}
   }
@@ -1069,29 +1203,60 @@ $('#refreshAllBtn').onclick=async()=>{
 
   const btn=$('#refreshAllBtn');
   btn.disabled=true;
-  btn.textContent=isAdmin&&isTWMarketOpen()?'即時價更新中…':'收盤價更新中…';
+  btn.textContent='抓取價格中…';
 
-  let fail=0, success=0, rejected=[];
+  const items=[];
   for(const id of ids){
+    const tr=trades[id];
     try{
-      const q=await getLatestPrice(trades[id].symbol,{allowIntraday:isAdmin});
-      await writeValidatedPrice(id,q);
-      success++;
+      const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
+      items.push({
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:q.price,
+        source:q.source,
+        mode:q.mode
+      });
     }catch(e){
-      fail++;
-      rejected.push(`${trades[id]?.symbol||id}：${e?.message||'失敗'}`);
-      console.error('收盤價更新失敗',trades[id]?.symbol,e);
+      items.push({
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:Number(tr.currentPrice||tr.entryPrice||0),
+        source:'行情抓取失敗，可手動輸入',
+        mode:'manual'
+      });
     }
   }
 
-  $('#lastRefresh').textContent=`${isAdmin&&isTWMarketOpen()?'盤中即時價':'收盤價'}更新：${nowText()}｜成功 ${success}${fail?`、保留原價 ${fail}`:''}`;
   btn.disabled=false;
   updatePriceModeUI();
 
-  if(fail){
-    const detail=rejected.slice(0,8).join('\n');
-    alert(`收盤價更新完成\n成功：${success} 筆\n未更新：${fail} 筆\n\n異常或無法確認的價格已保留原值，不會覆蓋。\n${detail}`);
+  const confirmed=await openPriceConfirm(items);
+  if(!confirmed)return;
+
+  btn.disabled=true;
+  btn.textContent='寫入中…';
+
+  let success=0,fail=0;
+  for(const item of confirmed){
+    try{
+      await writeManualOrFetchedPrice(item.id,item);
+      success++;
+    }catch(e){
+      fail++;
+      console.error('價格寫入失敗',item.symbol,e);
+    }
   }
+
+  $('#lastRefresh').textContent=`價格更新：${nowText()}｜成功 ${success}${fail?`、失敗 ${fail}`:''}`;
+  btn.disabled=false;
+  updatePriceModeUI();
+
+  alert(`價格更新完成\n成功：${success} 筆${fail?`\n失敗：${fail} 筆`:''}\n\n所有價格皆經確認後才寫入。`);
 };
 
 onValue(

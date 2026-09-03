@@ -712,12 +712,55 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v39：標題旁基準點說明 */
+.baseline-title-note{
+  display:inline-block;
+  margin-left:8px;
+  font-size:.42em;
+  font-weight:700;
+  opacity:.72;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .baseline-title-note{
+    margin-left:6px;
+    font-size:.38em;
+  }
+}
+
+
+/* v40：股票代號連結 Yahoo；管理者可直接刪除清單資料 */
+.stock-link{
+  color:inherit;
+  font-weight:900;
+  text-decoration:none;
+  border-bottom:1px dashed currentColor;
+  cursor:pointer;
+}
+.stock-link:hover{
+  text-decoration:none;
+  opacity:.78;
+}
+.today-delete-btn{
+  margin-left:auto;
+}
+@media(max-width:700px){
+  .stock-link{
+    border-bottom-width:1px;
+  }
+  .today-entry-meta{
+    flex-wrap:wrap;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽</h1><div class="sub">7 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">7 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新全部收盤價</button>
@@ -878,6 +921,9 @@ function filteredTrades(){
 // 所有統計與排行皆必須由 filteredTrades() 取得資料，確保與上方篩選條件完全同步。
 
 
+function yahooStockUrl(symbol){
+  return `https://tw.stock.yahoo.com/quote/${encodeURIComponent(String(symbol||'').trim())}`;
+}
 function renderTodayEntries(){
   const el=$('#todayEntries');
   const dateEl=$('#todayEntryDate');
@@ -896,12 +942,13 @@ function renderTodayEntries(){
   el.innerHTML=rows.map(([id,tr])=>`
     <div class="today-entry-item">
       <div class="today-entry-stock">
-        <b>${esc(tr.symbol||'')}</b>
+        <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
         <span>${esc(tr.stockName||'')}</span>
       </div>
       <div class="today-entry-meta">
         <span class="today-analyst">${esc(tr.analyst||'—')}</span>
         <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
+        ${isAdmin?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>
   `).join('');
@@ -912,7 +959,7 @@ function render(){
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
-    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="base-date">2026/09/01</td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
+    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="base-date">2026/09/01</td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span>${fmt(t.currentPrice||t.entryPrice)}</span>
   ${isAdmin?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
 </td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${c.open?`<button class="mini" data-up="${id}">更新價</button><button class="mini primary" data-settle="${id}">結算</button>`:''}<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
@@ -1237,7 +1284,13 @@ $('#saveBtn').onclick=async()=>{
 function startEdit(id){const t=trades[id]; if(!t||!isAdmin)return; editingId=id; $('#formTitle').textContent='修改交易'; ['analyst','symbol','stockName','entryDate','entryPrice','shares','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value=t[k]??''); $('#entryCard').scrollIntoView({behavior:'smooth'})}
 function clearForm(){editingId=null;$('#formTitle').textContent='新增交易';['symbol','stockName','entryPrice','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value='');$('#shares').value=1000;$('#entryDate').value=today()}
 $('#cancelEditBtn').onclick=clearForm;
-async function deleteTrade(id){if(!isAdmin)return;if(confirm('確定刪除此筆資料？'))await remove(ref(db,`analystPerformance/trades/${id}`))}
+async function deleteTrade(id){
+  if(!isAdmin)return;
+  const tr=trades[id];
+  if(!tr)return;
+  const ok=confirm(`確定刪除此筆資料？\n\n${tr.analyst||''}｜${tr.symbol||''} ${tr.stockName||''}\n\n刪除後將同步從清單移除。`);
+  if(ok)await remove(ref(db,`analystPerformance/trades/${id}`));
+}
 
 async function settleTrade(id){
   if(!isAdmin)return;

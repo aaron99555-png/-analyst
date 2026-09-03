@@ -437,6 +437,49 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   .today-entry-card{grid-column:1/-1 !important}
 }
 
+
+/* v27：電腦版查詢與篩選改為上下排列，避免三欄版面遮蔽 */
+@media(min-width:701px){
+  .filter-card .filters{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:8px !important;
+    width:100% !important;
+  }
+  .filter-card .filters > *{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  .filter-card .filters label{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:4px !important;
+  }
+  .filter-card .filters input,
+  .filter-card .filters select,
+  .filter-card .filters button{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  .filter-card .filters .form-actions{
+    display:block !important;
+    width:100% !important;
+  }
+}
+
+
+/* v28：新增交易置於最上方且完整滿版 */
+#entryCard{
+  width:100% !important;
+  grid-column:1/-1 !important;
+  margin-bottom:10px;
+}
+
 </style>
 </head>
 <body>
@@ -454,6 +497,8 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   </div>
 
   <div class="grid">
+    
+
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
@@ -472,7 +517,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
       </div>
     </section>
 
-    <section class="card span4 filter-card">
+<section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
         <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>

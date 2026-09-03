@@ -186,85 +186,11 @@ body.viewer-mode .admin-only{display:none!important}
 }
 </style>
 
-
-<style>
-/* V16 績效排行：頒獎 / 圖表模式 */
-.leaderboard-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.leader-divider{width:1px;height:28px;background:var(--line);margin:0 2px}
-.leader-view-btn.active{background:rgba(226,195,111,.16)!important;border-color:var(--gold)!important;color:var(--gold)!important;font-weight:800}
-.leaderboard-grid.award-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
-.leaderboard-grid.award-view .leader-card{min-width:0;overflow:visible}
-.leaderboard-grid.award-view .leader-value,
-.leaderboard-grid.award-view .leader-sub,
-.leaderboard-grid.award-view .leader-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:break-word}
-.leaderboard-grid.award-view .leader-card:nth-child(1){transform:translateY(-10px)}
-.leaderboard-grid.chart-view{display:block!important;padding:14px!important}
-.performance-chart{display:flex;flex-direction:column;gap:12px}
-.chart-row{display:grid;grid-template-columns:minmax(92px,150px) minmax(160px,1fr) minmax(105px,150px);gap:12px;align-items:center}
-.chart-name{font-weight:800;white-space:normal;word-break:keep-all}
-.chart-track{height:24px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);overflow:hidden;position:relative}
-.chart-bar{height:100%;min-width:2px;border-radius:999px;background:linear-gradient(90deg,var(--primary2),var(--gold))}
-.chart-value{text-align:right;font-weight:900;white-space:nowrap}
-.chart-meta{font-size:11px;color:var(--muted);margin-top:2px}
-@media(max-width:700px){
- .leaderboard-controls{display:grid!important;grid-template-columns:1fr 1fr;width:100%}
- .leader-divider{display:none}
- .leaderboard-grid.award-view{grid-template-columns:1fr!important;gap:10px!important}
- .leaderboard-grid.award-view .leader-card:nth-child(1){transform:none}
- .chart-row{grid-template-columns:78px minmax(105px,1fr) 92px;gap:7px}
- .chart-name{font-size:12px}
- .chart-value{font-size:12px}
-}
-</style>
-
-
-<style>
-/* V17 全面修正 */
-.leaderboard-grid.award-view{
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:12px!important;
-  align-items:stretch!important;
-}
-.leaderboard-grid.award-view .leader-card{
-  transform:none!important;
-  min-width:0!important;
-  height:auto!important;
-  overflow:visible!important;
-}
-.leader-rank{position:absolute;right:14px;top:12px;font-size:24px;line-height:1}
-.leader-card{position:relative}
-.leader-name{padding-right:42px!important;line-height:1.35!important;min-height:1.35em}
-.leader-value{font-size:clamp(20px,2vw,30px)!important;line-height:1.25!important;margin-top:8px;overflow-wrap:anywhere}
-.leader-sub{line-height:1.55!important;margin-top:5px;overflow-wrap:anywhere}
-.performance-chart{width:100%;min-width:0}
-.chart-track{min-width:0}
-.chart-bar{max-width:100%}
-.analyst-total-panel .rank-grid{overflow:visible}
-.analyst-total-panel #rankArea{width:100%;max-width:100%}
-@media(max-width:900px){
- .leaderboard-grid.award-view{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-@media(max-width:600px){
- .leaderboard-grid.award-view{grid-template-columns:1fr!important}
- .leaderboard-controls{grid-template-columns:1fr 1fr!important}
- .leader-sort-btn,.leader-view-btn{width:100%;min-width:0;white-space:normal;line-height:1.25}
- .leader-value{font-size:23px!important}
- .chart-row{grid-template-columns:72px minmax(90px,1fr) 88px!important}
- .chart-value{white-space:normal!important;overflow-wrap:anywhere}
-}
-</style>
-
-
-<style>
-.rank-basis{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:10px;color:var(--gold);font-weight:800;white-space:nowrap}
-@media(max-width:600px){.rank-basis{grid-column:1/-1;justify-content:center}}
-</style>
-
 </head>
 <body class="viewer-mode">
 <div class="app">
   <div class="topbar">
-    <div class="brand"><h1>分析師即時績效表(基準日9/1)</h1><p>進場追蹤・自動行情更新・出場結算・總績效統計｜開啟頁面自動更新，每 60 秒刷新持有中股票</p><div class="update-strip"><span class="update-chip">資料更新：<b id="dataLastUpdate">尚未更新</b></span><span class="update-chip">行情更新：<b id="globalLastUpdate">尚未更新</b></span></div></div>
+    <div class="brand"><h1>分析師即時績效表</h1><p>進場追蹤・自動行情更新・出場結算・總績效統計｜開啟頁面自動更新，每 60 秒刷新持有中股票</p><div class="update-strip"><span class="update-chip">資料更新：<b id="dataLastUpdate">尚未更新</b></span><span class="update-chip">行情更新：<b id="globalLastUpdate">尚未更新</b></span></div></div>
     <div class="actions">
       <span id="modeBadge" class="mode-badge" title="一般查看模式可查看全部資料；管理者才可編輯">一般查看模式</span>
       <span id="cloudBadge" class="cloud-badge syncing" title="Firebase Realtime Database">Firebase 連線中</span>
@@ -283,9 +209,8 @@ body.viewer-mode .admin-only{display:none!important}
     <div class="leaderboard-head">
       <h2>🏆 績效排行榜</h2>
       <div class="leaderboard-controls">
-        <span class="rank-basis">依總報酬率排名</span>
-        <button type="button" class="btn leader-view-btn active" data-view-mode="award" onclick="setLeaderboardView('award')">頒獎模式</button>
-        <button type="button" class="btn leader-view-btn" data-view-mode="chart" onclick="setLeaderboardView('chart')">圖表模式</button>
+        <button type="button" class="btn leader-sort-btn active" data-rank-mode="total" onclick="setRankMode('total')">總損益排行</button>
+        <button type="button" class="btn leader-sort-btn" data-rank-mode="realized" onclick="setRankMode('realized')">已實現損益排行</button>
       </div>
     </div>
     <div id="leaderboardArea" class="leaderboard-grid"></div>
@@ -355,12 +280,11 @@ body.viewer-mode .admin-only{display:none!important}
 <div class="modal" id="priceModal"><div class="dialog"><h3>更新目前價格</h3><div class="content"><div class="modal-grid"><div class="field full"><label id="priceTitle">股票</label><input id="mCurrent" type="number" step="0.01" min="0"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('priceModal')">取消</button><button class="btn primary" onclick="savePrice()">更新</button></div></div></div>
 <div class="modal" id="exitModal"><div class="dialog"><h3>出場結算</h3><div class="content"><div class="modal-grid"><div class="field"><label>出場日期</label><input id="mExitDate" type="date"></div><div class="field"><label>出場價格</label><input id="mExitPrice" type="number" step="0.01" min="0"></div><div class="field full"><label>結算備註</label><input id="mExitNote" placeholder="停利／停損／策略結束"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('exitModal')">取消</button><button class="btn primary" onclick="settleTrade()">確認結算</button></div></div></div>
 <div class="modal" id="adminModal"><div class="dialog"><h3>管理者登入</h3><div class="content"><div class="modal-grid"><div class="field full"><label>管理者密碼</label><input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')adminLogin()"></div></div><div class="smallnote" style="margin-top:10px">一般模式僅能查詢與查看；登入後才開放新增、修改、更新價格、結算、刪除與資料匯出入。</div></div><div class="footer"><button class="btn" onclick="closeModal('adminModal')">取消</button><button class="btn primary" onclick="adminLogin()">登入</button></div></div></div>
-<div class="modal" id="editModal"><div class="dialog"><h3>修改交易資料</h3><div class="content"><div class="modal-grid"><div class="field"><label>分析師</label><select id="eAnalyst"><option value="王榮旭">王榮旭</option><option value="張貽程">張貽程</option><option value="金玉峰雷老闆">金玉峰雷老闆</option><option value="漁夫林睿閎">漁夫林睿閎</option><option value="艾綸劉育綸">艾綸劉育綸</option><option value="徐紹軒">徐紹軒</option></select></div><div class="field"><label>股票名稱</label><input id="eName"></div><div class="field"><label>進場日期</label><input id="eDate" type="date"></div><div class="field"><label>進場價(收盤價)</label><input id="eEntry" type="number" step="0.01" min="0"></div><div class="field"><label>停損價</label><input id="eStop" type="number" step="0.01" min="0"></div><div class="field"><label>停利價</label><input id="eTarget" type="number" step="0.01" min="0"></div><div class="field"><label>張數</label><input id="eLots" type="number" step="0.001" min="0"></div><div class="field full"><label>備註</label><input id="eNote"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('editModal')">取消</button><button class="btn primary" onclick="saveEdit()">儲存修改</button></div></div></div>
+<div class="modal" id="editModal"><div class="dialog"><h3>修改交易資料</h3><div class="content"><div class="modal-grid"><div class="field"><label>分析師</label><select id="eAnalyst"><option>王榮旭</option><option>張貽程</option></select></div><div class="field"><label>股票名稱</label><input id="eName"></div><div class="field"><label>進場日期</label><input id="eDate" type="date"></div><div class="field"><label>進場價(收盤價)</label><input id="eEntry" type="number" step="0.01" min="0"></div><div class="field"><label>停損價</label><input id="eStop" type="number" step="0.01" min="0"></div><div class="field"><label>停利價</label><input id="eTarget" type="number" step="0.01" min="0"></div><div class="field"><label>張數</label><input id="eLots" type="number" step="0.001" min="0"></div><div class="field full"><label>備註</label><input id="eNote"></div></div></div><div class="footer"><button class="btn" onclick="closeModal('editModal')">取消</button><button class="btn primary" onclick="saveEdit()">儲存修改</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const KEY='analystPerformance_v1';
-const ANALYSTS=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
 const FIREBASE_BASE='https://analyst-277bd-default-rtdb.firebaseio.com';
 const FIREBASE_NODE='analystPerformanceDashboard';
 const FIREBASE_URL=`${FIREBASE_BASE}/${FIREBASE_NODE}.json`;
@@ -465,7 +389,7 @@ async function pullCloud({initial=false}={}){
    const remoteTrades=normalizeCloudTrades(data.trades);
    const remoteDataUpdatedAt=Number(data.dataUpdatedAt||data.updatedAt||0);
    const remoteMarketUpdatedAt=Number(data.marketUpdatedAt||0);
-   if(initial||remoteStamp>cloudUpdatedAt||(!cloudUpdatedAt&&remoteTrades.length)){
+   if(initial||!isAdmin()||remoteStamp>cloudUpdatedAt){
      trades=remoteTrades;
      cloudUpdatedAt=remoteStamp;
      dataUpdatedAt=remoteDataUpdatedAt; marketUpdatedAt=remoteMarketUpdatedAt;
@@ -524,15 +448,6 @@ function syncAnalystTabs(){const v=document.getElementById('analystFilter').valu
 function esc(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function formatUpdateDate(v){if(!v)return '尚未更新';const d=new Date(v);if(Number.isNaN(d.getTime()))return '尚未更新';return d.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
 function renderGlobalUpdate(){const marketEl=document.getElementById('globalLastUpdate'),dataEl=document.getElementById('dataLastUpdate');if(marketEl)marketEl.textContent=marketUpdatedAt?formatUpdateDate(marketUpdatedAt):'尚未更新';if(dataEl)dataEl.textContent=dataUpdatedAt?formatUpdateDate(dataUpdatedAt):'尚未更新';}
-
-function normalizeAnalystNames(){
- let changed=false;
- trades.forEach(t=>{
-   if(t.analyst==='徐*紹軒*'){t.analyst='徐紹軒';changed=true;}
- });
- if(changed)saveLocal();
-}
-
 function render(){
  const steps=[
    renderFilters,
@@ -552,68 +467,88 @@ function clearHoldRange(){holdFrom.value='';holdTo.value='';render();}
 function setQuickRange(type){const d=new Date(),iso=x=>x.toISOString().slice(0,10);let from='',to=iso(d);if(type==='today')from=to;else if(type==='7d'){const x=new Date(d);x.setDate(x.getDate()-6);from=iso(x);}else if(type==='30d'){const x=new Date(d);x.setDate(x.getDate()-29);from=iso(x);}else if(type==='month'){from=`${to.slice(0,7)}-01`;}holdFrom.value=from;holdTo.value=to;render();}
 function getRiskState(t){if(t.status!=='open')return 'normal';const c=getCalc(t),p=c.price,stop=Number(t.stopLoss||0),target=Number(t.takeProfit||0);if(stop>0&&p<=stop)return 'stop';if(target>0&&p>=target)return 'target';if(stop>0&&p>stop&&p<=stop*1.03)return 'near-stop';if(target>0&&p<target&&p>=target*0.97)return 'near-target';return 'normal';}
 function riskLabel(state){return ({target:'已達停利','near-target':'接近停利',stop:'已達停損','near-stop':'接近停損',normal:'正常'})[state]||'正常';}
-function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=ANALYSTS;host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
-let leaderboardViewMode='award';
-
-function setLeaderboardView(mode){
- leaderboardViewMode=mode==='chart'?'chart':'award';
- document.querySelectorAll('.leader-view-btn').forEach(b=>b.classList.toggle('active',b.dataset.viewMode===leaderboardViewMode));
+function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
+let leaderboardRankMode='total';
+function setRankMode(mode){
+ leaderboardRankMode=mode==='realized'?'realized':'total';
+ document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
  renderLeaderboard();
 }
-function getLeaderboardData(){
- const names=ANALYSTS;
- return names.map(name=>{
+function renderLeaderboard(){
+ const host=document.getElementById('leaderboardArea'); if(!host)return;
+ const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
+ const arr=names.map(name=>{
    const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));
    let cost=0,totalProfit=0,realizedProfit=0,unrealizedProfit=0,closed=0,wins=0,open=0;
    list.forEach(t=>{
-     const c=getCalc(t);
-     cost+=c.cost;
-     totalProfit+=c.profit;
+     const c=getCalc(t); cost+=c.cost; totalProfit+=c.profit;
      if(t.status==='open'){open++;unrealizedProfit+=c.profit;}
      else{closed++;realizedProfit+=c.profit;if(c.profit>0)wins++;}
    });
-   return {
-     name,listCount:list.length,cost,totalProfit,realizedProfit,unrealizedProfit,closed,open,
-     totalReturn:cost?totalProfit/cost*100:0,
-     winRate:closed?wins/closed*100:0
-   };
- }).sort((a,b)=>{
-   if(b.totalReturn!==a.totalReturn)return b.totalReturn-a.totalReturn;
-   if(b.totalProfit!==a.totalProfit)return b.totalProfit-a.totalProfit;
-   return a.name.localeCompare(b.name,'zh-Hant');
+   return {name,n:list.length,open,closed,totalProfit,realizedProfit,unrealizedProfit,
+     ret:cost?totalProfit/cost*100:0,winRate:closed?wins/closed*100:0};
  });
-}
-function renderLeaderboard(){
- const host=document.getElementById('leaderboardArea');
- if(!host)return;
- const arr=getLeaderboardData();
-
- host.classList.toggle('award-view',leaderboardViewMode==='award');
- host.classList.toggle('chart-view',leaderboardViewMode==='chart');
-
- if(leaderboardViewMode==='chart'){
-   const max=Math.max(...arr.map(a=>Math.abs(a.totalReturn)),1);
-   host.innerHTML=`<div class="performance-chart">${arr.map((a,i)=>{
-     const val=a.totalReturn;
-     const width=Math.max(1,Math.abs(val)/max*100);
-     return `<div class="chart-row">
-       <div class="chart-name">${i+1}. ${esc(a.name)}<div class="chart-meta">${a.open}持股 / ${a.closed}結算</div></div>
-       <div class="chart-track" title="總報酬率 ${pct(val)}"><div class="chart-bar" style="width:${width}%"></div></div>
-       <div class="chart-value ${val>0?'positive':val<0?'negative':'neutral'}">${pct(val)}<div class="chart-meta">總報酬率</div></div>
-     </div>`;
-   }).join('')}</div>`;
-   return;
- }
-
- const medals=['🥇','🥈','🥉'];
- host.innerHTML=arr.map((a,i)=>`<div class="leader-card">
-   <div class="leader-rank">${medals[i]||('#'+(i+1))}</div>
+ const rankKey=leaderboardRankMode==='realized'?'realizedProfit':'totalProfit';
+ arr.sort((a,b)=>b[rankKey]-a[rankKey] || b.totalProfit-a.totalProfit);
+ if(!arr.some(a=>a.n)){host.innerHTML='<div class="leader-empty" style="grid-column:1/-1">新增交易後會顯示績效排行榜</div>';return;}
+ host.innerHTML=arr.map((a,i)=>`<div class="leader-card ${i===0?'first':''}">
+   <div class="leader-rank">${i===0?'🥇':i===1?'🥈':'🥉'}</div>
    <div class="leader-name">${esc(a.name)}</div>
-   <div class="leader-value ${a.totalReturn>0?'positive':a.totalReturn<0?'negative':'neutral'}">${pct(a.totalReturn)}</div>
-   <div class="leader-sub"><b>總報酬率</b>｜總獲利 ${money(a.totalProfit)}</div>
-   <div class="leader-sub">持股 ${a.open} 檔｜結算 ${a.closed} 檔｜勝率 ${fmt2(a.winRate)}%</div>
+   <div class="leader-metrics">
+     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'已實現損益':'總損益'}</span><b class="${a[rankKey]>=0?'positive':'negative'}">${money(a[rankKey])}</b></div>
+     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'總損益':'已實現損益'}</span><b class="${(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)>=0?'positive':'negative'}">${money(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)}</b></div>
+     <div class="leader-metric"><span>未實現損益</span><b class="${a.unrealizedProfit>=0?'positive':'negative'}">${money(a.unrealizedProfit)}</b></div>
+     <div class="leader-metric"><span>勝率</span><b>${fmt2(a.winRate)}%</b></div>
+   </div>
  </div>`).join('');
+ document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
 }
+function analystScopedTrades(){const af=document.getElementById('analystFilter').value;return trades.filter(t=>(af==='all'||t.analyst===af)&&holdRangeMatch(t));}
+function renderStats(){
+ const scoped=analystScopedTrades();
+ let totalProfit=0,totalCost=0,closed=0,wins=0,realized=0,unrealized=0;
+ scoped.forEach(t=>{
+   const c=getCalc(t);
+   totalProfit+=c.profit;
+   totalCost+=c.cost;
+   if(t.status==='closed'){
+     closed++;
+     realized+=c.profit;
+     if(c.profit>0)wins++;
+   }else{
+     unrealized+=c.profit;
+   }
+ });
+ const open=scoped.length-closed;
+ const ret=totalCost?totalProfit/totalCost*100:0;
+ const wr=closed?wins/closed*100:0;
+
+ const setText=(id,value)=>{
+   const el=document.getElementById(id);
+   if(el)el.textContent=value;
+ };
+ const setValue=(id,value,num)=>{
+   const el=document.getElementById(id);
+   if(!el)return;
+   el.textContent=value;
+   el.className='value '+(num>0?'positive':num<0?'negative':'neutral');
+ };
+
+ setText('sTotal',scoped.length);
+ setText('sOpen',open);
+ setText('sClosed',closed);
+
+ // 這五項目前已從頂部畫面移除，但保留相容性，未來加回也不會報錯
+ setValue('sRealized',money(realized),realized);
+ setValue('sUnrealized',money(unrealized),unrealized);
+ setValue('sProfit',money(totalProfit),totalProfit);
+ setValue('sReturn',pct(ret),ret);
+ const winEl=document.getElementById('sWinRate');
+ if(winEl)winEl.textContent=fmt2(wr)+'%';
+}
+function filtered(){const q=search.value.trim().toLowerCase(),st=statusFilter.value,rf=riskFilter.value,af=analystFilter.value,sort=sortBy.value;let a=trades.filter(t=>(st==='all'||t.status===st)&&(rf==='all'||getRiskState(t)===rf)&&(af==='all'||t.analyst===af)&&holdRangeMatch(t)&&(!q||[t.analyst,t.code,t.name,t.note,t.stopLoss,t.takeProfit].join(' ').toLowerCase().includes(q)));a.sort((x,y)=>{const X=getCalc(x),Y=getCalc(y);if(sort==='returnDesc')return Y.ret-X.ret;if(sort==='returnAsc')return X.ret-Y.ret;if(sort==='profitDesc')return Y.profit-X.profit;return String(y.entryDate).localeCompare(String(x.entryDate))});return a;}
+function renderTable(){const a=filtered();if(!a.length){tableArea.innerHTML='<div class="empty">目前沒有符合條件的交易紀錄</div>';return}tableArea.innerHTML=`<table class="table"><thead><tr><th>分析師</th><th>股票</th><th>狀態</th><th>風險</th><th>進場日期</th><th>進場價(收盤價)</th><th>停損</th><th>停利</th><th>目前／出場價</th><th class="mobile-hide">張數</th><th class="mobile-hide">價差</th><th>績效</th><th>損益金額</th><th class="mobile-hide">出場日期</th><th class="mobile-hide">行情更新</th><th>備註</th>${isAdmin()?'<th>操作</th>':''}</tr></thead><tbody>${a.map(rowHTML).join('')}</tbody></table>`}
+function rowHTML(t){const c=getCalc(t),diff=c.price-Number(t.entryPrice),cl=c.profit>0?'positive':c.profit<0?'negative':'neutral',risk=getRiskState(t);const ops=isAdmin()?`<td><div class="row-actions"><button type="button" class="iconbtn" data-action="edit" data-id="${esc(t.id)}">修改</button>${t.status==='open'?`<button type="button" class="iconbtn" data-action="price" data-id="${esc(t.id)}">更新價</button><button type="button" class="iconbtn exit" data-action="exit" data-id="${esc(t.id)}">結算</button>`:''}<button type="button" class="iconbtn delete" data-action="delete" data-id="${esc(t.id)}">刪除</button></div></td>`:'';const rowClass=risk==='stop'?'row-stop':risk==='target'?'row-target':(risk==='near-stop'||risk==='near-target')?'row-alert':'';return `<tr class="${rowClass}"><td><b>${esc(t.analyst)}</b></td><td><span class="symbol">${esc(t.code)}</span><span class="name">${esc(t.name)}</span></td><td><span class="pill ${t.status}">${t.status==='open'?'持有中':'已結算'}</span></td><td><span class="risk ${risk}">${riskLabel(risk)}</span></td><td>${esc(t.entryDate)}</td><td class="num">${fmt2(t.entryPrice)}</td><td class="num negative">${Number(t.stopLoss)>0?fmt2(t.stopLoss):'—'}</td><td class="num positive">${Number(t.takeProfit)>0?fmt2(t.takeProfit):'—'}</td><td class="num">${fmt2(c.price)}</td><td class="num mobile-hide">${fmt2(t.lots)}</td><td class="num ${cl} mobile-hide">${diff>=0?'+':''}${fmt2(diff)}</td><td class="num ${cl}">${pct(c.ret)}</td><td class="num ${cl}">${money(c.profit)}</td><td class="mobile-hide">${t.exitDate||'—'}</td><td class="mobile-hide">${formatUpdateDate(t.priceUpdatedAt||t.updatedAt)}</td><td title="${esc(t.note||t.exitNote)}">${esc((t.note||t.exitNote||'—').slice(0,18))}</td>${ops}</tr>`}
 function editAnalystRecords(name){
  if(!requireAdmin())return;
  const filter=document.getElementById('analystFilter');
@@ -629,33 +564,58 @@ function renderRank(){
  const summaryHost=document.getElementById('summaryArea');
  if(!rankHost||!summaryHost)return;
 
+ const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
  const base=trades.filter(t=>holdRangeMatch(t));
- let arr=ANALYSTS.map(name=>{
+
+ let arr=names.map(name=>{
    const list=base.filter(t=>t.analyst===name);
-   let n=0,open=0,closed=0,wins=0,cost=0,profit=0;
+   let n=0,open=0,closed=0,wins=0,cost=0,profit=0,realized=0,unrealized=0;
    list.forEach(t=>{
      const c=getCalc(t);
-     n++;cost+=c.cost;profit+=c.profit;
-     if(t.status==='open')open++;
-     else{closed++;if(c.profit>0)wins++;}
+     n++; cost+=c.cost; profit+=c.profit;
+     if(t.status==='open'){open++;unrealized+=c.profit;}
+     else{closed++;realized+=c.profit;if(c.profit>0)wins++;}
    });
-   return {name,n,open,closed,cost,profit,ret:cost?profit/cost*100:0,winRate:closed?wins/closed*100:0};
- }).sort((a,b)=>b.ret-a.ret);
+   return {
+     name,n,open,closed,cost,profit,realized,unrealized,
+     ret:cost?profit/cost*100:0,
+     winRate:closed?wins/closed*100:0
+   };
+ }).sort((a,b)=>b.profit-a.profit);
 
  rankHost.innerHTML=`<table class="rank-table">
-   <thead><tr><th>排名</th><th>分析師</th><th>交易</th><th>持有</th><th>已結算</th><th>總報酬率</th><th>勝率</th>${isAdmin()?'<th>操作</th>':''}</tr></thead>
+   <thead><tr>
+     <th>排名</th><th>分析師</th><th>交易</th><th>持有</th><th>已結算</th>
+     <th>報酬率</th><th>總損益</th><th>已實現</th><th>未實現</th><th>勝率</th>
+     ${isAdmin()?'<th>操作</th>':''}
+   </tr></thead>
    <tbody>${arr.map((a,i)=>`<tr>
-     <td>${i+1}</td><td><b>${esc(a.name)}</b></td><td>${a.n} 筆</td><td>${a.open}</td><td>${a.closed}</td>
+     <td>${i+1}</td>
+     <td><b>${esc(a.name)}</b></td>
+     <td>${a.n} 筆</td>
+     <td>${a.open}</td>
+     <td>${a.closed}</td>
      <td class="${a.ret>0?'positive':a.ret<0?'negative':'neutral'}"><b>${pct(a.ret)}</b></td>
+     <td class="${a.profit>0?'positive':a.profit<0?'negative':'neutral'}"><b>${money(a.profit)}</b></td>
+     <td class="${a.realized>0?'positive':a.realized<0?'negative':'neutral'}">${money(a.realized)}</td>
+     <td class="${a.unrealized>0?'positive':a.unrealized<0?'negative':'neutral'}">${money(a.unrealized)}</td>
      <td>${fmt2(a.winRate)}%</td>
      ${isAdmin()?`<td><button type="button" class="iconbtn" onclick="editAnalystRecords('${a.name}')">修改資料</button></td>`:''}
    </tr>`).join('')}</tbody>
  </table>`;
 
- const best=arr[0],totalTrades=arr.reduce((s,a)=>s+a.n,0);
+ const best=arr[0];
+ const totalProfit=arr.reduce((s,a)=>s+a.profit,0);
+ const realized=arr.reduce((s,a)=>s+a.realized,0);
+ const unrealized=arr.reduce((s,a)=>s+a.unrealized,0);
+ const totalTrades=arr.reduce((s,a)=>s+a.n,0);
+
  summaryHost.innerHTML=`
-   <tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${pct(best.ret)}</td></tr>
-   <tr><td>總交易筆數</td><td><b>${totalTrades}</b></td></tr>`;
+   <tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${money(best.profit)}</td></tr>
+   <tr><td>總交易筆數</td><td><b>${totalTrades}</b></td></tr>
+   <tr><td>總損益</td><td class="${totalProfit>0?'positive':totalProfit<0?'negative':'neutral'}"><b>${money(totalProfit)}</b></td></tr>
+   <tr><td>已實現損益</td><td class="${realized>0?'positive':realized<0?'negative':'neutral'}"><b>${money(realized)}</b></td></tr>
+   <tr><td>未實現損益</td><td class="${unrealized>0?'positive':unrealized<0?'negative':'neutral'}"><b>${money(unrealized)}</b></td></tr>`;
 }
 function openEdit(id){if(!requireAdmin())return;activeId=id;const t=trades.find(x=>String(x.id)===String(id));if(!t)return;eAnalyst.value=t.analyst||'王榮旭';eName.value=t.name||'';eDate.value=t.entryDate||'';eEntry.value=t.entryPrice||'';eStop.value=t.stopLoss||'';eTarget.value=t.takeProfit||'';eLots.value=t.lots||1;eNote.value=t.note||'';editModal.classList.add('show')}
 function saveEdit(){if(!requireAdmin())return;const t=trades.find(x=>String(x.id)===String(activeId));if(!t)return;const entry=Number(eEntry.value),lots=Number(eLots.value);if(!eDate.value||!entry||entry<=0||!lots||lots<=0){toast('請確認進場日期、進場價與張數');return;}t.analyst=eAnalyst.value;t.name=eName.value.trim();t.entryDate=eDate.value;t.entryPrice=entry;t.stopLoss=Number(eStop.value||0);t.takeProfit=Number(eTarget.value||0);t.lots=lots;t.note=eNote.value.trim();t.updatedAt=new Date().toISOString();closeModal('editModal');markDataUpdate();save();toast('交易資料已更新')}
@@ -835,9 +795,9 @@ async function updateOpenPrices(silent=false){
 }
 let autoRefreshStarted=false;
 function startAutoPriceRefresh(){
- if(!isAdmin())return;
  if(autoRefreshStarted)return;
- autoRefreshStarted=true; // 一般查看者只讀取管理者同步後的行情，避免每位訪客重複打行情 API
+ autoRefreshStarted=true;
+ if(!isAdmin())return; // 一般查看者只讀取管理者同步後的行情，避免每位訪客重複打行情 API
  setTimeout(()=>updateOpenPrices(true),1200);
  setInterval(()=>{if(document.visibilityState==='visible'&&isAdmin())updateOpenPrices(true)},60000);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&isAdmin())updateOpenPrices(true)});
@@ -859,7 +819,6 @@ document.getElementById('tableArea')?.addEventListener('click',e=>{
 ['priceModal','exitModal','adminModal','editModal'].forEach(id=>document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
 try{applyAdminMode();}catch(e){console.error('applyAdminMode failed',e);}
 try{initDefaultHoldRange();}catch(e){console.error('default hold range failed',e);}
-try{normalizeAnalystNames();}catch(e){console.error('analyst migration failed',e);}
 try{render();}catch(e){console.error('initial render failed',e);}
 initFirebaseSync().catch(e=>console.error('Firebase init failed',e));
 try{startAutoPriceRefresh();}catch(e){console.error('auto price refresh failed',e);}

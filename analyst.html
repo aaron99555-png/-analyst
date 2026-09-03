@@ -518,6 +518,16 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v30：目前價管理者手動輸入 */
+.current-price-cell{white-space:nowrap}
+.manual-price-btn{
+  margin-left:4px;
+  padding:2px 5px !important;
+  min-width:auto !important;
+  font-size:11px !important;
+}
+
 </style>
 </head>
 <body>
@@ -703,7 +713,10 @@ function render(){
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
-    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="base-date">2026/09/01</td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td>${fmt(t.currentPrice||t.entryPrice)}</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${c.open?`<button class="mini" data-up="${id}">更新價</button><button class="mini primary" data-settle="${id}">結算</button>`:''}<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
+    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="base-date">2026/09/01</td><td class="stock">${esc(t.symbol)} ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
+  <span>${fmt(t.currentPrice||t.entryPrice)}</span>
+  ${isAdmin?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
+</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${c.open?`<button class="mini" data-up="${id}">更新價</button><button class="mini primary" data-settle="${id}">結算</button>`:''}<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button></div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
@@ -1155,6 +1168,28 @@ async function writeManualOrFetchedPrice(id,item){
   });
 }
 
+
+async function manualCurrentPrice(id){
+  if(!isAdmin)return;
+  const tr=trades[id];
+  if(!tr)return;
+  const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
+  const input=prompt(`${tr.symbol} ${tr.stockName||''}\n請輸入目前價\n（正確價位一律以收盤為基準）`,oldPrice||'');
+  if(input===null)return;
+  const price=Number(input);
+  if(!Number.isFinite(price)||price<=0)return alert('請輸入正確的價格');
+  if(!confirm(`確認更新 ${tr.symbol} ${tr.stockName||''}\n目前價：${fmt(oldPrice)} → ${fmt(price)}`))return;
+  try{
+    await update(ref(db,`analystPerformance/trades/${id}`),{
+      currentPrice:price,
+      priceUpdatedAt:nowText(),
+      priceSource:'管理者手動輸入'
+    });
+  }catch(e){
+    alert(`手動更新失敗：${e?.message||'未知錯誤'}`);
+  }
+}
+
 async function refreshOne(id){
   if(!isAdmin)return;
   const tr=trades[id];
@@ -1258,6 +1293,15 @@ $('#refreshAllBtn').onclick=async()=>{
 
   alert(`價格更新完成\n成功：${success} 筆${fail?`\n失敗：${fail} 筆`:''}\n\n所有價格皆經確認後才寫入。`);
 };
+
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-manual-price]');
+  if(btn){
+    e.preventDefault();
+    manualCurrentPrice(btn.dataset.manualPrice);
+  }
+});
+
 
 onValue(
   tradesRef,

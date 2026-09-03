@@ -365,16 +365,66 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   margin:-4px 0 8px;
 }
 
+
+/* v20：今日進場與資料聲明 */
+.today-entry-card{border-color:rgba(217,178,76,.24)}
+.today-entry-list{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.today-entry-item{
+  border:1px solid rgba(217,178,76,.16);
+  border-radius:10px;
+  padding:9px 10px;
+  background:rgba(255,255,255,.018);
+}
+.today-entry-stock{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:6px;
+}
+.today-entry-stock b{font-size:15px;color:#f6d56b}
+.today-entry-stock span{font-size:13px;font-weight:800}
+.today-entry-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:11px;
+  color:var(--muted);
+}
+.today-analyst{font-weight:800}
+.today-price b{color:#f6f0df;font-size:12px}
+.today-entry-empty{
+  grid-column:1/-1;
+  color:var(--muted);
+  font-size:11px;
+  padding:8px 2px;
+}
+.data-footer-note{
+  text-align:center;
+  font-size:10px;
+  color:var(--muted);
+  opacity:.8;
+  padding:8px 4px 16px;
+}
+@media(max-width:700px){
+  .today-entry-list{grid-template-columns:1fr}
+  .today-entry-item{padding:8px 9px}
+  .today-entry-meta{font-size:10px}
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽</h1><div class="sub">6 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽</h1><div class="sub">7 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部收盤價</button>
-        <div class="price-note"><b>正式績效與最終數字一律以收盤價為準</b>｜一般使用者僅更新已完成收盤價</div>
+        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
@@ -385,7 +435,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span8">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>王榮旭</option><option>張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -393,6 +443,14 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
         <div><label>股票代號 / 名稱</label><input id="fKeyword" placeholder="例如 2330 / 台積電"></div>
         <div class="form-actions"><button id="clearFilterBtn" class="ghost">清除篩選</button></div>
       </div>
+    </section>
+
+    <section class="card span12 today-entry-card">
+      <div class="section-title">
+        <h2>今日進場股票</h2>
+        <span class="status" id="todayEntryDate">—</span>
+      </div>
+      <div id="todayEntries" class="today-entry-list"></div>
     </section>
 
     <section class="card span4">
@@ -411,7 +469,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>王榮旭</option><option>張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -485,7 +543,38 @@ function filteredTrades(){
 }
 // 所有統計與排行皆必須由 filteredTrades() 取得資料，確保與上方篩選條件完全同步。
 
+
+function renderTodayEntries(){
+  const el=$('#todayEntries');
+  const dateEl=$('#todayEntryDate');
+  if(!el)return;
+  const d=today();
+  if(dateEl)dateEl.textContent=d.replaceAll('-','/');
+  const rows=Object.entries(trades)
+    .filter(([id,tr])=>(tr.entryDate||'')===d)
+    .sort((a,b)=>(a[1].analyst||'').localeCompare(b[1].analyst||'','zh-Hant'));
+
+  if(!rows.length){
+    el.innerHTML='<div class="today-entry-empty">今日尚無進場股票</div>';
+    return;
+  }
+
+  el.innerHTML=rows.map(([id,tr])=>`
+    <div class="today-entry-item">
+      <div class="today-entry-stock">
+        <b>${esc(tr.symbol||'')}</b>
+        <span>${esc(tr.stockName||'')}</span>
+      </div>
+      <div class="today-entry-meta">
+        <span class="today-analyst">${esc(tr.analyst||'—')}</span>
+        <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
+      </div>
+    </div>
+  `).join('');
+}
+
 function render(){
+  renderTodayEntries();
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
@@ -548,7 +637,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -569,7 +658,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈'];
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -677,8 +766,8 @@ function updatePriceModeUI(){
   }
   if(note){
     note.innerHTML=isAdmin
-      ? '<strong>管理者盤中可寫入即時價</strong>｜<b>正式績效與最終數字一律以收盤價為準</b>'
-      : '<b>正式績效與最終數字一律以收盤價為準</b>｜一般使用者僅更新已完成收盤價';
+      ? '<strong>管理者盤中可寫入即時價</strong>｜<b>正確價位一律以收盤為基準</b>'
+      : '<b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價';
   }
 }
 if(localStorage.getItem('analystAdmin')==='1')setAdmin(true);
@@ -940,6 +1029,9 @@ onValue(
   tradesRef,
   snap=>{
     const incoming=snap.val();
+    if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='王榮旭')x.analyst='投資總舖師王榮旭';});
+    if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='張貽程')x.analyst='E神張貽程';});
+    if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='阮儀阮慧慈')x.analyst='阮姨阮慧慈';});
     if(incoming!==null) trades=incoming;
     else trades={};
     render();
@@ -950,4 +1042,6 @@ onValue(
   }
 );
 </script>
+
+<div class="data-footer-note">資料整理：萊恩｜如有錯誤或遺漏請告知</div>
 </body></html>

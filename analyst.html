@@ -454,6 +454,24 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   </div>
 
   <div class="grid">
+    <section class="card span12 admin-only hidden" id="entryCard">
+      <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
+      <div class="formgrid">
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
+        <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
+        <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
+        <div><label>入場日期</label><input id="entryDate" type="date"></div>
+        <div><label>進場價(收盤價)</label><input id="entryPrice" type="number" step="0.01"></div>
+        <div><label>股數</label><input id="shares" type="number" step="1" value="1000"></div>
+        <div><label>停損價</label><input id="stopLoss" type="number" step="0.01"></div>
+        <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
+        <div><label>出場日期</label><input id="exitDate" type="date"></div>
+        <div><label>出場價格</label><input id="exitPrice" type="number" step="0.01"></div>
+        <div style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
+        <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
+      </div>
+    </section>
+
     <section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
@@ -488,23 +506,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
       </div>
     </section>
 
-    <section class="card span12 admin-only hidden" id="entryCard">
-      <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
-      <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
-        <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
-        <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
-        <div><label>入場日期</label><input id="entryDate" type="date"></div>
-        <div><label>進場價(收盤價)</label><input id="entryPrice" type="number" step="0.01"></div>
-        <div><label>股數</label><input id="shares" type="number" step="1" value="1000"></div>
-        <div><label>停損價</label><input id="stopLoss" type="number" step="0.01"></div>
-        <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
-        <div><label>出場日期</label><input id="exitDate" type="date"></div>
-        <div><label>出場價格</label><input id="exitPrice" type="number" step="0.01"></div>
-        <div style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
-        <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
-      </div>
-    </section>
+    
 
     <section class="card span12">
       <div class="section-title holdings-title">

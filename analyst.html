@@ -322,7 +322,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span8">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">更新日期：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>王榮旭</option><option>張貽程</option><option>雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>王榮旭</option><option>張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
         <div><label>狀態</label><select id="fStatus"><option value="">全部</option><option value="open">持有中</option><option value="closed">已結算</option></select></div>
@@ -347,7 +347,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>王榮旭</option><option>張貽程</option><option>雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>王榮旭</option><option>張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -482,7 +482,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['王榮旭','張貽程','雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
+  const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
   const source=filteredTrades();
   return names.map(name=>{
     let total=0,unrealized=0,realized=0,cost=0,realizedCost=0,openCount=0,closedCount=0,tradesCount=0;

@@ -663,7 +663,32 @@ async function getLatestPrice(symbol){
   catch(e2){throw new Error('所有行情來源皆失敗')}}}
 }
 async function refreshOne(id){if(!isAdmin)return; const t=trades[id]; if(!t)return; const btn=document.querySelector(`[data-up="${id}"]`); if(btn){btn.disabled=true;btn.textContent='更新中'}; try{const q=await getLatestPrice(t.symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source}); $('#lastRefresh').textContent=`更新日期：${nowText()}`;}catch(e){alert(`${t.symbol} 股價更新失敗。\n建議：若瀏覽器阻擋跨網域，可改由 Cloudflare Worker / 自有 API Proxy 轉接 Yahoo Finance。`)}finally{if(btn){btn.disabled=false;btn.textContent='更新價'}}}
-$('#refreshAllBtn').onclick=async()=>{if(!isAdmin)return alert('更新股價屬管理操作，請先登入管理者'); const ids=Object.keys(trades).filter(id=>calc(trades[id]).open); $('#refreshAllBtn').disabled=true; $('#refreshAllBtn').textContent='更新中…'; let fail=0; for(const id of ids){try{const q=await getLatestPrice(trades[id].symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source})}catch(e){fail++}} $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（${fail} 筆失敗）`:''}`; $('#refreshAllBtn').disabled=false; $('#refreshAllBtn').textContent='⟳ 一鍵更新全部價格';};
+$('#refreshAllBtn').onclick=async()=>{
+  const ids=Object.keys(trades).filter(id=>calc(trades[id]).open);
+  if(!ids.length)return alert('目前沒有持有中的股票可更新');
+  const btn=$('#refreshAllBtn');
+  btn.disabled=true;
+  btn.textContent='更新中…';
+  let fail=0, success=0;
+  for(const id of ids){
+    try{
+      const q=await getLatestPrice(trades[id].symbol);
+      await update(ref(db,`analystPerformance/trades/${id}`),{
+        currentPrice:q.price,
+        priceUpdatedAt:nowText(),
+        priceSource:q.source
+      });
+      success++;
+    }catch(e){
+      console.error('股價更新失敗', trades[id]?.symbol, e);
+      fail++;
+    }
+  }
+  $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（成功 ${success}、失敗 ${fail}）`:''}`;
+  btn.disabled=false;
+  btn.textContent='⟳ 一鍵更新全部價格';
+  if(fail===ids.length)alert('全部股價更新失敗，可能是行情來源或 Firebase 寫入權限限制。');
+};
 
 onValue(
   tradesRef,

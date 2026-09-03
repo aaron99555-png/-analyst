@@ -231,7 +231,7 @@ body.viewer-mode .admin-only{display:none!important}
     <div class="panel-head"><h2>新增分析師交易</h2><div class="smallnote">台股張數＝1,000 股；也可直接輸入股數</div></div>
     <div class="panel-body">
       <div class="form-grid">
-        <div class="field"><label>分析師 *</label><select id="fAnalyst"><option value="王榮旭">王榮旭</option><option value="張貽程">張貽程</option><option value="金玉峰雷老闆">金玉峰雷老闆</option><option value="漁夫林睿閎">漁夫林睿閎</option><option value="艾綸劉育綸">艾綸劉育綸</option></select></div>
+        <div class="field"><label>分析師 *</label><select id="fAnalyst"><option value="王榮旭">王榮旭</option><option value="張貽程">張貽程</option><option value="金玉峰雷老闆">金玉峰雷老闆</option><option value="漁夫林睿閎">漁夫林睿閎</option><option value="艾綸劉育綸">艾綸劉育綸</option><option value="徐紹軒">徐紹軒</option></select></div>
         <div class="field"><label>股票代號 *</label><input id="fCode" inputmode="numeric" placeholder="2330"></div>
         <div class="field"><label>股票名稱</label><input id="fName" placeholder="台積電"></div>
         <div class="field"><label>進場日期 *</label><input id="fDate" type="date"></div>
@@ -263,7 +263,7 @@ body.viewer-mode .admin-only{display:none!important}
         <select id="sortBy" onchange="scheduleRender(0)"><option value="dateDesc">最新進場</option><option value="returnDesc">績效最高</option><option value="returnAsc">績效最低</option><option value="profitDesc">獲利最高</option></select>
       </div>
     </div>
-    <div class="panel-body" style="padding-bottom:0"><div class="analyst-tabs"><button class="analyst-tab active" data-analyst="all" onclick="setAnalystFilter('all')">全部分析師</button><button class="analyst-tab" data-analyst="王榮旭" onclick="setAnalystFilter('王榮旭')">王榮旭</button><button class="analyst-tab" data-analyst="張貽程" onclick="setAnalystFilter('張貽程')">張貽程</button><button class="analyst-tab" data-analyst="金玉峰雷老闆" onclick="setAnalystFilter('金玉峰雷老闆')">金玉峰雷老闆</button><button class="analyst-tab" data-analyst="漁夫林睿閎" onclick="setAnalystFilter('漁夫林睿閎')">漁夫林睿閎</button><button class="analyst-tab" data-analyst="艾綸劉育綸" onclick="setAnalystFilter('艾綸劉育綸')">艾綸劉育綸</button></div><div id="analystCards" class="analyst-cards"></div></div><div class="table-wrap" id="tableArea"></div>
+    <div class="panel-body" style="padding-bottom:0"><div class="analyst-tabs"><button class="analyst-tab active" data-analyst="all" onclick="setAnalystFilter('all')">全部分析師</button><button class="analyst-tab" data-analyst="王榮旭" onclick="setAnalystFilter('王榮旭')">王榮旭</button><button class="analyst-tab" data-analyst="張貽程" onclick="setAnalystFilter('張貽程')">張貽程</button><button class="analyst-tab" data-analyst="金玉峰雷老闆" onclick="setAnalystFilter('金玉峰雷老闆')">金玉峰雷老闆</button><button class="analyst-tab" data-analyst="漁夫林睿閎" onclick="setAnalystFilter('漁夫林睿閎')">漁夫林睿閎</button><button class="analyst-tab" data-analyst="艾綸劉育綸" onclick="setAnalystFilter('艾綸劉育綸')">艾綸劉育綸</button><button class="analyst-tab" data-analyst="徐紹軒" onclick="setAnalystFilter('徐紹軒')">徐紹軒</button></div><div id="analystCards" class="analyst-cards"></div></div><div class="table-wrap" id="tableArea"></div>
   </div>
 
   <div class="panel analyst-total-panel">
@@ -434,7 +434,7 @@ function renderFilters(){
  const sel=document.getElementById('analystFilter');
  if(!sel)return;
  const old=sel.value;
- const fixed=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸'];
+ const fixed=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
  const desired=['all',...fixed];
  const current=[...sel.options].map(o=>o.value);
  if(current.length!==desired.length||current.some((v,i)=>v!==desired[i])){
@@ -467,7 +467,7 @@ function clearHoldRange(){holdFrom.value='';holdTo.value='';render();}
 function setQuickRange(type){const d=new Date(),iso=x=>x.toISOString().slice(0,10);let from='',to=iso(d);if(type==='today')from=to;else if(type==='7d'){const x=new Date(d);x.setDate(x.getDate()-6);from=iso(x);}else if(type==='30d'){const x=new Date(d);x.setDate(x.getDate()-29);from=iso(x);}else if(type==='month'){from=`${to.slice(0,7)}-01`;}holdFrom.value=from;holdTo.value=to;render();}
 function getRiskState(t){if(t.status!=='open')return 'normal';const c=getCalc(t),p=c.price,stop=Number(t.stopLoss||0),target=Number(t.takeProfit||0);if(stop>0&&p<=stop)return 'stop';if(target>0&&p>=target)return 'target';if(stop>0&&p>stop&&p<=stop*1.03)return 'near-stop';if(target>0&&p<target&&p>=target*0.97)return 'near-target';return 'normal';}
 function riskLabel(state){return ({target:'已達停利','near-target':'接近停利',stop:'已達停損','near-stop':'接近停損',normal:'正常'})[state]||'正常';}
-function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸'];host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
+function renderAnalystCards(){const host=document.getElementById('analystCards');if(!host)return;const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];host.innerHTML=names.map(name=>{const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));let cost=0,profit=0,closed=0,wins=0,open=0;list.forEach(t=>{const c=getCalc(t);cost+=c.cost;profit+=c.profit;if(t.status==='open')open++;else{closed++;if(c.profit>0)wins++;}});const ret=cost?profit/cost*100:0,wr=closed?wins/closed*100:0;return `<div class="analyst-card"><div class="head"><span class="namex">${esc(name)}</span><button class="analyst-tab ${analystFilter.value===name?'active':''}" type="button" onclick="setAnalystFilter('${name}')">查看清單</button></div><div class="metrics"><div class="metric"><span>持有中</span><b>${open}</b></div><div class="metric"><span>總報酬</span><b class="${ret>=0?'positive':'negative'}">${pct(ret)}</b></div><div class="metric"><span>總損益</span><b class="${profit>=0?'positive':'negative'}">${money(profit)}</b></div><div class="metric"><span>勝率</span><b>${fmt2(wr)}%</b></div></div></div>`}).join('');}
 let leaderboardRankMode='total';
 function setRankMode(mode){
  leaderboardRankMode=mode==='realized'?'realized':'total';
@@ -476,7 +476,7 @@ function setRankMode(mode){
 }
 function renderLeaderboard(){
  const host=document.getElementById('leaderboardArea'); if(!host)return;
- const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸'];
+ const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
  const arr=names.map(name=>{
    const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));
    let cost=0,totalProfit=0,realizedProfit=0,unrealizedProfit=0,closed=0,wins=0,open=0;
@@ -564,7 +564,7 @@ function renderRank(){
  const summaryHost=document.getElementById('summaryArea');
  if(!rankHost||!summaryHost)return;
 
- const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸'];
+ const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
  const base=trades.filter(t=>holdRangeMatch(t));
 
  let arr=names.map(name=>{

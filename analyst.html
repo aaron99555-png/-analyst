@@ -305,6 +305,31 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   .rank-row.no-trade > div:nth-child(4){justify-self:start}
 }
 
+
+/* v15: 行情資料提醒 */
+.price-update-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.price-note{
+  font-size:10px;
+  color:var(--muted);
+  white-space:nowrap;
+  text-align:center;
+}
+@media(max-width:700px){
+  .price-update-wrap{width:100%}
+  .price-update-wrap .refresh-hero{width:100%}
+  .price-note{
+    width:100%;
+    font-size:10px;
+    white-space:normal;
+    line-height:1.35;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -312,7 +337,10 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   <div class="topbar">
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽</h1><div class="sub">6 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
-      <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部價格</button>
+      <div class="price-update-wrap">
+        <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部價格</button>
+        <div class="price-note">資料回傳僅供參考，一切依收盤價為主</div>
+      </div>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>

@@ -186,6 +186,179 @@ body.viewer-mode .admin-only{display:none!important}
 }
 </style>
 
+
+<style>
+/* V16 格式優化＋分析師評分 */
+.score-explain{
+  margin:12px 0 16px;padding:14px 16px;border:1px solid var(--line);
+  border-radius:14px;background:linear-gradient(180deg,rgba(226,195,111,.08),rgba(255,255,255,.015));
+}
+.score-explain .title{font-weight:900;color:var(--gold);margin-bottom:7px}
+.score-explain .formula{font-size:13px;line-height:1.75;color:var(--muted)}
+.score-explain b{color:var(--text)}
+.score-pill{
+  display:inline-flex;align-items:center;justify-content:center;min-width:68px;
+  padding:7px 10px;border-radius:999px;font-weight:900;border:1px solid var(--line);
+  background:rgba(255,255,255,.04)
+}
+.score-grade{font-size:11px;margin-left:5px;color:var(--muted);font-weight:700}
+.score-bar{height:8px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;min-width:90px}
+.score-bar > i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--primary2),var(--gold))}
+.rank-table th{white-space:nowrap}
+.rank-table td{vertical-align:middle}
+.rank-table tbody tr:hover{background:rgba(226,195,111,.04)}
+.analyst-total-panel .panel-head{align-items:flex-start}
+.leader-score{
+  display:flex;align-items:baseline;gap:6px;margin-top:8px
+}
+.leader-score strong{font-size:28px;color:var(--gold)}
+.leader-score span{font-size:12px;color:var(--muted)}
+.metric-grid-compact{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px
+}
+.metric-grid-compact .mini{
+  padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.025)
+}
+.metric-grid-compact .mini span{display:block;font-size:11px;color:var(--muted)}
+.metric-grid-compact .mini b{display:block;margin-top:3px;font-size:14px}
+@media(max-width:900px){
+  .metric-grid-compact{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .score-explain{padding:12px}
+  .analyst-total-panel .rank-table{min-width:1120px}
+}
+</style>
+
+
+<style>
+.inactive-analyst,.inactive-row{opacity:.58}
+.inactive-analyst .leader-main{font-size:24px}
+.inactive-row:hover{opacity:.8}
+</style>
+
+
+<style>
+/* V19 百分比排行榜＋頒獎台 */
+.podium-section{
+  padding:8px 18px 22px;
+  border-top:1px solid var(--line);
+}
+.podium-title{
+  margin:10px 0 18px;
+  font-weight:900;
+  font-size:17px;
+  color:var(--gold);
+}
+.podium-wrap{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:14px;
+  min-height:310px;
+  padding:70px 14px 0;
+  overflow:visible;
+}
+.podium-item{
+  position:relative;
+  flex:0 1 220px;
+  max-width:220px;
+  min-width:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  text-align:center;
+}
+.podium-info{
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 12px);
+  transform:translateX(-50%);
+  width:100%;
+  min-height:70px;
+  padding:8px 7px;
+  box-sizing:border-box;
+}
+.podium-name{
+  font-weight:900;
+  font-size:16px;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+.podium-return{
+  margin-top:5px;
+  font-size:21px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.podium-step{
+  border:1px solid rgba(226,195,111,.35);
+  border-bottom:0;
+  border-radius:14px 14px 0 0;
+  background:linear-gradient(180deg,rgba(226,195,111,.19),rgba(142,107,39,.10));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding-top:15px;
+  box-sizing:border-box;
+  box-shadow:0 -8px 28px rgba(0,0,0,.12);
+}
+.podium-rank{
+  font-size:30px;
+  font-weight:1000;
+  line-height:1;
+}
+.podium-label{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:800;
+}
+.podium-item.rank-1{order:2}
+.podium-item.rank-2{order:1}
+.podium-item.rank-3{order:3}
+.podium-item.rank-1 .podium-step{height:180px}
+.podium-item.rank-2 .podium-step{height:135px}
+.podium-item.rank-3 .podium-step{height:105px}
+.podium-empty{
+  width:100%;
+  padding:35px 12px;
+  text-align:center;
+  color:var(--muted);
+}
+.inactive-analyst,.inactive-row{opacity:.58}
+@media(max-width:700px){
+  .podium-wrap{
+    gap:7px;
+    min-height:255px;
+    padding:72px 0 0;
+  }
+  .podium-item{
+    flex:1 1 0;
+    min-width:0;
+    max-width:none;
+  }
+  .podium-info{
+    bottom:calc(100% + 8px);
+    padding:5px 2px;
+    min-height:64px;
+  }
+  .podium-name{
+    font-size:12px;
+    line-height:1.25;
+  }
+  .podium-return{
+    font-size:15px;
+  }
+  .podium-rank{font-size:25px}
+  .podium-item.rank-1 .podium-step{height:145px}
+  .podium-item.rank-2 .podium-step{height:108px}
+  .podium-item.rank-3 .podium-step{height:82px}
+  .podium-label{font-size:10px}
+}
+</style>
+
 </head>
 <body class="viewer-mode">
 <div class="app">
@@ -207,13 +380,17 @@ body.viewer-mode .admin-only{display:none!important}
 
   <div class="leaderboard-panel">
     <div class="leaderboard-head">
-      <h2>🏆 績效排行榜</h2>
+      <h2>🏆 績效排行榜 <span class="smallnote">｜卡片同步顯示綜合評分</span></h2>
       <div class="leaderboard-controls">
-        <button type="button" class="btn leader-sort-btn active" data-rank-mode="total" onclick="setRankMode('total')">總損益排行</button>
-        <button type="button" class="btn leader-sort-btn" data-rank-mode="realized" onclick="setRankMode('realized')">已實現損益排行</button>
+        <button type="button" class="btn leader-sort-btn active" data-rank-mode="total" onclick="setRankMode('total')">總績效％排行</button>
+        <button type="button" class="btn leader-sort-btn" data-rank-mode="realized" onclick="setRankMode('realized')">已實現績效％排行</button>
       </div>
     </div>
     <div id="leaderboardArea" class="leaderboard-grid"></div>
+    <div class="podium-section">
+      <div class="podium-title">🏆 績效頒獎台 <span class="smallnote">依百分比績效排名</span></div>
+      <div id="podiumArea" class="podium-wrap"></div>
+    </div>
   </div>
 
   <div class="stats">
@@ -266,7 +443,17 @@ body.viewer-mode .admin-only{display:none!important}
     <div class="panel-body" style="padding-bottom:0"><div class="analyst-tabs"><button class="analyst-tab active" data-analyst="all" onclick="setAnalystFilter('all')">全部分析師</button><button class="analyst-tab" data-analyst="王榮旭" onclick="setAnalystFilter('王榮旭')">王榮旭</button><button class="analyst-tab" data-analyst="張貽程" onclick="setAnalystFilter('張貽程')">張貽程</button><button class="analyst-tab" data-analyst="金玉峰雷老闆" onclick="setAnalystFilter('金玉峰雷老闆')">金玉峰雷老闆</button><button class="analyst-tab" data-analyst="漁夫林睿閎" onclick="setAnalystFilter('漁夫林睿閎')">漁夫林睿閎</button><button class="analyst-tab" data-analyst="艾綸劉育綸" onclick="setAnalystFilter('艾綸劉育綸')">艾綸劉育綸</button><button class="analyst-tab" data-analyst="徐紹軒" onclick="setAnalystFilter('徐紹軒')">徐紹軒</button></div><div id="analystCards" class="analyst-cards"></div></div><div class="table-wrap" id="tableArea"></div>
   </div>
 
-  <div class="panel analyst-total-panel">
+  
+<div class="score-explain">
+  <div class="title">📊 綜合評分（輔助參考，不影響名次）</div>
+  <div class="formula">
+    <b>已實現績效 40%</b> ＋ <b>未實現績效 20%</b> ＋ <b>勝率 20%</b> ＋
+    <b>交易樣本 10%</b> ＋ <b>風險穩定度 10%</b>。<br>
+    已結算交易權重最高；持有中部位只計部分分數。交易筆數太少時，樣本分會較低，避免單筆大賺直接登頂。
+  </div>
+</div>
+
+<div class="panel analyst-total-panel">
     <div class="panel-head"><h2>分析師總績效</h2><div class="smallnote">固定顯示｜管理者可直接切換至該分析師資料進行修改</div></div>
     <div class="panel-body rank-grid">
       <div id="rankArea"></div>
@@ -289,6 +476,7 @@ const FIREBASE_BASE='https://analyst-277bd-default-rtdb.firebaseio.com';
 const FIREBASE_NODE='analystPerformanceDashboard';
 const FIREBASE_URL=`${FIREBASE_BASE}/${FIREBASE_NODE}.json`;
 let trades=JSON.parse(localStorage.getItem(KEY)||'[]');
+trades.forEach(t=>{if(t.analyst==='徐*紹軒*')t.analyst='徐紹軒';});
 let activeId=null;
 let cloudUpdatedAt=0;
 let cloudWriteTimer=null;
@@ -474,35 +662,163 @@ function setRankMode(mode){
  document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
  renderLeaderboard();
 }
+
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function scoreGrade(score){
+ if(score>=85)return 'S';
+ if(score>=75)return 'A';
+ if(score>=65)return 'B';
+ if(score>=55)return 'C';
+ return 'D';
+}
+function analystScore(list){
+ let realizedCost=0,realizedProfit=0,unrealizedCost=0,unrealizedProfit=0;
+ let closed=0,wins=0,losses=0,totalLossPct=0;
+ list.forEach(t=>{
+   const c=getCalc(t);
+   if(t.status==='closed'){
+     closed++; realizedCost+=c.cost; realizedProfit+=c.profit;
+     if(c.profit>0)wins++;
+     if(c.ret<0){losses++;totalLossPct+=Math.abs(c.ret);}
+   }else{
+     unrealizedCost+=c.cost; unrealizedProfit+=c.profit;
+   }
+ });
+ const realizedRet=realizedCost?realizedProfit/realizedCost*100:0;
+ const unrealizedRet=unrealizedCost?unrealizedProfit/unrealizedCost*100:0;
+ const winRate=closed?wins/closed*100:0;
+ const avgLoss=losses?totalLossPct/losses:0;
+
+ // 報酬分：-15% = 0分，+15% = 100分；未實現較保守
+ const realizedScore=clamp((realizedRet+15)/30*100,0,100);
+ const unrealizedScore=clamp((unrealizedRet+12)/24*100,0,100);
+ // 勝率直接換算；無已結算交易給中性 50 分，但樣本分會壓低總分
+ const winScore=closed?clamp(winRate,0,100):50;
+ // 10筆達滿分，少量交易不容易因單筆極端值衝高
+ const sampleScore=clamp(list.length/10*100,0,100);
+ // 平均虧損越小越穩定；平均虧損 >=15% 時為0分。尚無虧損視為100分。
+ const stabilityScore=losses?clamp(100-(avgLoss/15*100),0,100):100;
+
+ const raw =
+   realizedScore*0.40 +
+   unrealizedScore*0.20 +
+   winScore*0.20 +
+   sampleScore*0.10 +
+   stabilityScore*0.10;
+
+ // 尚無交易者直接0分；只有持有中但沒有已結算，最高先限制在70分
+ let score=list.length?raw:0;
+ if(list.length && closed===0) score=Math.min(score,70);
+
+ return {
+   score:Math.round(score*10)/10,
+   grade:scoreGrade(score),
+   realizedRet,unrealizedRet,winRate,sampleScore,stabilityScore,
+   realizedProfit,unrealizedProfit,closed,total:list.length
+ };
+}
+
+
+function calcAnalystPerformance(list){
+ let totalCost=0,totalProfit=0,realizedCost=0,realizedProfit=0,unrealizedCost=0,unrealizedProfit=0;
+ list.forEach(t=>{
+   const c=getCalc(t);
+   totalCost+=c.cost; totalProfit+=c.profit;
+   if(t.status==='closed'){realizedCost+=c.cost;realizedProfit+=c.profit;}
+   else{unrealizedCost+=c.cost;unrealizedProfit+=c.profit;}
+ });
+ return {
+   totalCost,totalProfit,realizedCost,realizedProfit,unrealizedCost,unrealizedProfit,
+   totalRet:totalCost?totalProfit/totalCost*100:0,
+   realizedRet:realizedCost?realizedProfit/realizedCost*100:0,
+   unrealizedRet:unrealizedCost?unrealizedProfit/unrealizedCost*100:0
+ };
+}
+function renderPodium(arr){
+ const host=document.getElementById('podiumArea');
+ if(!host)return;
+ const active=arr.filter(a=>a.active).slice(0,3);
+ if(!active.length){
+   host.innerHTML='<div class="podium-empty">目前尚無交易資料可排名</div>';
+   return;
+ }
+ const medal=['🥇','🥈','🥉'];
+ host.innerHTML=active.map((a,i)=>{
+   const rank=i+1;
+   const rankingRet=leaderboardRankMode==='realized'?a.realizedRet:a.totalRet;
+   return `<div class="podium-item rank-${rank}">
+     <div class="podium-info">
+       <div class="podium-name">${esc(a.name)}</div>
+       <div class="podium-return ${rankingRet>0?'positive':rankingRet<0?'negative':'neutral'}">${pct(rankingRet)}</div>
+     </div>
+     <div class="podium-step">
+       <div class="podium-rank">${medal[i]}</div>
+       <div class="podium-label">第 ${rank} 名</div>
+     </div>
+   </div>`;
+ }).join('');
+}
+
 function renderLeaderboard(){
  const host=document.getElementById('leaderboardArea'); if(!host)return;
  const names=['王榮旭','張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒'];
- const arr=names.map(name=>{
+ let arr=names.map(name=>{
    const list=trades.filter(t=>t.analyst===name&&holdRangeMatch(t));
-   let cost=0,totalProfit=0,realizedProfit=0,unrealizedProfit=0,closed=0,wins=0,open=0;
-   list.forEach(t=>{
-     const c=getCalc(t); cost+=c.cost; totalProfit+=c.profit;
-     if(t.status==='open'){open++;unrealizedProfit+=c.profit;}
-     else{closed++;realizedProfit+=c.profit;if(c.profit>0)wins++;}
-   });
-   return {name,n:list.length,open,closed,totalProfit,realizedProfit,unrealizedProfit,
-     ret:cost?totalProfit/cost*100:0,winRate:closed?wins/closed*100:0};
+   const perf=calcAnalystPerformance(list);
+   const scoring=analystScore(list);
+   return {name,list,...perf,...scoring,active:list.length>0};
  });
- const rankKey=leaderboardRankMode==='realized'?'realizedProfit':'totalProfit';
- arr.sort((a,b)=>b[rankKey]-a[rankKey] || b.totalProfit-a.totalProfit);
- if(!arr.some(a=>a.n)){host.innerHTML='<div class="leader-empty" style="grid-column:1/-1">新增交易後會顯示績效排行榜</div>';return;}
- host.innerHTML=arr.map((a,i)=>`<div class="leader-card ${i===0?'first':''}">
-   <div class="leader-rank">${i===0?'🥇':i===1?'🥈':'🥉'}</div>
-   <div class="leader-name">${esc(a.name)}</div>
-   <div class="leader-metrics">
-     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'已實現損益':'總損益'}</span><b class="${a[rankKey]>=0?'positive':'negative'}">${money(a[rankKey])}</b></div>
-     <div class="leader-metric"><span>${leaderboardRankMode==='realized'?'總損益':'已實現損益'}</span><b class="${(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)>=0?'positive':'negative'}">${money(leaderboardRankMode==='realized'?a.totalProfit:a.realizedProfit)}</b></div>
-     <div class="leader-metric"><span>未實現損益</span><b class="${a.unrealizedProfit>=0?'positive':'negative'}">${money(a.unrealizedProfit)}</b></div>
-     <div class="leader-metric"><span>勝率</span><b>${fmt2(a.winRate)}%</b></div>
-   </div>
- </div>`).join('');
- document.querySelectorAll('.leader-sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.rankMode===leaderboardRankMode));
+
+ // 所有名次一律用百分比績效；0筆交易不列入名次
+ arr.sort((a,b)=>{
+   if(a.active!==b.active)return a.active?-1:1;
+   if(!a.active&&!b.active)return names.indexOf(a.name)-names.indexOf(b.name);
+   const av=leaderboardRankMode==='realized'?a.realizedRet:a.totalRet;
+   const bv=leaderboardRankMode==='realized'?b.realizedRet:b.totalRet;
+   if(bv!==av)return bv-av;
+   if(b.realizedRet!==a.realizedRet)return b.realizedRet-a.realizedRet;
+   return b.score-a.score;
+ });
+
+ let activeRank=0;
+ const medals=['🥇','🥈','🥉'];
+ host.innerHTML=arr.map(a=>{
+   const rank=a.active?++activeRank:null;
+   if(!a.active){
+     return `<div class="leader-card inactive-analyst">
+       <div class="leader-rank">—</div>
+       <div class="leader-name">${esc(a.name)}</div>
+       <div class="smallnote">基準日：2026/09/01</div>
+       <div class="leader-score"><strong>—</strong><span>尚無操作</span></div>
+       <div class="leader-main neutral">—</div>
+       <div class="leader-sub">尚無交易紀錄，不列入排名</div>
+       <div class="metric-grid-compact">
+         <div class="mini"><span>總績效</span><b>—</b></div>
+         <div class="mini"><span>已實現績效</span><b>—</b></div>
+         <div class="mini"><span>勝率</span><b>—</b></div>
+         <div class="mini"><span>交易筆數</span><b>0</b></div>
+       </div>
+     </div>`;
+   }
+   const rankingRet=leaderboardRankMode==='realized'?a.realizedRet:a.totalRet;
+   return `<div class="leader-card">
+     <div class="leader-rank">${medals[rank-1]||('#'+rank)}</div>
+     <div class="leader-name">${esc(a.name)}</div>
+     <div class="smallnote">基準日：2026/09/01</div>
+     <div class="leader-score"><strong>${fmt2(a.score)}</strong><span>分｜${a.grade}級</span></div>
+     <div class="leader-main ${rankingRet>0?'positive':rankingRet<0?'negative':'neutral'}">${pct(rankingRet)}</div>
+     <div class="leader-sub">${leaderboardRankMode==='realized'?'已實現績效％':'總績效％'}</div>
+     <div class="metric-grid-compact">
+       <div class="mini"><span>總績效</span><b>${pct(a.totalRet)}</b></div>
+       <div class="mini"><span>已實現績效</span><b>${pct(a.realizedRet)}</b></div>
+       <div class="mini"><span>勝率</span><b>${fmt2(a.winRate)}%</b></div>
+       <div class="mini"><span>交易筆數</span><b>${a.total}</b></div>
+     </div>
+   </div>`;
+ }).join('');
+ renderPodium(arr);
 }
+
 function analystScopedTrades(){const af=document.getElementById('analystFilter').value;return trades.filter(t=>(af==='all'||t.analyst===af)&&holdRangeMatch(t));}
 function renderStats(){
  const scoped=analystScopedTrades();
@@ -569,50 +885,60 @@ function renderRank(){
 
  let arr=names.map(name=>{
    const list=base.filter(t=>t.analyst===name);
-   let n=0,open=0,closed=0,wins=0,cost=0,profit=0,realized=0,unrealized=0;
+   let open=0,closed=0,wins=0;
    list.forEach(t=>{
      const c=getCalc(t);
-     n++; cost+=c.cost; profit+=c.profit;
-     if(t.status==='open'){open++;unrealized+=c.profit;}
-     else{closed++;realized+=c.profit;if(c.profit>0)wins++;}
+     if(t.status==='open')open++;
+     else{closed++;if(c.profit>0)wins++;}
    });
-   return {
-     name,n,open,closed,cost,profit,realized,unrealized,
-     ret:cost?profit/cost*100:0,
-     winRate:closed?wins/closed*100:0
-   };
- }).sort((a,b)=>b.profit-a.profit);
+   const perf=calcAnalystPerformance(list);
+   const scoring=analystScore(list);
+   return {name,list,open,closed,wins,...perf,...scoring,active:list.length>0};
+ }).sort((a,b)=>{
+   if(a.active!==b.active)return a.active?-1:1;
+   if(!a.active&&!b.active)return names.indexOf(a.name)-names.indexOf(b.name);
+   if(b.totalRet!==a.totalRet)return b.totalRet-a.totalRet;
+   return b.realizedRet-a.realizedRet;
+ });
 
+ let activeRank=0;
  rankHost.innerHTML=`<table class="rank-table">
    <thead><tr>
-     <th>排名</th><th>分析師</th><th>交易</th><th>持有</th><th>已結算</th>
-     <th>報酬率</th><th>總損益</th><th>已實現</th><th>未實現</th><th>勝率</th>
+     <th>排名</th><th>分析師</th><th>基準日</th>
+     <th>總績效％</th><th>已實現績效％</th><th>未實現績效％</th>
+     <th>交易</th><th>持有</th><th>已結算</th><th>勝率</th>
+     <th>總損益</th><th>已實現損益</th><th>未實現損益</th>
      ${isAdmin()?'<th>操作</th>':''}
    </tr></thead>
-   <tbody>${arr.map((a,i)=>`<tr>
-     <td>${i+1}</td>
-     <td><b>${esc(a.name)}</b></td>
-     <td>${a.n} 筆</td>
-     <td>${a.open}</td>
-     <td>${a.closed}</td>
-     <td class="${a.ret>0?'positive':a.ret<0?'negative':'neutral'}"><b>${pct(a.ret)}</b></td>
-     <td class="${a.profit>0?'positive':a.profit<0?'negative':'neutral'}"><b>${money(a.profit)}</b></td>
-     <td class="${a.realized>0?'positive':a.realized<0?'negative':'neutral'}">${money(a.realized)}</td>
-     <td class="${a.unrealized>0?'positive':a.unrealized<0?'negative':'neutral'}">${money(a.unrealized)}</td>
-     <td>${fmt2(a.winRate)}%</td>
-     ${isAdmin()?`<td><button type="button" class="iconbtn" onclick="editAnalystRecords('${a.name}')">修改資料</button></td>`:''}
-   </tr>`).join('')}</tbody>
+   <tbody>${arr.map(a=>{
+     const rank=a.active?++activeRank:null;
+     return `<tr class="${a.active?'':'inactive-row'}">
+       <td><b>${a.active?rank:'—'}</b></td>
+       <td><b>${esc(a.name)}</b>${a.active?'':' <span class="smallnote">尚無操作</span>'}</td>
+       <td><b>2026/09/01</b></td>
+       <td class="${a.totalRet>0?'positive':a.totalRet<0?'negative':'neutral'}"><b>${a.active?pct(a.totalRet):'—'}</b></td>
+       <td class="${a.realizedRet>0?'positive':a.realizedRet<0?'negative':'neutral'}">${a.active?pct(a.realizedRet):'—'}</td>
+       <td class="${a.unrealizedRet>0?'positive':a.unrealizedRet<0?'negative':'neutral'}">${a.active?pct(a.unrealizedRet):'—'}</td>
+       <td>${a.total}</td><td>${a.open}</td><td>${a.closed}</td>
+       <td>${a.active?fmt2(a.winRate)+'%':'—'}</td>
+       <td class="${a.totalProfit>0?'positive':a.totalProfit<0?'negative':'neutral'}">${a.active?money(a.totalProfit):'—'}</td>
+       <td class="${a.realizedProfit>0?'positive':a.realizedProfit<0?'negative':'neutral'}">${a.active?money(a.realizedProfit):'—'}</td>
+       <td class="${a.unrealizedProfit>0?'positive':a.unrealizedProfit<0?'negative':'neutral'}">${a.active?money(a.unrealizedProfit):'—'}</td>
+       ${isAdmin()?`<td><button type="button" class="iconbtn" onclick="editAnalystRecords('${a.name}')">${a.active?'修改資料':'新增資料'}</button></td>`:''}
+     </tr>`;
+   }).join('')}</tbody>
  </table>`;
 
- const best=arr[0];
- const totalProfit=arr.reduce((s,a)=>s+a.profit,0);
- const realized=arr.reduce((s,a)=>s+a.realized,0);
- const unrealized=arr.reduce((s,a)=>s+a.unrealized,0);
- const totalTrades=arr.reduce((s,a)=>s+a.n,0);
+ const activeArr=arr.filter(a=>a.active);
+ const totalProfit=activeArr.reduce((s,a)=>s+a.totalProfit,0);
+ const realized=activeArr.reduce((s,a)=>s+a.realizedProfit,0);
+ const unrealized=activeArr.reduce((s,a)=>s+a.unrealizedProfit,0);
 
  summaryHost.innerHTML=`
-   <tr><td>目前績效最佳分析師</td><td><b>${esc(best.name)}</b> ${money(best.profit)}</td></tr>
-   <tr><td>總交易筆數</td><td><b>${totalTrades}</b></td></tr>
+   <tr><td>績效基準日</td><td><b>2026/09/01</b></td></tr>
+   <tr><td>總績效第一名</td><td>${activeArr.length?`<b>${esc(activeArr[0].name)}</b> ${pct(activeArr[0].totalRet)}`:'尚無交易'}</td></tr>
+   <tr><td>排名方式</td><td><b>總績效百分比</b></td></tr>
+   <tr><td>有操作分析師</td><td><b>${activeArr.length}</b> / ${names.length}</td></tr>
    <tr><td>總損益</td><td class="${totalProfit>0?'positive':totalProfit<0?'negative':'neutral'}"><b>${money(totalProfit)}</b></td></tr>
    <tr><td>已實現損益</td><td class="${realized>0?'positive':realized<0?'negative':'neutral'}"><b>${money(realized)}</b></td></tr>
    <tr><td>未實現損益</td><td class="${unrealized>0?'positive':unrealized<0?'negative':'neutral'}"><b>${money(unrealized)}</b></td></tr>`;

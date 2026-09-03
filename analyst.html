@@ -649,6 +649,49 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v37：頒獎台第4名以後完整排行 */
+.podium-rest-rank{
+  width:100%;
+  margin-top:12px;
+  border-top:1px solid var(--line);
+  padding-top:8px;
+}
+.podium-rest-row{
+  display:grid;
+  grid-template-columns:58px minmax(100px,1fr) 78px 100px;
+  align-items:center;
+  gap:8px;
+  padding:7px 6px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:12px;
+}
+.podium-rest-place{
+  font-weight:900;
+  color:var(--muted);
+}
+.podium-rest-name{
+  font-weight:850;
+  min-width:0;
+}
+.podium-rest-perf,
+.podium-rest-pl{
+  text-align:right;
+  font-weight:900;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .podium-rest-row{
+    grid-template-columns:48px minmax(0,1fr) 68px;
+    gap:6px;
+    padding:7px 3px;
+    font-size:11px;
+  }
+  .podium-rest-pl{
+    display:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -968,6 +1011,7 @@ function renderCharts(){
   const valueLabelPlugin={
     id:'valueLabelPlugin',
     afterDatasetsDraw(chart){
+    if(window.innerWidth<=700)return;
       const {ctx}=chart; ctx.save(); ctx.textAlign='center';
       ctx.font='700 11px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
       chart.data.datasets.forEach((dataset,di)=>{
@@ -1074,24 +1118,58 @@ function renderCharts(){
 }
 
 function renderPodium(data){
-  const sorted=[...data].filter(x=>x.tradesCount>0).sort((a,b)=>b.totalPerf-a.totalPerf);
-  const medals=['🥇','🥈','🥉'];
-  const el=document.getElementById('podium');
+  const el=$('#podium');
   if(!el)return;
-  if(!sorted.length){
-    el.innerHTML='<div class="podium-empty">目前篩選條件下尚無可排名交易</div>';
+
+  const ranked=data
+    .filter(x=>x.tradesCount>0)
+    .sort((a,b)=>b.totalPerf-a.totalPerf);
+
+  if(!ranked.length){
+    el.innerHTML='<div class="empty">目前篩選條件下尚無可排名資料</div>';
     return;
   }
-  el.innerHTML=sorted.slice(0,3).map((r,i)=>`<div class="podium-item p${i+1}">
-    <div class="podium-person">
-      <div class="podium-medal">${medals[i]}</div>
-      <div class="podium-name">${esc(r.name)}</div>
-      <div class="podium-perf ${r.totalPerf>=0?'pos':'neg'}">${pct(r.totalPerf)}</div>
-      <div class="podium-profit ${r.total>=0?'pos':'neg'}">${fmtMoney(r.total)}</div>
-      <div class="podium-counts">持股 ${r.openCount} 檔 <span>｜</span> 結算 ${r.closedCount} 檔</div>
+
+  const top3=ranked.slice(0,3);
+  const byPlace={};
+  top3.forEach((x,i)=>byPlace[i+1]=x);
+
+  const podiumItem=(place,cls)=>{
+    const x=byPlace[place];
+    if(!x)return `<div class="podium-step ${cls} podium-empty-step"></div>`;
+    const medal=place===1?'🥇':place===2?'🥈':'🥉';
+    return `
+      <div class="podium-step ${cls}">
+        <div class="podium-medal">${medal}</div>
+        <div class="podium-name">${esc(x.name)}</div>
+        <div class="podium-perf ${x.totalPerf>=0?'pos':'neg'}">${pct(x.totalPerf)}</div>
+        <div class="podium-pl ${x.total>=0?'pos':'neg'}">${money(x.total)}</div>
+        <div class="podium-count">${x.openCount} 持有中・${x.closedCount} 已結算</div>
+        <div class="podium-place">第 ${place} 名</div>
+      </div>`;
+  };
+
+  const rest=ranked.slice(3);
+  const restHtml=rest.length?`
+    <div class="podium-rest-rank">
+      ${rest.map((x,i)=>`
+        <div class="podium-rest-row">
+          <div class="podium-rest-place">第 ${i+4} 名</div>
+          <div class="podium-rest-name">${esc(x.name)}</div>
+          <div class="podium-rest-perf ${x.totalPerf>=0?'pos':'neg'}">${pct(x.totalPerf)}</div>
+          <div class="podium-rest-pl ${x.total>=0?'pos':'neg'}">${money(x.total)}</div>
+        </div>
+      `).join('')}
+    </div>`:'';
+
+  el.innerHTML=`
+    <div class="podium-stage">
+      ${podiumItem(2,'p2')}
+      ${podiumItem(1,'p1')}
+      ${podiumItem(3,'p3')}
     </div>
-    <div class="podium-step"><div class="place">${i+1}</div></div>
-  </div>`).join('');
+    ${restHtml}
+  `;
 }
 
 function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}

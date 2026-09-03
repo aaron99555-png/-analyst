@@ -692,6 +692,26 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v38：管理者匯入匯出 */
+.admin-data-tools{
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+  margin-left:6px;
+}
+@media(max-width:700px){
+  .admin-data-tools{
+    display:flex;
+    width:100%;
+    margin-left:0;
+    margin-top:6px;
+  }
+  .admin-data-tools button{
+    flex:1;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -701,6 +721,12 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新全部收盤價</button>
+<div class="admin-only hidden admin-data-tools" id="adminDataTools">
+  <button id="exportDataBtn" class="ghost">匯出資料</button>
+  <button id="importDataBtn" class="ghost">匯入資料</button>
+  <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
+</div>
+
         <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="adminBtn" class="primary">管理者登入</button>
@@ -1587,6 +1613,68 @@ document.addEventListener('click',e=>{
     e.preventDefault();
     manualCurrentPrice(btn.dataset.manualPrice);
   }
+});
+
+
+function exportAllData(){
+  if(!isAdmin)return;
+  const payload={
+    exportedAt:nowText(),
+    app:'台股擂台賽',
+    version:38,
+    trades
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=today().replaceAll('-','');
+  a.href=url;
+  a.download=`台股擂台賽_交易資料_${d}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+async function importAllData(file){
+  if(!isAdmin)return;
+  if(!file)return;
+
+  let obj;
+  try{
+    const text=await file.text();
+    obj=JSON.parse(text);
+  }catch(e){
+    return alert('匯入失敗：檔案不是有效的 JSON');
+  }
+
+  const incoming=obj?.trades ?? obj;
+  if(!incoming || typeof incoming!=='object' || Array.isArray(incoming)){
+    return alert('匯入失敗：找不到有效的交易資料');
+  }
+
+  const count=Object.keys(incoming).length;
+  const ok=confirm(
+    `即將匯入 ${count} 筆交易資料。\n\n`+
+    `此操作會以匯入檔內容覆蓋目前 Firebase 的全部交易資料。\n`+
+    `建議先使用「匯出資料」備份。\n\n是否繼續？`
+  );
+  if(!ok)return;
+
+  try{
+    await set(ref(db,'analystPerformance/trades'),incoming);
+    alert(`匯入完成，共 ${count} 筆資料`);
+  }catch(e){
+    alert(`匯入失敗：${e?.message||'未知錯誤'}`);
+  }
+}
+
+$('#exportDataBtn')?.addEventListener('click',exportAllData);
+$('#importDataBtn')?.addEventListener('click',()=>$('#importDataFile')?.click());
+$('#importDataFile')?.addEventListener('change',async e=>{
+  const file=e.target.files?.[0];
+  await importAllData(file);
+  e.target.value='';
 });
 
 

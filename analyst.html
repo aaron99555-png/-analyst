@@ -415,6 +415,28 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   .today-entry-meta{font-size:10px}
 }
 
+
+/* v24：電腦版左右配置 */
+@media(min-width:701px){
+  .today-entry-card{grid-column:span 8 !important}
+  .today-entry-list{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media(max-width:700px){
+  .today-entry-card{grid-column:1/-1 !important}
+}
+
+
+/* v25：電腦版 左 / 中 / 右 三欄配置 */
+@media(min-width:701px){
+  .filter-card{grid-column:span 4 !important}
+  .today-entry-card{grid-column:span 4 !important}
+  .today-entry-list{grid-template-columns:1fr !important}
+}
+@media(max-width:700px){
+  .filter-card,
+  .today-entry-card{grid-column:1/-1 !important}
+}
+
 </style>
 </head>
 <body>
@@ -432,7 +454,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   </div>
 
   <div class="grid">
-    <section class="card span8">
+    <section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
         <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
@@ -445,7 +467,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
       </div>
     </section>
 
-    <section class="card span12 today-entry-card">
+    <section class="card span4 today-entry-card">
       <div class="section-title">
         <h2>今日進場股票</h2>
         <span class="status" id="todayEntryDate">—</span>

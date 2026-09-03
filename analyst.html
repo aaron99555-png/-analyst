@@ -330,6 +330,29 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v16 收盤價模式 */
+.price-note{max-width:280px}
+#lastRefresh{font-weight:800}
+
+
+/* v17：強調收盤價為正式依據 */
+.price-note{
+  max-width:360px;
+  padding:5px 8px;
+  border:1px solid rgba(217,178,76,.28);
+  border-radius:8px;
+  background:rgba(217,178,76,.07);
+  line-height:1.45;
+}
+.price-note b,.price-note strong{
+  color:#f6d56b;
+  font-weight:900;
+}
+@media(max-width:700px){
+  .price-note{max-width:none}
+}
+
 </style>
 </head>
 <body>
@@ -338,8 +361,8 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽</h1><div class="sub">6 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部價格</button>
-        <div class="price-note">資料回傳僅供參考，一切依收盤價為主</div>
+        <button id="refreshAllBtn" class="refresh-hero">⟳ 一鍵更新全部收盤價</button>
+        <div class="price-note"><b>正式績效與最終數字一律以收盤價為準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
@@ -348,7 +371,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 
   <div class="grid">
     <section class="card span8">
-      <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">更新日期：—</span></div>
+      <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
         <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>王榮旭</option><option>張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option></select></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
@@ -604,8 +627,22 @@ function bindRows(){
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
-function setAdmin(v){isAdmin=v; localStorage.setItem('analystAdmin',v?'1':'0'); $$('.admin-only').forEach(x=>x.classList.toggle('hidden',!v)); $$('.admin-col').forEach(x=>x.classList.toggle('hidden',!v)); $('#adminBtn').classList.toggle('hidden',v); $('#logoutBtn').classList.toggle('hidden',!v); render()}
+function setAdmin(v){isAdmin=v; localStorage.setItem('analystAdmin',v?'1':'0'); $$('.admin-only').forEach(x=>x.classList.toggle('hidden',!v)); $$('.admin-col').forEach(x=>x.classList.toggle('hidden',!v)); $('#adminBtn').classList.toggle('hidden',v); $('#logoutBtn').classList.toggle('hidden',!v); render(); updatePriceModeUI();}
+
+function updatePriceModeUI(){
+  const btn=$('#refreshAllBtn');
+  const note=document.querySelector('.price-note');
+  if(btn){
+    btn.textContent=isAdmin?'⟳ 更新價格（盤中可即時）':'⟳ 一鍵更新全部收盤價';
+  }
+  if(note){
+    note.innerHTML=isAdmin
+      ? '<strong>管理者盤中可寫入即時價</strong>｜<b>正式績效與最終數字一律以收盤價為準</b>'
+      : '<b>正式績效與最終數字一律以收盤價為準</b>｜一般使用者僅更新已完成收盤價';
+  }
+}
 if(localStorage.getItem('analystAdmin')==='1')setAdmin(true);
+else updatePriceModeUI();
 
 $('#adminBtn').onclick=()=>{$('#loginModal').classList.add('show');$('#adminPwd').focus()}; $('#closeLogin').onclick=()=>$('#loginModal').classList.remove('show');
 $('#doLogin').onclick=()=>{if($('#adminPwd').value===ADMIN_PASSWORD){setAdmin(true);$('#loginModal').classList.remove('show');$('#adminPwd').value=''}else alert('密碼錯誤')};
@@ -651,71 +688,212 @@ async function settleTrade(id){
 ['fAnalyst','fFrom','fTo','fStatus','fKeyword'].forEach(id=>$('#'+id).addEventListener(id==='fKeyword'?'input':'change',render));
 $('#clearFilterBtn').onclick=()=>{$('#fAnalyst').value='';$('#fStatus').value='';$('#fKeyword').value='';$('#fFrom').value='';$('#fTo').value='';render()};
 
-// ---- 股價更新：台股官方即時行情優先，Yahoo / Stooq 備援 ----
-async function fetchTWSE(sym){
+// ---- 股價更新 v16：以「已完成收盤價」為主，避免即時錯價污染資料 ----
+const PRICE_MAX_DEVIATION=0.15; // 一般台股多為 ±10%，預留誤差；異常價格直接拒絕
+const twNow=()=>{
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,weekday:'short'
+  }).formatToParts(new Date());
+  return Object.fromEntries(parts.map(x=>[x.type,x.value]));
+};
+function isTWMarketOpen(){
+  const p=twNow(), wd=p.weekday;
+  if(wd==='Sat'||wd==='Sun')return false;
+  const m=(+p.hour)*60+(+p.minute);
+  return m>=540 && m<815; // 09:00 ~ 13:35：尚未視為今日收盤完成
+}
+function sanePrice(price,reference){
+  price=Number(price); reference=Number(reference);
+  if(!Number.isFinite(price)||price<=0)return false;
+  if(!Number.isFinite(reference)||reference<=0)return true;
+  return Math.abs(price/reference-1)<=PRICE_MAX_DEVIATION;
+}
+async function fetchJsonViaProxy(url){
+  const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+  const r=await fetch(proxy,{cache:'no-store'});
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  return await r.json();
+}
+
+// TWSE / TPEx 官方 MIS。
+// 交易時段內一律使用 y（前一交易日收盤），收盤完成後才使用 z（今日最後成交/收盤）。
+async function fetchTWSEPrice(sym,{allowIntraday=false}={}){
   const channels=[`tse_${sym}.tw`,`otc_${sym}.tw`];
   for(const ch of channels){
     const u=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${encodeURIComponent(ch)}&json=1&delay=0&_=${Date.now()}`;
     try{
-      const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'});
-      if(!r.ok)continue;
-      const j=await r.json(); const d=j?.msgArray?.[0];
-      if(!d)continue;
-      const raw=(d.z && d.z!=='-')?d.z:(d.y && d.y!=='-')?d.y:null;
-      const price=Number(raw);
-      if(price>0)return {price,source:ch.startsWith('tse_')?'TWSE':'TPEx'};
-    }catch(e){}
+      const j=await fetchJsonViaProxy(u);
+      const d=j?.msgArray?.[0];
+      if(!d || String(d.c||'').trim()!==String(sym).trim())continue;
+
+      const prev=Number(d.y);
+      const last=Number(d.z);
+      const marketOpen=isTWMarketOpen();
+      const marketName=ch.startsWith('tse_')?'TWSE':'TPEx';
+
+      // 管理者盤中可寫入即時成交價；一般使用者不允許。
+      if(marketOpen && allowIntraday && sanePrice(last,prev)){
+        return {
+          price:last,
+          reference:prev,
+          source:`${marketName} 盤中即時價`,
+          mode:'intraday'
+        };
+      }
+
+      // 一般使用者盤中只能取最近一個已完成收盤價。
+      if(marketOpen && sanePrice(prev,null)){
+        return {
+          price:prev,
+          reference:prev,
+          source:`${marketName} 前一交易日收盤`,
+          mode:'closed'
+        };
+      }
+
+      // 收盤後採最後成交/收盤價。
+      if(sanePrice(last,prev)){
+        return {
+          price:last,
+          reference:prev,
+          source:`${marketName} 收盤`,
+          mode:'closed'
+        };
+      }
+
+      if(sanePrice(prev,null)){
+        return {
+          price:prev,
+          reference:prev,
+          source:`${marketName} 最近收盤`,
+          mode:'closed'
+        };
+      }
+    }catch(e){
+      console.warn('官方行情失敗',ch,e);
+    }
   }
-  throw new Error('TWSE/TPEx failed');
+  throw new Error('TWSE/TPEx price failed');
 }
-async function fetchYahoo(sym){
-  const candidates=[`${sym}.TW`,`${sym}.TWO`,sym];
+
+// Yahoo 僅做備援；只允許台灣市場 .TW / .TWO，不再嘗試裸代號。
+async function fetchYahooClose(sym){
+  const candidates=[`${sym}.TW`,`${sym}.TWO`];
   for(const s of candidates){
-    const urls=[
-      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?interval=1m&range=1d`,
-      `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?interval=1m&range=1d`
-    ];
-    for(const u of urls){try{const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'}); if(!r.ok)continue; const j=await r.json(); const meta=j?.chart?.result?.[0]?.meta; const p=meta?.regularMarketPrice??meta?.previousClose; if(p)return {price:+p,source:'Yahoo Finance'};}catch(e){}}
+    for(const host of ['query1.finance.yahoo.com','query2.finance.yahoo.com']){
+      try{
+        const u=`https://${host}/v8/finance/chart/${encodeURIComponent(s)}?interval=1d&range=5d`;
+        const j=await fetchJsonViaProxy(u);
+        const result=j?.chart?.result?.[0];
+        const meta=result?.meta;
+        if(!result || !meta)continue;
+        if(meta.currency && meta.currency!=='TWD')continue;
+
+        const closes=result?.indicators?.quote?.[0]?.close||[];
+        const timestamps=result?.timestamp||[];
+        const valid=[];
+        closes.forEach((v,i)=>{
+          const p=Number(v);
+          if(Number.isFinite(p)&&p>0&&timestamps[i])valid.push({price:p,ts:timestamps[i]});
+        });
+        if(!valid.length)continue;
+
+        // 盤中時 Yahoo 的最後一根日K可能仍在變動，因此取倒數第二個已完成日K。
+        let pick=valid[valid.length-1];
+        if(isTWMarketOpen() && valid.length>=2)pick=valid[valid.length-2];
+
+        const prev=Number(meta.previousClose ?? meta.chartPreviousClose);
+        if(!sanePrice(pick.price,prev))continue;
+
+        return {
+          price:pick.price,
+          reference:prev,
+          source:`Yahoo ${s} 收盤備援`,
+          mode:'closed'
+        };
+      }catch(e){
+        console.warn('Yahoo 備援失敗',s,e);
+      }
+    }
   }
-  throw new Error('Yahoo failed');
+  throw new Error('Yahoo close failed');
 }
-async function fetchStooq(sym){
-  const code=`${sym}.tw`;
-  const u=`https://stooq.com/q/l/?s=${code}&f=sd2t2ohlcv&h&e=csv`;
-  const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,{cache:'no-store'}); if(!r.ok)throw new Error('Stooq failed'); const txt=await r.text(); const lines=txt.trim().split(/\r?\n/); if(lines.length<2)throw new Error('Stooq empty'); const arr=lines[1].split(','); const close=+arr[6]; if(!close)throw new Error('Stooq no price'); return {price:close,source:'Stooq'};
+
+async function getLatestPrice(symbol,{allowIntraday=false}={}){
+  const sym=String(symbol||'').trim();
+  if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
+  try{
+    return await fetchTWSEPrice(sym,{allowIntraday});
+  }catch(e0){
+    // 備援只回傳收盤資料，不提供盤中即時價，避免第三方錯價污染。
+    return await fetchYahooClose(sym);
+  }
 }
-async function getLatestPrice(symbol){
-  try{return await fetchTWSE(symbol)}
-  catch(e0){try{return await fetchYahoo(symbol)}
-  catch(e1){try{return await fetchStooq(symbol)}
-  catch(e2){throw new Error('所有行情來源皆失敗')}}}
+
+async function writeValidatedPrice(id,q){
+  const tr=trades[id];
+  if(!tr)throw new Error('找不到交易資料');
+  const old=Number(tr.currentPrice||0);
+
+  // 若行情來源沒有參考價，再以舊資料做第二層防呆；偏差 >35% 不自動寫入。
+  if(old>0 && (!q.reference || q.reference<=0) && Math.abs(q.price/old-1)>0.35){
+    throw new Error(`異常價格：${q.price}`);
+  }
+
+  await update(ref(db,`analystPerformance/trades/${id}`),{
+    currentPrice:q.price,
+    priceUpdatedAt:nowText(),
+    priceSource:q.source
+  });
 }
-async function refreshOne(id){if(!isAdmin)return; const t=trades[id]; if(!t)return; const btn=document.querySelector(`[data-up="${id}"]`); if(btn){btn.disabled=true;btn.textContent='更新中'}; try{const q=await getLatestPrice(t.symbol); await update(ref(db,`analystPerformance/trades/${id}`),{currentPrice:q.price,priceUpdatedAt:nowText(),priceSource:q.source}); $('#lastRefresh').textContent=`更新日期：${nowText()}`;}catch(e){alert(`${t.symbol} 股價更新失敗。\n建議：若瀏覽器阻擋跨網域，可改由 Cloudflare Worker / 自有 API Proxy 轉接 Yahoo Finance。`)}finally{if(btn){btn.disabled=false;btn.textContent='更新價'}}}
+
+async function refreshOne(id){
+  if(!isAdmin)return;
+  const tr=trades[id];
+  if(!tr)return;
+  const btn=document.querySelector(`[data-up="${id}"]`);
+  if(btn){btn.disabled=true;btn.textContent='更新中'}
+  try{
+    const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
+    await writeValidatedPrice(id,q);
+    $('#lastRefresh').textContent=`收盤價更新：${nowText()}`;
+  }catch(e){
+    alert(`${tr.symbol} 收盤價更新失敗。\n${e?.message||'行情來源暫時無法使用'}\n\n系統已保留原價格，不會寫入可疑數值。`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='更新價'}
+  }
+}
+
 $('#refreshAllBtn').onclick=async()=>{
   const ids=Object.keys(trades).filter(id=>calc(trades[id]).open);
   if(!ids.length)return alert('目前沒有持有中的股票可更新');
+
   const btn=$('#refreshAllBtn');
   btn.disabled=true;
-  btn.textContent='更新中…';
-  let fail=0, success=0;
+  btn.textContent=isAdmin&&isTWMarketOpen()?'即時價更新中…':'收盤價更新中…';
+
+  let fail=0, success=0, rejected=[];
   for(const id of ids){
     try{
-      const q=await getLatestPrice(trades[id].symbol);
-      await update(ref(db,`analystPerformance/trades/${id}`),{
-        currentPrice:q.price,
-        priceUpdatedAt:nowText(),
-        priceSource:q.source
-      });
+      const q=await getLatestPrice(trades[id].symbol,{allowIntraday:isAdmin});
+      await writeValidatedPrice(id,q);
       success++;
     }catch(e){
-      console.error('股價更新失敗', trades[id]?.symbol, e);
       fail++;
+      rejected.push(`${trades[id]?.symbol||id}：${e?.message||'失敗'}`);
+      console.error('收盤價更新失敗',trades[id]?.symbol,e);
     }
   }
-  $('#lastRefresh').textContent=`更新日期：${nowText()}${fail?`（成功 ${success}、失敗 ${fail}）`:''}`;
+
+  $('#lastRefresh').textContent=`${isAdmin&&isTWMarketOpen()?'盤中即時價':'收盤價'}更新：${nowText()}｜成功 ${success}${fail?`、保留原價 ${fail}`:''}`;
   btn.disabled=false;
-  btn.textContent='⟳ 一鍵更新全部價格';
-  if(fail===ids.length)alert('全部股價更新失敗，可能是行情來源或 Firebase 寫入權限限制。');
+  updatePriceModeUI();
+
+  if(fail){
+    const detail=rejected.slice(0,8).join('\n');
+    alert(`收盤價更新完成\n成功：${success} 筆\n未更新：${fail} 筆\n\n異常或無法確認的價格已保留原值，不會覆蓋。\n${detail}`);
+  }
 };
 
 onValue(

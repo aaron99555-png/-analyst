@@ -1747,6 +1747,38 @@ onValue(
     // 讀取失敗時不清空畫面上既有資料
   }
 );
+
+// v42：管理者清單操作改用事件委派，確保重新 render 後仍可操作
+document.addEventListener('click', async (e)=>{
+  const btn=e.target.closest('button');
+  if(!btn || !isAdmin)return;
+
+  const settleId=btn.dataset.settle;
+  const editId=btn.dataset.edit;
+  const delId=btn.dataset.del;
+
+  try{
+    if(settleId){
+      e.preventDefault();
+      if(typeof settleTrade==='function') await settleTrade(settleId);
+      else if(typeof settle==='function') await settle(settleId);
+      return;
+    }
+    if(editId){
+      e.preventDefault();
+      if(typeof startEdit==='function') startEdit(editId);
+      return;
+    }
+    if(delId){
+      e.preventDefault();
+      if(typeof deleteTrade==='function') await deleteTrade(delId);
+      return;
+    }
+  }catch(err){
+    console.error('管理者操作失敗',err);
+    alert('操作失敗：'+(err?.message||'請稍後再試'));
+  }
+});
 </script>
 
 <div class="data-footer-note">資料整理：萊恩｜如有錯誤或遺漏請告知</div>

@@ -860,7 +860,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   </div>
   <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
 </div>
-        <div class="chart-box"><h3>分析師總績效排行｜已實現＋未實現</h3><div id="podium" class="podium-wrap"></div><div class="podium-note">依總績效 % 由高至低排列｜0 筆交易不列入排名</div></div>
+        <div class="chart-box"><h3>分析師總績效排行｜全部期間・總績效%</h3><div id="podium" class="podium-wrap"></div><div class="podium-note">依總績效 % 由高至低排列｜0 筆交易不列入排名</div></div>
       </div>
     </section>
 
@@ -1131,9 +1131,10 @@ function chartAnalystLabel(name){
 }
 
 function renderCharts(){
+  const podiumData=analystSummaryAll().filter(x=>x.tradesCount>0);
+  renderPodium(podiumData);
   if(typeof Chart==='undefined')return;
   const d=analystSummaryAll().filter(x=>x.tradesCount>0);
-  const podiumData=analystSummary().filter(x=>x.tradesCount>0);
   if(!d.length){
     if(profitChart){profitChart.destroy();profitChart=null;}
     renderPodium(podiumData);

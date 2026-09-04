@@ -847,6 +847,13 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
   box-shadow:0 0 0 1px rgba(230,170,70,.38) inset;
 }
 
+
+/* v54：查詢、今日進場、今日出場、績效排行榜 1:1:1:1 */
+.span3{grid-column:span 3}
+@media(max-width:700px){
+  .span3{grid-column:span 12}
+}
+
 </style>
 </head>
 <body>
@@ -890,7 +897,7 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
       </div>
     </section>
 
-<section class="card span4 filter-card">
+<section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
         <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
@@ -903,21 +910,23 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
       </div>
     </section>
 
-    <section class="card span4 today-entry-card">
+    <section class="card span3 today-entry-card">
       <div class="section-title">
         <h2>今日進場股票</h2>
         <span class="status" id="todayEntryDate">—</span>
       </div>
       <div id="todayEntries" class="today-entry-list"></div>
-      <div class="today-exit-divider"></div>
-      <div class="section-title today-exit-title">
+    </section>
+
+    <section class="card span3 today-exit-card">
+      <div class="section-title">
         <h2>今日出場股票</h2>
         <span class="status" id="todayExitDate">—</span>
       </div>
       <div id="todayExits" class="today-entry-list"></div>
     </section>
 
-    <section class="card span4">
+    <section class="card span3">
       <div class="section-title"><h2>績效排行榜</h2><span class="status">依總績效 % 排名（含已實現＋未實現）</span></div>
       <div id="rankList" class="rank-list"></div>
     </section>

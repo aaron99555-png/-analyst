@@ -764,6 +764,20 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   width:100%;
 }
 
+
+/* v45：今日進場股票下方新增今日出場股票 */
+.today-exit-divider{
+  height:1px;
+  background:var(--line);
+  margin:14px 0 12px;
+}
+.today-exit-title{
+  margin-bottom:8px;
+}
+.today-exit-title h2{
+  font-size:inherit;
+}
+
 </style>
 </head>
 <body>
@@ -826,6 +840,12 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
         <span class="status" id="todayEntryDate">—</span>
       </div>
       <div id="todayEntries" class="today-entry-list"></div>
+      <div class="today-exit-divider"></div>
+      <div class="section-title today-exit-title">
+        <h2>今日出場股票</h2>
+        <span class="status" id="todayExitDate">—</span>
+      </div>
+      <div id="todayExits" class="today-entry-list"></div>
     </section>
 
     <section class="card span4">
@@ -933,6 +953,37 @@ function filteredTrades(){
 function yahooStockUrl(symbol){
   return `https://tw.stock.yahoo.com/quote/${encodeURIComponent(String(symbol||'').trim())}`;
 }
+function renderTodayExits(){
+  const d=today();
+  const dateEl=$('#todayExitDate');
+  const list=$('#todayExits');
+  if(!list)return;
+  if(dateEl)dateEl.textContent=d.replaceAll('-','/');
+
+  const rows=Object.entries(trades||{})
+    .filter(([id,tr])=>tr && tr.exitDate===d)
+    .sort((a,b)=>String(a[1].analyst||'').localeCompare(String(b[1].analyst||''),'zh-Hant'));
+
+  if(!rows.length){
+    list.innerHTML='<div class="empty">今日尚無出場股票</div>';
+    return;
+  }
+
+  list.innerHTML=rows.map(([id,tr])=>`
+    <div class="today-entry-item">
+      <div class="today-entry-main">
+        <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
+        <span>${esc(tr.stockName||'')}</span>
+      </div>
+      <div class="today-entry-meta">
+        <span>${esc(tr.analyst||'')}</span>
+        <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
+        ${isAdmin?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderTodayEntries(){
   const el=$('#todayEntries');
   const dateEl=$('#todayEntryDate');
@@ -964,7 +1015,7 @@ function renderTodayEntries(){
 }
 
 function render(){
-  renderTodayEntries();
+  renderTodayEntries(); renderTodayExits();
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;

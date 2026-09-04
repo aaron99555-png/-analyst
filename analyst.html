@@ -854,6 +854,28 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
   .span3{grid-column:span 12}
 }
 
+
+/* v55：四個主要卡片強制同一行 */
+@media(min-width:701px){
+  .grid{
+    grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  }
+  .grid > .span3{
+    grid-column:span 3 !important;
+    min-width:0;
+  }
+  .filter-card,
+  .today-entry-card,
+  .today-exit-card{
+    min-width:0;
+  }
+}
+@media(max-width:700px){
+  .grid > .span3{
+    grid-column:span 12 !important;
+  }
+}
+
 </style>
 </head>
 <body>

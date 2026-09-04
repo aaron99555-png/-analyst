@@ -778,6 +778,25 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   font-size:inherit;
 }
 
+
+/* v46：分析師總績效表格排序 + 快速分析師篩選 */
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+th.sortable::after{content:' ↕';opacity:.35;font-size:10px}
+th.sortable.sort-active[data-dir="asc"]::after{content:' ▲';opacity:1}
+th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
+.analyst-quick-filter{
+  display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px;
+}
+.analyst-chip{
+  padding:6px 9px;border-radius:999px;font-size:11px;font-weight:800;
+  border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;
+}
+.analyst-chip.active{background:var(--accent);color:#111;border-color:var(--accent)}
+@media(max-width:700px){
+  .analyst-quick-filter{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .analyst-chip{flex:0 0 auto;font-size:10px;padding:5px 8px}
+}
+
 </style>
 </head>
 <body>
@@ -877,8 +896,9 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
         <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span><span class="holdings-badge settled-badge">已結算 <b id="mClosed">0</b> 檔</span></div>
         <span class="status" id="countText">0 筆</span>
       </div>
+      <div class="analyst-quick-filter" id="analystQuickFilter"></div>
       <div class="table-wrap"><table><thead><tr>
-        <th>分析師</th><th>基準日</th><th>股票</th><th>入場日期</th><th>進場價(收盤價)</th><th>目前價</th><th>更新日期</th><th>股數</th><th>績效%</th><th>目前損益</th><th>停損</th><th>停利</th><th>出場日期</th><th>出場價</th><th>已實現損益</th><th>狀態</th><th>備註</th><th class="admin-col hidden">操作</th>
+        <th class="sortable" data-sort="analyst">分析師</th><th class="sortable" data-sort="baseDate">基準日</th><th class="sortable" data-sort="stock">股票</th><th class="sortable" data-sort="entryDate">入場日期</th><th class="sortable" data-sort="entryPrice">進場價(收盤價)</th><th class="sortable" data-sort="currentPrice">目前價</th><th class="sortable" data-sort="priceUpdatedAt">更新日期</th><th class="sortable" data-sort="shares">股數</th><th class="sortable" data-sort="perf">績效%</th><th class="sortable" data-sort="unreal">目前損益</th><th class="sortable" data-sort="stopLoss">停損</th><th class="sortable" data-sort="takeProfit">停利</th><th class="sortable" data-sort="exitDate">出場日期</th><th class="sortable" data-sort="exitPrice">出場價</th><th class="sortable" data-sort="realized">已實現損益</th><th class="sortable" data-sort="status">狀態</th><th>備註</th><th class="admin-col hidden">操作</th>
       </tr></thead><tbody id="tbody"></tbody></table></div>
     </section>
   </div>
@@ -935,13 +955,43 @@ function calc(t){
   return {open,unreal,realized,total:unreal+realized,perf};
 }
 
+let performanceSort={key:'entryDate',dir:'desc'};
+
 function filteredEntries(){
   const a=$('#fAnalyst').value, month=$('#fMonth')?.value||'', from=$('#fFrom').value, to=$('#fTo').value, st=$('#fStatus').value, kw=$('#fKeyword').value.trim().toLowerCase();
   return Object.entries(trades).filter(([id,t])=>{
     const c=calc(t); const d=t.entryDate||'';
     const monthOK=!month || d.startsWith(month);
     return (!a||t.analyst===a)&&monthOK&&(!from||d>=from)&&(!to||d<=to)&&(!st||(st==='open'?c.open:!c.open))&&(!kw||`${t.symbol||''} ${t.stockName||''}`.toLowerCase().includes(kw));
-  }).sort((a,b)=>(b[1].entryDate||'').localeCompare(a[1].entryDate||''));
+  }).sort((a,b)=>{
+    const [ida,ta]=a,[idb,tb]=b;
+    const ca=calc(ta), cb=calc(tb);
+    const key=performanceSort.key;
+    const value=(tr,c)=>{
+      switch(key){
+        case 'analyst': return tr.analyst||'';
+        case 'baseDate': return '2026/09/01';
+        case 'stock': return `${tr.symbol||''} ${tr.stockName||''}`;
+        case 'entryDate': return tr.entryDate||'';
+        case 'entryPrice': return Number(tr.entryPrice)||0;
+        case 'currentPrice': return Number(tr.currentPrice||tr.entryPrice)||0;
+        case 'priceUpdatedAt': return tr.priceUpdatedAt||'';
+        case 'shares': return Number(tr.shares)||0;
+        case 'perf': return Number(c.perf)||0;
+        case 'unreal': return Number(c.unreal)||0;
+        case 'stopLoss': return Number(tr.stopLoss)||0;
+        case 'takeProfit': return Number(tr.takeProfit)||0;
+        case 'exitDate': return tr.exitDate||'';
+        case 'exitPrice': return Number(tr.exitPrice)||0;
+        case 'realized': return Number(c.realized)||0;
+        case 'status': return c.open?'持有中':'已結算';
+        default:return tr.entryDate||'';
+      }
+    };
+    const va=value(ta,ca), vb=value(tb,cb);
+    let cmp=typeof va==='number'&&typeof vb==='number' ? va-vb : String(va).localeCompare(String(vb),'zh-Hant',{numeric:true});
+    return performanceSort.dir==='asc'?cmp:-cmp;
+  });
 }
 
 function filteredTrades(){
@@ -1014,8 +1064,37 @@ function renderTodayEntries(){
   `).join('');
 }
 
+function renderAnalystQuickFilter(){
+  const el=$('#analystQuickFilter');
+  if(!el)return;
+  const current=$('#fAnalyst')?.value||'';
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長'];
+  el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
+    names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
+}
+
+document.addEventListener('click',e=>{
+  const chip=e.target.closest('[data-quick-analyst]');
+  if(chip){
+    const sel=$('#fAnalyst');
+    if(sel){sel.value=chip.dataset.quickAnalyst||'';render();}
+    return;
+  }
+  const th=e.target.closest('th[data-sort]');
+  if(th){
+    const key=th.dataset.sort;
+    if(performanceSort.key===key) performanceSort.dir=performanceSort.dir==='asc'?'desc':'asc';
+    else performanceSort={key,dir:'asc'};
+    render();
+  }
+});
+
 function render(){
-  renderTodayEntries(); renderTodayExits();
+  renderTodayEntries(); renderTodayExits(); renderAnalystQuickFilter();
+  $$('th[data-sort]').forEach(th=>{
+    th.classList.toggle('sort-active',th.dataset.sort===performanceSort.key);
+    th.dataset.dir=th.dataset.sort===performanceSort.key?performanceSort.dir:'';
+  });
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;

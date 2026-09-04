@@ -760,7 +760,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">7 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">8 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新全部收盤價</button>
@@ -783,7 +783,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -801,7 +801,7 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
 <section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -1021,7 +1021,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -1042,7 +1042,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長'];
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);

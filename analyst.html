@@ -876,6 +876,39 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
   }
 }
 
+
+/* v56：四格同一行比例 0.5：1：1：2 */
+@media(min-width:701px){
+  .grid{
+    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
+  }
+  .grid > .filter-card.span3{
+    grid-column:span 1 !important;
+  }
+  .grid > .today-entry-card.span3{
+    grid-column:span 2 !important;
+  }
+  .grid > .today-exit-card.span3{
+    grid-column:span 2 !important;
+  }
+  .grid > .span3:not(.filter-card):not(.today-entry-card):not(.today-exit-card){
+    grid-column:span 4 !important;
+  }
+  /* 原本全寬區塊在 9 欄系統下仍維持全寬 */
+  .grid > .span12{
+    grid-column:1 / -1 !important;
+  }
+}
+@media(max-width:700px){
+  .grid{
+    grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  }
+  .grid > .span3,
+  .grid > .span12{
+    grid-column:span 12 !important;
+  }
+}
+
 </style>
 </head>
 <body>

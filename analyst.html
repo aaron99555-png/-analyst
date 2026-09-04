@@ -755,6 +755,24 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
   }
 }
 
+
+/* v44：今日進場 / 今日出場上下分欄 */
+.today-section-title{
+  font-size:12px;
+  font-weight:900;
+  margin:8px 0 6px;
+  opacity:.88;
+}
+.today-section-divider{
+  height:1px;
+  background:var(--line);
+  margin:12px 0 10px;
+}
+#todayExits .empty,
+#todayEntries .empty{
+  padding:8px 0;
+}
+
 </style>
 </head>
 <body>
@@ -816,7 +834,12 @@ button,.btn{border:1px solid var(--line);background:#1b150d;color:var(--text);pa
         <h2>今日進場股票</h2>
         <span class="status" id="todayEntryDate">—</span>
       </div>
-      <div id="todayEntries" class="today-entry-list"></div>
+      <div class="today-section-title">今日進場股票</div>
+<div id="todayEntries" class="today-entry-list"></div>
+<div class="today-section-divider"></div>
+<div class="today-section-title">今日出場股票</div>
+<div id="todayExits" class="today-entry-list"></div>
+
     </section>
 
     <section class="card span4">
@@ -954,8 +977,44 @@ function renderTodayEntries(){
   `).join('');
 }
 
+
+function renderTodayExits(){
+  const box=$('#todayExits');
+  if(!box)return;
+  const d=today();
+  const rows=Object.entries(trades)
+    .filter(([id,tr])=>tr && tr.exitDate===d)
+    .sort((a,b)=>String(a[1].analyst||'').localeCompare(String(b[1].analyst||''),'zh-Hant'));
+
+  if(!rows.length){
+    box.innerHTML='<div class="empty">今日尚無出場股票</div>';
+    return;
+  }
+
+  box.innerHTML=rows.map(([id,tr])=>{
+    const ep=Number(tr.entryPrice)||0;
+    const xp=Number(tr.exitPrice)||0;
+    const perf=ep?((xp-ep)/ep*100):0;
+    return `
+      <div class="today-entry-item">
+        <div class="today-stock">
+          <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
+          <span>${esc(tr.stockName||'')}</span>
+        </div>
+        <div class="today-entry-meta">
+          <span class="today-analyst">${esc(tr.analyst||'—')}</span>
+          <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
+          <span class="${perf>=0?'pos':'neg'}"><b>${pct(perf)}</b></span>
+          ${isAdmin?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 function render(){
   renderTodayEntries();
+  renderTodayExits();
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;

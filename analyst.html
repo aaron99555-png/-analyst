@@ -909,6 +909,147 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
   }
 }
 
+
+/* v57：四格同一行比例 0.7：1：1：1.3 */
+@media(min-width:701px){
+  .grid{
+    grid-template-columns:repeat(40,minmax(0,1fr)) !important;
+  }
+  .grid > .filter-card.span3{
+    grid-column:span 7 !important;
+  }
+  .grid > .today-entry-card.span3{
+    grid-column:span 10 !important;
+  }
+  .grid > .today-exit-card.span3{
+    grid-column:span 10 !important;
+  }
+  .grid > .span3:not(.filter-card):not(.today-entry-card):not(.today-exit-card){
+    grid-column:span 13 !important;
+  }
+  .grid > .span12{
+    grid-column:1 / -1 !important;
+  }
+}
+@media(max-width:700px){
+  .grid{
+    grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  }
+  .grid > .span3,
+  .grid > .span12{
+    grid-column:span 12 !important;
+  }
+}
+
+
+/* v58：績效排行榜的總績效／損益金額不得超出卡片 */
+.rank-list,
+.rank-list *{
+  box-sizing:border-box;
+}
+.rank-list{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+}
+.rank-list > *{
+  max-width:100%;
+  min-width:0;
+}
+.rank-list .podium,
+.rank-list .podium-rest-rank,
+.rank-list .rank-item{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.rank-list .podium * ,
+.rank-list .podium-rest-rank * ,
+.rank-list .rank-item *{
+  min-width:0;
+}
+.rank-list .podium-rest-rank,
+.rank-list .rank-item{
+  overflow:hidden;
+}
+.rank-list .podium-rest-perf,
+.rank-list .podium-rest-pl,
+.rank-list [class*="perf"],
+.rank-list [class*="profit"],
+.rank-list [class*="pl"]{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@media(min-width:701px){
+  /* 排行榜縮窄後，數字依卡片寬度自動縮放 */
+  .rank-list{
+    font-size:clamp(10px,0.78vw,13px);
+  }
+  .rank-list .podium-rest-rank{
+    grid-template-columns:minmax(24px,.35fr) minmax(0,1.25fr) minmax(52px,.8fr) minmax(64px,1fr) !important;
+    gap:5px !important;
+  }
+  .rank-list .podium-rest-perf,
+  .rank-list .podium-rest-pl{
+    font-size:clamp(10px,0.72vw,12px) !important;
+  }
+}
+
+
+/* v59：排行榜總績效與損益金額完整限制於各自框內 */
+.rank-list .podium-rest-rank{
+  display:grid !important;
+  grid-template-columns:32px minmax(0,1fr) minmax(58px,72px) minmax(72px,92px) !important;
+  align-items:center;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+}
+.rank-list .podium-rest-perf,
+.rank-list .podium-rest-pl{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  padding:0 3px;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  text-align:right;
+  font-size:clamp(9px,0.68vw,12px) !important;
+  line-height:1.25;
+}
+.rank-list .podium-step{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.rank-list .podium-step .perf,
+.rank-list .podium-step .pl,
+.rank-list .podium-step [class*="perf"],
+.rank-list .podium-step [class*="pl"]{
+  display:block;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  font-size:clamp(9px,0.68vw,12px) !important;
+}
+@media(max-width:1100px) and (min-width:701px){
+  .rank-list .podium-rest-rank{
+    grid-template-columns:26px minmax(0,1fr) minmax(50px,62px) minmax(62px,78px) !important;
+    gap:3px !important;
+  }
+  .rank-list .podium-rest-perf,
+  .rank-list .podium-rest-pl{
+    font-size:9px !important;
+    padding:0 2px;
+  }
+}
+
 </style>
 </head>
 <body>

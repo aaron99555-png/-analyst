@@ -875,7 +875,7 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option><option>黃培碩</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -893,7 +893,7 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
 <section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option><option>黃培碩</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -1178,7 +1178,7 @@ function renderAnalystQuickFilter(){
   const el=$('#analystQuickFilter');
   if(!el)return;
   const current=$('#fAnalyst')?.value||'';
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
     names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
 }
@@ -1274,7 +1274,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -1295,7 +1295,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -2091,7 +2091,10 @@ onValue(
     if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='王榮旭')x.analyst='投資總舖師王榮旭';});
     if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='張貽程')x.analyst='E神張貽程';});
     if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='阮儀阮慧慈')x.analyst='阮姨阮慧慈';});
-    if(incoming!==null) trades=incoming;
+if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='郭榮哲投資長')x.analyst='郭哲榮投資長';});
+    if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='黃培碩')x.analyst='運達黃培碩';});
+if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='徐紹軒')x.analyst='運達徐紹軒';});
+if(incoming!==null) trades=incoming;
     else trades={};
     render();
   },

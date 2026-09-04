@@ -804,12 +804,46 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
   color:var(--muted);
 }
 
+
+/* v49：今日進場／今日出場－分析師名稱與價位放大 */
+.today-entry-meta{
+  font-size:14px !important;
+  line-height:1.5;
+}
+.today-entry-meta > span:first-child{
+  font-size:15px !important;
+  font-weight:900;
+}
+.today-entry-meta .today-price,
+.today-entry-meta .today-price b{
+  font-size:15px !important;
+  font-weight:900;
+}
+@media(max-width:700px){
+  .today-entry-meta{
+    font-size:13px !important;
+  }
+  .today-entry-meta > span:first-child,
+  .today-entry-meta .today-price,
+  .today-entry-meta .today-price b{
+    font-size:14px !important;
+  }
+}
+
+
+/* v50：同股票代號的持有中部位同步目前價 */
+.same-stock-sync-note{
+  font-size:10px;
+  opacity:.72;
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">9 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">10 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button>
@@ -832,7 +866,7 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option><option>黃培碩</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -850,7 +884,7 @@ th.sortable.sort-active[data-dir="desc"]::after{content:' ▼';opacity:1}
 <section class="card span4 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>徐紹軒</option><option>阮姨阮慧慈</option><option>郭榮哲投資長</option><option>團團</option><option>黃培碩</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -1080,7 +1114,7 @@ function renderAnalystQuickFilter(){
   const el=$('#analystQuickFilter');
   if(!el)return;
   const current=$('#fAnalyst')?.value||'';
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
   el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
     names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
 }
@@ -1176,7 +1210,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -1197,7 +1231,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團'];
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','徐紹軒','阮姨阮慧慈','郭榮哲投資長','團團','黃培碩'];
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -1726,7 +1760,7 @@ function openPriceConfirm(items){
           <input type="number" step="0.01" min="0" data-price-index="${i}" value="${Number(x.price||0)}">
           <div class="price-confirm-source">${esc(x.source||'手動')}</div>
         </div>
-        <div class="price-confirm-source">${x.mode==='intraday'?'盤中即時':'收盤價'}</div>
+        <div class="price-confirm-source">${x.mode==='intraday'?'盤中即時':'收盤價'}<br><span class="same-stock-sync-note">同代號持股同步</span></div>
       </div>
     `).join('');
 
@@ -1751,14 +1785,38 @@ function openPriceConfirm(items){
   });
 }
 
+async function syncSameStockCurrentPrice(symbol,price,source){
+  const normalized=String(symbol||'').trim();
+  if(!normalized)throw new Error('股票代號不存在');
+
+  const updatedAt=nowText();
+  const sameStockIds=Object.entries(trades||{})
+    .filter(([tid,tr])=>{
+      if(!tr)return false;
+      return String(tr.symbol||'').trim()===normalized && calc(tr).open;
+    })
+    .map(([tid])=>tid);
+
+  if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
+
+  await Promise.all(sameStockIds.map(tid=>
+    update(ref(db,`analystPerformance/trades/${tid}`),{
+      currentPrice:price,
+      priceUpdatedAt:updatedAt,
+      priceSource:source||'手動確認'
+    })
+  ));
+  return sameStockIds.length;
+}
+
 async function writeManualOrFetchedPrice(id,item){
   const tr=trades[id];
   if(!tr)throw new Error('找不到交易資料');
-  await update(ref(db,`analystPerformance/trades/${id}`),{
-    currentPrice:item.price,
-    priceUpdatedAt:nowText(),
-    priceSource:item.source||'手動確認'
-  });
+  return await syncSameStockCurrentPrice(
+    tr.symbol,
+    item.price,
+    item.source||'手動確認'
+  );
 }
 
 
@@ -1773,11 +1831,14 @@ async function manualCurrentPrice(id){
   if(!Number.isFinite(price)||price<=0)return alert('請輸入正確的價格');
   if(!confirm(`確認更新 ${tr.symbol} ${tr.stockName||''}\n目前價：${fmt(oldPrice)} → ${fmt(price)}`))return;
   try{
-    await update(ref(db,`analystPerformance/trades/${id}`),{
-      currentPrice:price,
-      priceUpdatedAt:nowText(),
-      priceSource:'管理者手動輸入'
-    });
+    const synced=await syncSameStockCurrentPrice(
+      tr.symbol,
+      price,
+      '管理者手動輸入'
+    );
+    if(synced>1){
+      alert(`${tr.symbol} 已同步更新 ${synced} 筆持有中資料`);
+    }
   }catch(e){
     alert(`手動更新失敗：${e?.message||'未知錯誤'}`);
   }
@@ -1816,8 +1877,8 @@ async function refreshOne(id){
 
     const confirmed=await openPriceConfirm([item]);
     if(!confirmed)return;
-    await writeManualOrFetchedPrice(id,confirmed[0]);
-    $('#lastRefresh').textContent=`價格更新：${nowText()}`;
+    const synced=await writeManualOrFetchedPrice(id,confirmed[0]);
+    $('#lastRefresh').textContent=`價格更新：${nowText()}${synced>1?`｜同股同步 ${synced} 筆`:''}`;
   }catch(e){
     alert(`${tr.symbol} 更新失敗。\n${e?.message||'請確認輸入價格'}`);
   }finally{

@@ -1131,6 +1131,69 @@ main{
   box-shadow:0 0 0 2px rgba(243,182,31,.22);
 }
 
+
+/* v64：同時持有未結算股票 */
+.shared-open-list{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.shared-open-item{
+  min-width:0;
+  padding:12px 14px;
+  border:1px solid var(--line,#334155);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.shared-open-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.shared-open-stock{
+  min-width:0;
+  font-weight:800;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.shared-open-count{
+  flex:0 0 auto;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#f3b61f;
+  color:#161616;
+  font-size:12px;
+  font-weight:800;
+}
+.shared-open-analysts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.shared-open-analyst{
+  max-width:100%;
+  padding:4px 7px;
+  border-radius:8px;
+  border:1px solid rgba(143,165,207,.28);
+  background:rgba(96,112,143,.18);
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.shared-open-empty{
+  grid-column:1/-1;
+  padding:18px;
+  text-align:center;
+  opacity:.65;
+}
+@media(max-width:1200px){.shared-open-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.shared-open-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.shared-open-list{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -1208,7 +1271,16 @@ main{
       <div id="rankList" class="rank-list"></div>
     </section>
 
-    <section class="card span12">
+    
+    <section class="card span12 shared-open-card">
+      <div class="section-title">
+        <h2>同時持有未結算股票</h2>
+        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+      </div>
+      <div id="sharedOpenPositions" class="shared-open-list"></div>
+    </section>
+
+<section class="card span12">
       <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
       <div class="chart-grid">
         <div class="chart-box">
@@ -1430,6 +1502,57 @@ function renderTodayExits(){
   `).join('');
 }
 
+
+function renderSharedOpenPositions(){
+  const box=$('#sharedOpenPositions');
+  if(!box)return;
+
+  const groups={};
+  Object.entries(trades||{}).forEach(([id,tr])=>{
+    if(!tr)return;
+    const c=calc(tr);
+    if(!c.open)return;
+
+    const symbol=String(tr.symbol||'').trim().toUpperCase();
+    if(!symbol)return;
+
+    if(!groups[symbol]){
+      groups[symbol]={
+        symbol,
+        stockName:String(tr.stockName||'').trim(),
+        analysts:new Set()
+      };
+    }
+    if(!groups[symbol].stockName && tr.stockName){
+      groups[symbol].stockName=String(tr.stockName).trim();
+    }
+    if(tr.analyst)groups[symbol].analysts.add(tr.analyst);
+  });
+
+  const shared=Object.values(groups)
+    .filter(g=>g.analysts.size>=2)
+    .sort((a,b)=>b.analysts.size-a.analysts.size || a.symbol.localeCompare(b.symbol));
+
+  if(!shared.length){
+    box.innerHTML='<div class="shared-open-empty">目前沒有 2 位以上分析師同時持有的未結算股票</div>';
+    return;
+  }
+
+  box.innerHTML=shared.map(g=>{
+    const names=[...g.analysts];
+    const label=`${g.symbol}${g.stockName?' '+g.stockName:''}`;
+    return `<div class="shared-open-item">
+      <div class="shared-open-head">
+        <a class="shared-open-stock" href="${yahooStockUrl(g.symbol)}" target="_blank" rel="noopener">${label}</a>
+        <span class="shared-open-count">${names.length} 位持有</span>
+      </div>
+      <div class="shared-open-analysts">
+        ${names.map(n=>`<span class="shared-open-analyst">${n}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderTodayEntries(){
   const el=$('#todayEntries');
   const dateEl=$('#todayEntryDate');
@@ -1490,7 +1613,8 @@ function render(){
     const a=$('#analyst');
     if(a){a.value='團團';a.disabled=true;}
   }
-  renderTodayEntries(); renderTodayExits(); renderAnalystQuickFilter();
+  renderTodayEntries();
+  renderSharedOpenPositions(); renderTodayExits(); renderAnalystQuickFilter();
   $$('th[data-sort]').forEach(th=>{
     th.classList.toggle('sort-active',th.dataset.sort===performanceSort.key);
     th.dataset.dir=th.dataset.sort===performanceSort.key?performanceSort.dir:'';

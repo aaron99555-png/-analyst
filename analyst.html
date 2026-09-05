@@ -1703,6 +1703,22 @@ body{
   }
 }
 
+
+/* v75：同時持有未結算股票移至最上方，強化優先層級 */
+.shared-open-card{
+  position:relative;
+  overflow:hidden;
+}
+.shared-open-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,.85),transparent);
+}
+
 </style>
 </head>
 <body>
@@ -1745,6 +1761,15 @@ body{
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
     </section>
+
+<section class="card span12 shared-open-card">
+      <div class="section-title">
+        <h2>同時持有未結算股票</h2>
+        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+      </div>
+      <div id="sharedOpenPositions" class="shared-open-list"></div>
+    </section>
+
 
 <section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
@@ -1789,16 +1814,6 @@ body{
       <div class="rank-rule-note">依總績效 % 排名（含已實現＋未實現）</div>
       <div id="rankList" class="rank-list"></div>
     </section>
-
-    
-    <section class="card span12 shared-open-card">
-      <div class="section-title">
-        <h2>同時持有未結算股票</h2>
-        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
-      </div>
-      <div id="sharedOpenPositions" class="shared-open-list"></div>
-    </section>
-
 <section class="card span12">
       <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
       <div class="chart-grid">

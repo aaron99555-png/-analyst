@@ -1132,7 +1132,7 @@ main{
 }
 
 
-/* v64：同時持有未結算股票 */
+/* v64：同時持有中股票 */
 .shared-open-list{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1195,7 +1195,7 @@ main{
 @media(max-width:700px){.shared-open-list{grid-template-columns:1fr}}
 
 
-/* v65：同時持有未結算股票－高反差顯示 */
+/* v65：同時持有中股票－高反差顯示 */
 .shared-open-stock{
   color:#f8fafc !important;
   text-decoration:none !important;
@@ -1704,7 +1704,7 @@ body{
 }
 
 
-/* v75：同時持有未結算股票移至最上方，強化優先層級 */
+/* v75：同時持有中股票移至最上方，強化優先層級 */
 .shared-open-card{
   position:relative;
   overflow:hidden;
@@ -1764,7 +1764,7 @@ body{
 
 <section class="card span12 shared-open-card">
       <div class="section-title">
-        <h2>同時持有未結算股票</h2>
+        <h2>同時持有中股票</h2>
         <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
       </div>
       <div id="sharedOpenPositions" class="shared-open-list"></div>

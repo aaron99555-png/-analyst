@@ -1215,6 +1215,295 @@ main{
   font-weight:700 !important;
 }
 
+
+/* v66：財富感背景－深黑綠＋金色光暈，維持閱讀性 */
+body{
+  background:
+    radial-gradient(circle at 15% 8%, rgba(212,175,55,.16) 0, transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(22,101,52,.22) 0, transparent 30%),
+    radial-gradient(circle at 52% 100%, rgba(212,175,55,.08) 0, transparent 34%),
+    linear-gradient(145deg,#07110c 0%,#0b1710 42%,#10150f 72%,#080b09 100%) !important;
+  background-attachment:fixed !important;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    linear-gradient(115deg,transparent 0 46%,rgba(255,215,90,.025) 47%,transparent 48%),
+    linear-gradient(25deg,transparent 0 64%,rgba(255,255,255,.018) 65%,transparent 66%);
+}
+.card{
+  background:linear-gradient(145deg,rgba(15,28,20,.94),rgba(12,18,15,.94)) !important;
+  border-color:rgba(212,175,55,.26) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,220,120,.035) !important;
+}
+.section-title h2{
+  color:#f5e6ad !important;
+}
+.shared-open-item{
+  background:linear-gradient(145deg,rgba(24,48,32,.86),rgba(16,28,21,.9)) !important;
+  border-color:rgba(212,175,55,.42) !important;
+}
+.shared-open-count{
+  background:linear-gradient(135deg,#e4bd4b,#f5d879) !important;
+  color:#18140a !important;
+}
+
+
+/* v67：移除綠色背景，改純黑金財富風 */
+body{
+  background:
+    radial-gradient(circle at 15% 8%, rgba(212,175,55,.18) 0, transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(184,134,11,.12) 0, transparent 30%),
+    radial-gradient(circle at 52% 100%, rgba(255,215,90,.07) 0, transparent 34%),
+    linear-gradient(145deg,#080808 0%,#11100d 42%,#17140d 72%,#070707 100%) !important;
+  background-attachment:fixed !important;
+}
+.card{
+  background:linear-gradient(145deg,rgba(25,23,18,.96),rgba(13,13,13,.96)) !important;
+  border-color:rgba(212,175,55,.30) !important;
+}
+.shared-open-item{
+  background:linear-gradient(145deg,rgba(39,34,22,.9),rgba(20,18,14,.94)) !important;
+  border-color:rgba(212,175,55,.44) !important;
+}
+.shared-open-analyst{
+  background:rgba(70,61,39,.58) !important;
+  border-color:rgba(232,202,112,.36) !important;
+  color:#fff !important;
+}
+
+
+/* v68：整體排版與手機版查詢篩選優化 */
+@media(max-width:700px){
+  .filter-card{
+    overflow:hidden !important;
+  }
+  .filter-card .filters{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    align-items:stretch !important;
+  }
+  .filter-card .filters > div{
+    min-width:0 !important;
+    height:78px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    overflow:hidden !important;
+  }
+  .filter-card .filters label{
+    height:18px !important;
+    line-height:18px !important;
+    margin-bottom:4px !important;
+    font-size:11px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  .filter-card .filters input,
+  .filter-card .filters select{
+    width:100% !important;
+    height:40px !important;
+    min-height:40px !important;
+    max-height:40px !important;
+    box-sizing:border-box !important;
+    font-size:13px !important;
+  }
+  .filter-card .filters .form-actions{
+    grid-column:1 / -1 !important;
+    height:44px !important;
+    display:flex !important;
+    align-items:flex-end !important;
+  }
+  .filter-card .filters .form-actions button{
+    width:100% !important;
+    height:40px !important;
+  }
+  .filter-card .section-title{
+    flex-wrap:wrap !important;
+    row-gap:4px !important;
+  }
+  .filter-card .section-title h2{
+    font-size:17px !important;
+  }
+  .filter-card .section-title .status{
+    width:100% !important;
+    font-size:10px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+}
+@media(min-width:701px){
+  .filter-card .filters{
+    align-items:end !important;
+  }
+  .filter-card .filters > div{
+    min-width:0;
+  }
+}
+
+
+/* v69：日期查詢與排行榜統計區間 */
+.date-card-title{
+  align-items:center !important;
+  gap:8px;
+}
+.date-card-title h2{
+  min-width:0;
+}
+.date-query-box{
+  flex:0 0 auto;
+  min-width:0;
+}
+.date-picker-box{
+  width:132px !important;
+  max-width:132px !important;
+  height:34px !important;
+  padding:5px 8px !important;
+  border-radius:8px !important;
+  cursor:pointer !important;
+  font-size:12px !important;
+  box-sizing:border-box !important;
+}
+.date-picker-box::-webkit-calendar-picker-indicator{
+  cursor:pointer;
+  opacity:.95;
+}
+.rank-title-row{
+  align-items:flex-start !important;
+}
+#rankRangeStatus{
+  white-space:normal !important;
+  text-align:right;
+  line-height:1.35;
+  max-width:58%;
+}
+.rank-rule-note{
+  margin:-2px 0 8px;
+  font-size:10px;
+  opacity:.62;
+  text-align:right;
+}
+@media(max-width:700px){
+  .date-card-title{
+    flex-wrap:nowrap !important;
+  }
+  .date-card-title h2{
+    font-size:16px !important;
+    white-space:nowrap;
+  }
+  .date-picker-box{
+    width:128px !important;
+    max-width:128px !important;
+    height:36px !important;
+    font-size:12px !important;
+  }
+  #rankRangeStatus{
+    max-width:62%;
+    font-size:10px !important;
+  }
+}
+
+
+/* v70：進場／出場清單文字格式統一 */
+.today-entry-card .today-entry-item,
+.today-exit-card .today-entry-item{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.today-entry-card .today-entry-stock,
+.today-exit-card .today-entry-stock{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.today-entry-card .today-entry-stock .stock-link,
+.today-exit-card .today-entry-stock .stock-link{
+  flex:0 0 auto;
+}
+.today-entry-card .today-entry-stock span,
+.today-exit-card .today-entry-stock span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.today-entry-card .today-entry-meta,
+.today-exit-card .today-entry-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:13px;
+}
+.today-entry-card .today-analyst,
+.today-exit-card .today-analyst{
+  font-weight:800;
+}
+.today-entry-card .today-price,
+.today-exit-card .today-price{
+  font-weight:700;
+}
+
+
+/* v71：進出場空白提示、回到今天、重新整理清除篩選 */
+.today-empty-message{
+  width:100%;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 8px;
+  box-sizing:border-box;
+  font-size:13px !important;
+  line-height:1.4 !important;
+  font-weight:600 !important;
+  opacity:.72;
+  text-align:center;
+}
+.date-query-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.date-today-btn{
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 9px !important;
+  white-space:nowrap;
+  font-size:11px !important;
+}
+@media(max-width:700px){
+  .date-card-title{
+    align-items:flex-start !important;
+  }
+  .date-query-box{
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    max-width:148px;
+  }
+  .date-picker-box{
+    width:128px !important;
+  }
+  .date-today-btn{
+    width:128px !important;
+    height:32px !important;
+    min-height:32px !important;
+  }
+  .today-empty-message{
+    min-height:46px;
+    font-size:12px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1272,23 +1561,33 @@ main{
     </section>
 
     <section class="card span3 today-entry-card">
-      <div class="section-title">
-        <h2>今日進場股票</h2>
-        <span class="status" id="todayEntryDate">—</span>
+      <div class="section-title date-card-title">
+        <h2 id="entryCardTitle">今日進場股票</h2>
+        <div class="date-query-box">
+          <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
+          <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
+        </div>
       </div>
       <div id="todayEntries" class="today-entry-list"></div>
     </section>
 
     <section class="card span3 today-exit-card">
-      <div class="section-title">
-        <h2>今日出場股票</h2>
-        <span class="status" id="todayExitDate">—</span>
+      <div class="section-title date-card-title">
+        <h2 id="exitCardTitle">今日出場股票</h2>
+        <div class="date-query-box">
+          <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
+          <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
+        </div>
       </div>
       <div id="todayExits" class="today-entry-list"></div>
     </section>
 
     <section class="card span3">
-      <div class="section-title"><h2>績效排行榜</h2><span class="status">依總績效 % 排名（含已實現＋未實現）</span></div>
+      <div class="section-title rank-title-row">
+        <h2>績效排行榜</h2>
+        <span class="status" id="rankRangeStatus">統計區間：全部期間</span>
+      </div>
+      <div class="rank-rule-note">依總績效 % 排名（含已實現＋未實現）</div>
       <div id="rankList" class="rank-list"></div>
     </section>
 
@@ -1483,6 +1782,25 @@ function filteredEntries(){
   });
 }
 
+
+function updateRankRangeStatus(){
+  const el=$('#rankRangeStatus');
+  if(!el)return;
+  const from=$('#fFrom')?.value||'';
+  const to=$('#fTo')?.value||'';
+
+  let text='全部期間';
+  if(from && to){
+    text=`${from.replaceAll('-','/')}～${to.replaceAll('-','/')}`;
+  }else if(from){
+    text=`${from.replaceAll('-','/')} 起`;
+  }else if(to){
+    text=`截至 ${to.replaceAll('-','/')}`;
+  }
+
+  el.textContent=`統計區間：${text}`;
+}
+
 function filteredTrades(){
   return filteredEntries().map(([,t])=>t);
 }
@@ -1492,30 +1810,37 @@ function filteredTrades(){
 function yahooStockUrl(symbol){
   return `https://tw.stock.yahoo.com/quote/${encodeURIComponent(String(symbol||'').trim())}`;
 }
+function shortMD(d){
+  if(!d)return '';
+  const parts=String(d).split('-');
+  return parts.length===3?`${Number(parts[1])}/${Number(parts[2])}`:d;
+}
+
 function renderTodayExits(){
-  const d=today();
-  const dateEl=$('#todayExitDate');
+  const picker=$('#exitQueryDate');
+  const d=(picker?.value)||today();
+  const title=$('#exitCardTitle');
   const list=$('#todayExits');
   if(!list)return;
-  if(dateEl)dateEl.textContent=d.replaceAll('-','/');
+  if(title)title.textContent=`${shortMD(d)}出場股票`;
 
   const rows=Object.entries(trades||{})
     .filter(([id,tr])=>tr && tr.exitDate===d)
     .sort((a,b)=>String(a[1].analyst||'').localeCompare(String(b[1].analyst||''),'zh-Hant'));
 
   if(!rows.length){
-    list.innerHTML='<div class="empty">今日尚無出場股票</div>';
+    list.innerHTML=`<div class="today-empty-message">${shortMD(d)} 尚無出場股票</div>`;
     return;
   }
 
   list.innerHTML=rows.map(([id,tr])=>`
     <div class="today-entry-item">
-      <div class="today-entry-main">
+      <div class="today-entry-stock">
         <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
         <span>${esc(tr.stockName||'')}</span>
       </div>
       <div class="today-entry-meta">
-        <span>${esc(tr.analyst||'')}</span>
+        <span class="today-analyst">${esc(tr.analyst||'—')}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
@@ -1576,16 +1901,18 @@ function renderSharedOpenPositions(){
 
 function renderTodayEntries(){
   const el=$('#todayEntries');
-  const dateEl=$('#todayEntryDate');
+  const picker=$('#entryQueryDate');
+  const d=(picker?.value)||today();
+  const title=$('#entryCardTitle');
   if(!el)return;
-  const d=today();
-  if(dateEl)dateEl.textContent=d.replaceAll('-','/');
+  if(title)title.textContent=`${shortMD(d)}進場股票`;
+
   const rows=Object.entries(trades)
     .filter(([id,tr])=>(tr.entryDate||'')===d)
     .sort((a,b)=>(a[1].analyst||'').localeCompare(b[1].analyst||'','zh-Hant'));
 
   if(!rows.length){
-    el.innerHTML='<div class="today-entry-empty">今日尚無進場股票</div>';
+    el.innerHTML=`<div class="today-empty-message">${shortMD(d)} 尚無進場股票</div>`;
     return;
   }
 
@@ -1636,6 +1963,7 @@ function render(){
   }
   renderTodayEntries();
   renderSharedOpenPositions(); renderTodayExits(); renderAnalystQuickFilter();
+  updateRankRangeStatus();
   $$('th[data-sort]').forEach(th=>{
     th.classList.toggle('sort-active',th.dataset.sort===performanceSort.key);
     th.dataset.dir=th.dataset.sort===performanceSort.key?performanceSort.dir:'';
@@ -2512,6 +2840,61 @@ $('#importDataFile')?.addEventListener('change',async e=>{
   const file=e.target.files?.[0];
   await importAllData(file);
   e.target.value='';
+});
+
+
+
+
+function resetFiltersToDefault(){
+  const ids=['fAnalyst','fMonth','fFrom','fTo','fStatus','fKeyword'];
+  ids.forEach(id=>{
+    const el=$('#'+id);
+    if(!el)return;
+    el.value='';
+  });
+  if(typeof performanceSort!=='undefined'){
+    performanceSort={key:'entryDate',dir:'desc'};
+  }
+  updateRankRangeStatus();
+}
+
+function initDateQueryPickers(){
+  const entry=$('#entryQueryDate');
+  const exit=$('#exitQueryDate');
+  if(entry)entry.value=today();
+  if(exit)exit.value=today();
+
+  [entry,exit,$('#fFrom'),$('#fTo')].forEach(input=>{
+    if(!input)return;
+    input.addEventListener('click',()=>{
+      try{ if(typeof input.showPicker==='function')input.showPicker(); }catch(e){}
+    });
+  });
+
+  entry?.addEventListener('change',renderTodayEntries);
+  exit?.addEventListener('change',renderTodayExits);
+
+  $('#entryTodayBtn')?.addEventListener('click',()=>{
+    if(entry)entry.value=today();
+    renderTodayEntries();
+  });
+  $('#exitTodayBtn')?.addEventListener('click',()=>{
+    if(exit)exit.value=today();
+    renderTodayExits();
+  });
+}
+
+try{
+  ['analystFilters','performanceFilters','filterState','analystPerformanceFilters'].forEach(k=>localStorage.removeItem(k));
+}catch(e){}
+resetFiltersToDefault();
+initDateQueryPickers();
+
+['fFrom','fTo'].forEach(id=>{
+  const el=$('#'+id);
+  if(!el)return;
+  el.addEventListener('change',updateRankRangeStatus);
+  el.addEventListener('input',updateRankRangeStatus);
 });
 
 

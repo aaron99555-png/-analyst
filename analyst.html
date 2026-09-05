@@ -1504,6 +1504,192 @@ body{
   }
 }
 
+
+/* v72：日期控制同一排、全站日期 YYYY-MM-DD */
+.date-query-box{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:5px !important;
+  max-width:none !important;
+}
+.date-picker-box{
+  width:124px !important;
+  max-width:124px !important;
+  flex:0 0 124px !important;
+}
+.date-today-btn{
+  width:auto !important;
+  min-width:68px !important;
+  flex:0 0 auto !important;
+  padding:0 7px !important;
+}
+@media(max-width:700px){
+  .date-card-title{
+    flex-wrap:wrap !important;
+    align-items:center !important;
+  }
+  .date-query-box{
+    width:100% !important;
+    max-width:100% !important;
+    justify-content:flex-start !important;
+  }
+  .date-picker-box{
+    width:calc(100% - 76px) !important;
+    max-width:none !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+  }
+  .date-today-btn{
+    width:70px !important;
+    min-width:70px !important;
+    flex:0 0 70px !important;
+  }
+}
+
+
+/* v73：排行榜分析師交易簡表 */
+.rank-name-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:#f7e7ad;
+  padding:0;
+  margin:0;
+  text-align:left;
+  font:inherit;
+  font-weight:850;
+  cursor:pointer;
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:3px;
+}
+.rank-name-btn:hover{
+  color:#ffd66b;
+}
+.analyst-trades-modal-card{
+  width:min(92vw,760px) !important;
+  max-height:84vh;
+  overflow:auto;
+}
+.analyst-trades-modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  position:sticky;
+  top:0;
+  z-index:2;
+  padding-bottom:10px;
+  background:inherit;
+}
+.analyst-trades-modal-head h3{
+  margin:0 0 4px;
+}
+.analyst-trades-range{
+  font-size:11px;
+  opacity:.68;
+}
+.analyst-trades-body{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.analyst-trade-section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  font-weight:900;
+  color:#f5e6ad;
+}
+.analyst-trade-section-title span{
+  font-size:11px;
+  opacity:.7;
+}
+.analyst-trade-item{
+  border:1px solid rgba(212,175,55,.28);
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:8px;
+  background:rgba(255,255,255,.025);
+}
+.analyst-trade-item.open{
+  border-color:rgba(212,175,55,.46);
+}
+.analyst-trade-item.closed{
+  opacity:.88;
+}
+.analyst-trade-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.analyst-trade-stock{
+  min-width:0;
+  font-size:14px;
+}
+.analyst-trade-status{
+  flex:0 0 auto;
+  padding:3px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+}
+.analyst-trade-status.open{
+  background:rgba(212,175,55,.18);
+  color:#ffd66b;
+  border:1px solid rgba(212,175,55,.38);
+}
+.analyst-trade-status.closed{
+  background:rgba(148,163,184,.12);
+  color:#d9dee8;
+  border:1px solid rgba(148,163,184,.28);
+}
+.analyst-trade-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px 10px;
+  font-size:11px;
+}
+.analyst-trade-grid span{
+  min-width:0;
+  white-space:nowrap;
+}
+.analyst-trade-grid b{
+  margin-left:3px;
+}
+.analyst-trade-empty{
+  padding:12px;
+  text-align:center;
+  font-size:12px;
+  opacity:.58;
+  border:1px dashed rgba(255,255,255,.12);
+  border-radius:8px;
+}
+.closed-section{
+  padding-top:4px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+@media(max-width:700px){
+  .analyst-trades-modal-card{
+    width:94vw !important;
+    max-height:88vh;
+    padding:12px !important;
+  }
+  .analyst-trade-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    font-size:10px;
+  }
+  .analyst-trade-stock{
+    font-size:13px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1629,6 +1815,20 @@ body{
         <th class="sortable" data-sort="analyst">分析師</th><th class="sortable" data-sort="stock">股票</th><th class="sortable" data-sort="entryDate">入場日期</th><th class="sortable" data-sort="entryPrice">進場價(收盤價)</th><th class="sortable" data-sort="currentPrice">目前價</th><th class="sortable" data-sort="priceUpdatedAt">更新日期</th><th class="sortable" data-sort="shares">股數</th><th class="sortable" data-sort="perf">績效%</th><th class="sortable" data-sort="unreal">目前損益</th><th class="sortable" data-sort="stopLoss">停損</th><th class="sortable" data-sort="takeProfit">停利</th><th class="sortable" data-sort="exitDate">出場日期</th><th class="sortable" data-sort="exitPrice">出場價</th><th class="sortable" data-sort="realized">已實現損益</th><th class="sortable" data-sort="status">狀態</th><th>備註</th><th class="admin-col hidden">操作</th>
       </tr></thead><tbody id="tbody"></tbody></table></div>
     </section>
+  </div>
+</div>
+
+
+<div class="modal" id="analystTradesModal">
+  <div class="modal-card analyst-trades-modal-card">
+    <div class="analyst-trades-modal-head">
+      <div>
+        <h3 id="analystTradesTitle">分析師交易簡表</h3>
+        <div id="analystTradesRange" class="analyst-trades-range">—</div>
+      </div>
+      <button id="closeAnalystTrades" class="ghost analyst-trades-close" type="button">關閉</button>
+    </div>
+    <div id="analystTradesBody" class="analyst-trades-body"></div>
   </div>
 </div>
 
@@ -1791,11 +1991,11 @@ function updateRankRangeStatus(){
 
   let text='全部期間';
   if(from && to){
-    text=`${from.replaceAll('-','/')}～${to.replaceAll('-','/')}`;
+    text=`${from}～${to}`;
   }else if(from){
-    text=`${from.replaceAll('-','/')} 起`;
+    text=`${from} 起`;
   }else if(to){
-    text=`截至 ${to.replaceAll('-','/')}`;
+    text=`截至 ${to}`;
   }
 
   el.textContent=`統計區間：${text}`;
@@ -1811,9 +2011,7 @@ function yahooStockUrl(symbol){
   return `https://tw.stock.yahoo.com/quote/${encodeURIComponent(String(symbol||'').trim())}`;
 }
 function shortMD(d){
-  if(!d)return '';
-  const parts=String(d).split('-');
-  return parts.length===3?`${Number(parts[1])}/${Number(parts[2])}`:d;
+  return d ? String(d).slice(0,10) : '';
 }
 
 function renderTodayExits(){
@@ -1982,6 +2180,85 @@ function render(){
   renderRank(); renderCharts(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}
+
+function analystTradeListSource(){
+  // 與排行榜相同：依目前「查詢與篩選」條件顯示
+  return filteredTrades();
+}
+
+function renderAnalystTradesModal(name){
+  const modal=$('#analystTradesModal');
+  const body=$('#analystTradesBody');
+  const title=$('#analystTradesTitle');
+  const range=$('#analystTradesRange');
+  if(!modal||!body)return;
+
+  const rows=analystTradeListSource()
+    .filter(tr=>tr && tr.analyst===name)
+    .map(tr=>({tr,c:calc(tr)}));
+
+  const openRows=rows
+    .filter(x=>x.c.open)
+    .sort((a,b)=>String(b.tr.entryDate||'').localeCompare(String(a.tr.entryDate||'')));
+
+  const closedRows=rows
+    .filter(x=>!x.c.open)
+    .sort((a,b)=>String(b.tr.exitDate||'').localeCompare(String(a.tr.exitDate||'')));
+
+  if(title)title.textContent=`${name}｜進出買賣簡表`;
+  if(range)range.textContent=$('#rankRangeStatus')?.textContent||'統計區間：全部期間';
+
+  const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
+  const openHtml=openRows.length?openRows.map(({tr,c})=>`
+    <div class="analyst-trade-item open">
+      <div class="analyst-trade-top">
+        <a class="stock-link analyst-trade-stock" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer">${stockLabel(tr)}</a>
+        <span class="analyst-trade-status open">持有中</span>
+      </div>
+      <div class="analyst-trade-grid">
+        <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
+        <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
+        <span>目前價 <b>${fmt(tr.currentPrice)}</b></span>
+        <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
+      </div>
+    </div>
+  `).join(''):'<div class="analyst-trade-empty">目前沒有持有中的股票</div>';
+
+  const closedHtml=closedRows.length?closedRows.map(({tr,c})=>`
+    <div class="analyst-trade-item closed">
+      <div class="analyst-trade-top">
+        <a class="stock-link analyst-trade-stock" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer">${stockLabel(tr)}</a>
+        <span class="analyst-trade-status closed">已結算</span>
+      </div>
+      <div class="analyst-trade-grid">
+        <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
+        <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
+        <span>出場日 <b>${esc(tr.exitDate||'—')}</b></span>
+        <span>出場價 <b>${fmt(tr.exitPrice)}</b></span>
+        <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
+        <span>已實現 <b class="${c.realized>=0?'pos':'neg'}">${fmtMoney(c.realized)}</b></span>
+      </div>
+    </div>
+  `).join(''):'<div class="analyst-trade-empty">目前沒有已結算股票</div>';
+
+  body.innerHTML=`
+    <section class="analyst-trade-section">
+      <div class="analyst-trade-section-title">持有中 <span>${openRows.length} 檔</span></div>
+      ${openHtml}
+    </section>
+    <section class="analyst-trade-section closed-section">
+      <div class="analyst-trade-section-title">已結算 <span>${closedRows.length} 檔</span></div>
+      ${closedHtml}
+    </section>
+  `;
+
+  modal.classList.add('show');
+}
+
+function closeAnalystTradesModal(){
+  $('#analystTradesModal')?.classList.remove('show');
+}
+
 function renderRank(){
   const data=analystSummary();
   const totalRank=data.filter(r=>r.tradesCount>0).sort((a,b)=>b.totalPerf-a.totalPerf);
@@ -1993,7 +2270,7 @@ function renderRank(){
     const perf=metric==='realized'?r.realizedPerf:r.totalPerf;
     return `<div class="rank-row rank-compact">
       <div class="rank-no">${i+1}</div>
-      <div class="rank-name">${esc(r.name)}</div>
+      <button class="rank-name rank-name-btn" type="button" data-rank-analyst="${esc(r.name)}">${esc(r.name)}</button>
       <div><div class="k">${metric==='realized'?'已實現績效':'總績效'}</div><div class="rank-value ${perf>=0?'pos':'neg'}">${pct(perf)}</div></div>
       <div><div class="k">損益金額</div><div class="rank-value ${r.total>=0?'pos':'neg'}">${fmtMoney(metric==='realized'?r.realized:r.total)}</div></div>
     </div>`;
@@ -2016,7 +2293,7 @@ function renderRank(){
       <div class="rank-group-title">尚無操作 <span>0 筆交易・不列入排名</span></div>
       ${noTrade.map(r=>`<div class="rank-row no-trade">
         <div class="rank-no">—</div>
-        <div class="rank-name">${esc(r.name)}</div>
+        <button class="rank-name rank-name-btn" type="button" data-rank-analyst="${esc(r.name)}">${esc(r.name)}</button>
         <div class="no-trade-msg">尚無操作</div>
         <div>${isAdmin?`<button class="mini primary" data-add-analyst="${esc(r.name)}">新增資料</button>`:''}</div>
       </div>`).join('')}
@@ -2024,6 +2301,11 @@ function renderRank(){
   }
 
   $('#rankList').innerHTML=html;
+
+  $$('[data-rank-analyst]').forEach(btn=>{
+    btn.onclick=()=>renderAnalystTradesModal(btn.dataset.rankAnalyst||'');
+  });
+
   $$('[data-add-analyst]').forEach(btn=>btn.onclick=()=>{
     if(!isAdmin)return;
     $('#analyst').value=btn.dataset.addAnalyst;
@@ -2897,6 +3179,15 @@ initDateQueryPickers();
   el.addEventListener('input',updateRankRangeStatus);
 });
 
+
+
+$('#closeAnalystTrades')?.addEventListener('click',closeAnalystTradesModal);
+$('#analystTradesModal')?.addEventListener('click',e=>{
+  if(e.target?.id==='analystTradesModal')closeAnalystTradesModal();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeAnalystTradesModal();
+});
 
 onValue(
   tradesRef,

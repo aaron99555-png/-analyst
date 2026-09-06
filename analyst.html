@@ -2032,6 +2032,15 @@ body{
   }
 }
 
+
+/* v86：股價更新期間保持資料可見 */
+body.price-writing #tbody{
+  opacity:.82;
+}
+body.price-writing #refreshAllBtn{
+  pointer-events:none;
+}
+
 </style>
 </head>
 <body>
@@ -2223,7 +2232,9 @@ const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let trades={}; let isAdmin=false; let editingId=null;
+let trades={};
+let priceBulkWriting=false;
+ let isAdmin=false; let editingId=null;
 let adminRole='';
 const ADMIN_PASSWORD='51685168';
 const ADMIN2_PASSWORD='16888';
@@ -2982,7 +2993,6 @@ function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&l
 function bindRows(){
   $$('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
   $$('[data-del]').forEach(b=>b.onclick=()=>deleteTrade(b.dataset.del));
-  $$('[data-up]').forEach(b=>b.onclick=()=>refreshOne(b.dataset.up));
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
@@ -3482,7 +3492,7 @@ function openPriceConfirm(items){
   });
 }
 
-async function syncSameStockCurrentPrice(symbol,price,source){
+async function syncSameStockCurrentPrice(symbol,price,source,{renderNow=true}={}){
   const normalized=String(symbol||'').trim();
   if(!normalized)throw new Error('股票代號不存在');
 
@@ -3496,13 +3506,27 @@ async function syncSameStockCurrentPrice(symbol,price,source){
 
   if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
 
-  await Promise.all(sameStockIds.map(tid=>
-    update(ref(db,`analystPerformance/trades/${tid}`),{
+  // 一次 multipath update，避免同一檔多筆持股造成多次 onValue / render。
+  const patch={};
+  sameStockIds.forEach(tid=>{
+    patch[`${tid}/currentPrice`]=price;
+    patch[`${tid}/priceUpdatedAt`]=updatedAt;
+    patch[`${tid}/priceSource`]=source||'手動確認';
+  });
+
+  // 先更新本機資料，畫面立即反映，不必等 Firebase 回傳。
+  sameStockIds.forEach(tid=>{
+    if(!trades[tid])return;
+    trades[tid]={
+      ...trades[tid],
       currentPrice:price,
       priceUpdatedAt:updatedAt,
       priceSource:source||'手動確認'
-    })
-  ));
+    };
+  });
+
+  if(renderNow)render();
+  await update(tradesRef,patch);
   return sameStockIds.length;
 }
 
@@ -3660,20 +3684,73 @@ $('#refreshAllBtn').onclick=async()=>{
   btn.textContent='寫入中…';
 
   let success=0,fail=0,syncedRows=0;
+  const bulkPatch={};
+  const localUpdates=[];
+  const bulkUpdatedAt=nowText();
+
+  // 先把本次所有股票要更新的持股整理成一個 Firebase multipath patch。
   for(const item of confirmed){
     try{
-      const n=await writeManualOrFetchedPrice(item.id,item);
+      const normalized=String(item.symbol||'').trim();
+      const sameStockIds=Object.entries(trades||{})
+        .filter(([tid,tr])=>tr && String(tr.symbol||'').trim()===normalized && calc(tr).open)
+        .map(([tid])=>tid);
+
+      if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
+
+      sameStockIds.forEach(tid=>{
+        bulkPatch[`${tid}/currentPrice`]=item.price;
+        bulkPatch[`${tid}/priceUpdatedAt`]=bulkUpdatedAt;
+        bulkPatch[`${tid}/priceSource`]=item.source||'手動確認';
+        localUpdates.push({
+          id:tid,
+          price:item.price,
+          source:item.source||'手動確認'
+        });
+      });
+
       success++;
-      syncedRows+=Number(n)||0;
+      syncedRows+=sameStockIds.length;
     }catch(e){
       fail++;
-      console.error('價格寫入失敗',item.symbol,e);
+      console.error('價格寫入整理失敗',item.symbol,e);
     }
   }
 
-  $('#lastRefresh').textContent=`價格更新：${nowText()}｜股票 ${success}${fail?`、失敗 ${fail}`:''}`;
+  try{
+    if(Object.keys(bulkPatch).length){
+      priceBulkWriting=true;
+      document.body.classList.add('price-writing');
+
+      // 本機先更新，底下表格不會因等待 Firebase 而消失。
+      localUpdates.forEach(x=>{
+        if(!trades[x.id])return;
+        trades[x.id]={
+          ...trades[x.id],
+          currentPrice:x.price,
+          priceUpdatedAt:bulkUpdatedAt,
+          priceSource:x.source
+        };
+      });
+
+      // 只重畫一次。
+      render();
+
+      // Firebase 也只寫一次；完成後 onValue 再做最終校正。
+      await update(tradesRef,bulkPatch);
+    }
+  }catch(e){
+    console.error('批次價格寫入失敗',e);
+    alert(`價格寫入 Firebase 失敗：${e?.message||'未知錯誤'}\n畫面會保留目前資料，請稍後再試。`);
+  }finally{
+    priceBulkWriting=false;
+    document.body.classList.remove('price-writing');
+  }
+
+  $('#lastRefresh').textContent=`價格更新：${bulkUpdatedAt}｜股票 ${success}${fail?`、失敗 ${fail}`:''}`;
   btn.disabled=false;
   updatePriceModeUI();
+  render();
 
   alert(`價格更新完成\n成功：${success} 檔股票${fail?`\n失敗：${fail} 檔`:''}\n同步持股資料：${syncedRows} 筆\n\n行情順位：Fugle → TWSE/TPEx → Yahoo`);
 };
@@ -3863,6 +3940,7 @@ if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='郭榮哲投
 if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='徐紹軒')x.analyst='運達徐紹軒';});
 if(incoming!==null) trades=incoming;
     else trades={};
+    syncAnalystSelects();
     render();
   },
   err=>{

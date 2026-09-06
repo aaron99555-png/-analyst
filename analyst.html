@@ -1954,15 +1954,75 @@ body{
   }
 }
 
+
+/* v84：主要管理者－分析師管理 */
+.analyst-manage-card{
+  width:min(92vw,520px) !important;
+}
+.analyst-manage-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:14px;
+}
+.analyst-manage-head h3{
+  margin:0 0 4px;
+}
+.analyst-manage-note{
+  font-size:11px;
+}
+.analyst-add-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-bottom:14px;
+}
+.analyst-add-row input{
+  width:100%;
+  min-width:0;
+}
+.analyst-manage-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:50vh;
+  overflow:auto;
+}
+.analyst-manage-item{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  padding:8px 10px;
+  border:1px solid rgba(212,175,55,.22);
+  border-radius:8px;
+  background:rgba(255,255,255,.025);
+}
+.analyst-manage-index{
+  font-size:11px;
+  opacity:.55;
+  text-align:center;
+}
+.analyst-manage-name{
+  font-weight:800;
+}
+@media(max-width:700px){
+  #manageAnalystsBtn{
+    width:100%;
+    margin-top:6px;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">10 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">分析師即時追蹤｜出場結算｜百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button><span class="fugle-badge">Fugle 優先</span>
+        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button><button id="manageAnalystsBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">＋ 新增分析師</button><span class="fugle-badge">Fugle 優先</span>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
@@ -1982,7 +2042,7 @@ body{
     <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option><option>蔡明彰</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -2009,7 +2069,7 @@ body{
 <section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option><option>蔡明彰</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -2095,6 +2155,24 @@ body{
   </div>
 </div>
 
+
+<div class="modal" id="analystManageModal">
+  <div class="modal-card analyst-manage-card">
+    <div class="analyst-manage-head">
+      <div>
+        <h3>分析師管理</h3>
+        <div class="muted analyst-manage-note">僅主要管理者可新增分析師</div>
+      </div>
+      <button id="closeAnalystManage" class="ghost" type="button">關閉</button>
+    </div>
+    <div class="analyst-add-row">
+      <input id="newAnalystName" type="text" placeholder="輸入分析師名稱" maxlength="30">
+      <button id="addAnalystBtn" class="primary" type="button">新增</button>
+    </div>
+    <div id="analystManageList" class="analyst-manage-list"></div>
+  </div>
+</div>
+
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -2134,6 +2212,85 @@ const ADMIN2_PASSWORD='16888';
 const isMainAdmin=()=>isAdmin&&adminRole==='main';
 const isAdmin2=()=>isAdmin&&adminRole==='admin2';
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
+
+const DEFAULT_ANALYSTS=[
+  '投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸',
+  '運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡明彰'
+];
+const ANALYST_STORAGE_KEY='analystPerformanceAnalysts';
+
+function getAnalystNames(){
+  let custom=[];
+  try{
+    const raw=localStorage.getItem(ANALYST_STORAGE_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(Array.isArray(parsed))custom=parsed.filter(Boolean).map(x=>String(x).trim()).filter(Boolean);
+    }
+  }catch(e){}
+  const fromTrades=Object.values(trades||{}).map(x=>String(x?.analyst||'').trim()).filter(Boolean);
+  return [...new Set([...DEFAULT_ANALYSTS,...custom,...fromTrades])];
+}
+
+function saveCustomAnalyst(name){
+  const clean=String(name||'').trim();
+  if(!clean)return false;
+  const current=getAnalystNames();
+  if(current.includes(clean))return false;
+  const custom=current.filter(x=>!DEFAULT_ANALYSTS.includes(x));
+  custom.push(clean);
+  localStorage.setItem(ANALYST_STORAGE_KEY,JSON.stringify(custom));
+  return true;
+}
+
+function syncAnalystSelects(){
+  const names=getAnalystNames();
+
+  const fillSelect=(sel,keepValue=true)=>{
+    const el=$(sel);
+    if(!el)return;
+    const old=keepValue?el.value:'';
+    el.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
+    if(old && names.includes(old))el.value=old;
+  };
+
+  fillSelect('#analyst');
+  const f=$('#fAnalyst');
+  if(f){
+    const old=f.value;
+    f.innerHTML='<option value="">全部</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
+    if(old && names.includes(old))f.value=old;
+  }
+
+  renderAnalystQuickFilter?.();
+}
+
+function renderAnalystManageList(){
+  const box=$('#analystManageList');
+  if(!box)return;
+  const names=getAnalystNames();
+  box.innerHTML=names.map((n,i)=>`
+    <div class="analyst-manage-item">
+      <span class="analyst-manage-index">${i+1}</span>
+      <span class="analyst-manage-name">${esc(n)}</span>
+    </div>
+  `).join('');
+}
+
+function openAnalystManage(){
+  if(!isMainAdmin())return;
+  renderAnalystManageList();
+  const input=$('#newAnalystName');
+  if(input)input.value='';
+  $('#analystManageModal')?.classList.add('show');
+  setTimeout(()=>input?.focus(),0);
+}
+
+function closeAnalystManage(){
+  $('#analystManageModal')?.classList.remove('show');
+}
+
+
 const fmt=n=>Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2});
 const fmtMoney=n=>(Number(n||0)>=0?'+':'')+fmt(n);
 const pct=n=>(Number(n||0)>=0?'+':'')+Number(n||0).toFixed(2)+'%';
@@ -2396,7 +2553,7 @@ function renderAnalystQuickFilter(){
   const el=$('#analystQuickFilter');
   if(!el)return;
   const current=$('#fAnalyst')?.value||'';
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
+  const names=getAnalystNames();
   el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
     names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
 }
@@ -2578,7 +2735,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
+  const names=getAnalystNames();
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -2599,7 +2756,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
+  const names=getAnalystNames();
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -3550,6 +3707,28 @@ $('#analystTradesModal')?.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAnalystTradesModal();
+});
+
+
+$('#manageAnalystsBtn')?.addEventListener('click',openAnalystManage);
+$('#closeAnalystManage')?.addEventListener('click',closeAnalystManage);
+$('#analystManageModal')?.addEventListener('click',e=>{
+  if(e.target?.id==='analystManageModal')closeAnalystManage();
+});
+$('#addAnalystBtn')?.addEventListener('click',()=>{
+  if(!isMainAdmin())return;
+  const input=$('#newAnalystName');
+  const name=String(input?.value||'').trim();
+  if(!name)return alert('請輸入分析師名稱');
+  if(!saveCustomAnalyst(name))return alert('此分析師已存在');
+  syncAnalystSelects();
+  renderAnalystManageList();
+  renderAll?.();
+  if(input)input.value='';
+  alert(`已新增分析師：${name}`);
+});
+$('#newAnalystName')?.addEventListener('keydown',e=>{
+  if(e.key==='Enter')$('#addAnalystBtn')?.click();
 });
 
 onValue(

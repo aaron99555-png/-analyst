@@ -1132,7 +1132,7 @@ main{
 }
 
 
-/* v64：同時持有未結算股票 */
+/* v64：同時持有中股票 */
 .shared-open-list{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1195,7 +1195,7 @@ main{
 @media(max-width:700px){.shared-open-list{grid-template-columns:1fr}}
 
 
-/* v65：同時持有未結算股票－高反差顯示 */
+/* v65：同時持有中股票－高反差顯示 */
 .shared-open-stock{
   color:#f8fafc !important;
   text-decoration:none !important;
@@ -1690,6 +1690,74 @@ body{
   }
 }
 
+
+/* v74：頁尾資料整理文字放大 */
+.data-footer-note{
+  font-size:15px !important;
+  line-height:1.6 !important;
+  font-weight:700 !important;
+}
+@media(max-width:700px){
+  .data-footer-note{
+    font-size:14px !important;
+  }
+}
+
+
+/* v75：同時持有中股票移至最上方，強化優先層級 */
+.shared-open-card{
+  position:relative;
+  overflow:hidden;
+}
+.shared-open-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,.85),transparent);
+}
+
+
+/* v77：手機版查詢與篩選 4:4:4（三等分） */
+@media(max-width:700px){
+  .filter-card .filters{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:6px !important;
+    align-items:stretch !important;
+  }
+  .filter-card .filters > div{
+    min-width:0 !important;
+    width:100% !important;
+    height:76px !important;
+    overflow:hidden !important;
+  }
+  .filter-card .filters label{
+    font-size:10px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  .filter-card .filters input,
+  .filter-card .filters select{
+    width:100% !important;
+    min-width:0 !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding-left:6px !important;
+    padding-right:5px !important;
+    font-size:11px !important;
+    box-sizing:border-box !important;
+  }
+  .filter-card .filters .form-actions{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    height:42px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1715,7 +1783,15 @@ body{
   <div class="grid">
     
 
-    <section class="card span12 admin-only hidden" id="entryCard">
+    <section class="card span12 shared-open-card">
+      <div class="section-title">
+        <h2>同時持有中股票</h2>
+        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+      </div>
+      <div id="sharedOpenPositions" class="shared-open-list"></div>
+    </section>
+
+<section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
         <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
@@ -1732,7 +1808,6 @@ body{
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
     </section>
-
 <section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
@@ -1776,16 +1851,6 @@ body{
       <div class="rank-rule-note">依總績效 % 排名（含已實現＋未實現）</div>
       <div id="rankList" class="rank-list"></div>
     </section>
-
-    
-    <section class="card span12 shared-open-card">
-      <div class="section-title">
-        <h2>同時持有未結算股票</h2>
-        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
-      </div>
-      <div id="sharedOpenPositions" class="shared-open-list"></div>
-    </section>
-
 <section class="card span12">
       <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
       <div class="chart-grid">
@@ -3251,5 +3316,5 @@ document.addEventListener('click', async (e)=>{
 }, true);
 </script>
 
-<div class="data-footer-note">資料整理：萊恩｜如有錯誤或遺漏請告知</div>
+<div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>
 </body></html>

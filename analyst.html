@@ -1758,6 +1758,18 @@ body{
   }
 }
 
+
+/* v80 desktop card order */
+@media(min-width:701px){
+  .grid > .shared-open-card{order:1 !important;}
+  #entryCard{order:2 !important;}
+  .grid > .filter-card.span3{order:10 !important;}
+  .grid > .span3:not(.filter-card):not(.today-entry-card):not(.today-exit-card){order:11 !important;}
+  .grid > .today-entry-card.span3{order:12 !important;}
+  .grid > .today-exit-card.span3{order:13 !important;}
+  .grid > .span12:not(.shared-open-card):not(#entryCard){order:20 !important;}
+}
+
 </style>
 </head>
 <body>

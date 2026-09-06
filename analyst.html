@@ -1720,51 +1720,19 @@ body{
 }
 
 
-/* v77：Fugle 行情優先 */
-.fugle-badge{
-  display:inline-flex;
-  align-items:center;
-  height:24px;
-  padding:0 7px;
-  margin-left:6px;
-  border-radius:999px;
-  border:1px solid rgba(212,175,55,.35);
-  background:rgba(212,175,55,.10);
-  color:#f3d77d;
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-@media(max-width:700px){
-  .fugle-badge{font-size:9px;height:22px;margin-left:4px}
-}
-
-
-/* v78：手機版查詢與篩選 4:4:4，狀態移到分析師旁邊 */
+/* v77：手機版查詢與篩選 4:4:4（三等分） */
 @media(max-width:700px){
   .filter-card .filters{
     display:grid !important;
     grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:8px !important;
+    gap:6px !important;
     align-items:stretch !important;
   }
   .filter-card .filters > div{
     min-width:0 !important;
     width:100% !important;
-    height:78px !important;
+    height:76px !important;
     overflow:hidden !important;
-  }
-  .filter-card .filters > div:has(#fAnalyst){order:1 !important;}
-  .filter-card .filters > div:has(#fStatus){order:2 !important;}
-  .filter-card .filters > div:has(#fMonth){order:3 !important;}
-  .filter-card .filters > div:has(#fFrom){order:4 !important;}
-  .filter-card .filters > div:has(#fTo){order:5 !important;}
-  .filter-card .filters > div:has(#fKeyword){order:6 !important;}
-
-  .filter-card .filters .form-actions{
-    order:7 !important;
-    grid-column:1 / -1 !important;
-    height:44px !important;
   }
   .filter-card .filters label{
     font-size:10px !important;
@@ -1775,270 +1743,19 @@ body{
   .filter-card .filters input,
   .filter-card .filters select{
     width:100% !important;
-    height:40px !important;
-    min-height:40px !important;
-    max-height:40px !important;
-    box-sizing:border-box !important;
-    font-size:12px !important;
+    min-width:0 !important;
+    height:38px !important;
+    min-height:38px !important;
     padding-left:6px !important;
-    padding-right:6px !important;
-  }
-}
-
-
-/* v79：手機版查詢與篩選所有格子等高 */
-@media(max-width:700px){
-  .filter-card .filters{
-    grid-auto-rows:78px !important;
-    align-items:stretch !important;
-  }
-  .filter-card .filters > div{
-    height:78px !important;
-    min-height:78px !important;
-    max-height:78px !important;
-    box-sizing:border-box !important;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:flex-start !important;
-  }
-  .filter-card .filters label{
-    height:18px !important;
-    min-height:18px !important;
-    max-height:18px !important;
-    line-height:18px !important;
-    margin:0 0 4px 0 !important;
-  }
-  .filter-card .filters input,
-  .filter-card .filters select{
-    height:40px !important;
-    min-height:40px !important;
-    max-height:40px !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-  }
-  .filter-card .filters .form-actions{
-    grid-column:1 / -1 !important;
-    height:44px !important;
-    min-height:44px !important;
-    max-height:44px !important;
-  }
-}
-
-
-/* v81：手機版查詢與篩選－乾淨三欄等寬，不硬鎖整格高度 */
-@media(max-width:700px){
-  .filter-card .filters{
-    display:grid !important;
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:8px 6px !important;
-    width:100% !important;
-    box-sizing:border-box !important;
-    align-items:start !important;
-  }
-
-  .filter-card .filters > div{
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    margin:0 !important;
-    padding:0 !important;
-    display:block !important;
-    box-sizing:border-box !important;
-    overflow:visible !important;
-  }
-
-  .filter-card .filters label{
-    display:block !important;
-    width:100% !important;
-    height:18px !important;
-    line-height:18px !important;
-    margin:0 0 4px 0 !important;
-    padding:0 !important;
-    font-size:10px !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    box-sizing:border-box !important;
-  }
-
-  .filter-card .filters input,
-  .filter-card .filters select{
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    height:40px !important;
-    min-height:40px !important;
-    max-height:40px !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
+    padding-right:5px !important;
     font-size:11px !important;
-    padding:0 6px !important;
+    box-sizing:border-box !important;
   }
-
-  /* iPhone 日期欄位避免撐開 */
-  .filter-card .filters input[type="date"]{
-    min-width:0 !important;
-    width:100% !important;
-    max-width:100% !important;
-    font-size:10px !important;
-    padding:0 4px !important;
-  }
-
-  /* 第一排：分析師｜狀態｜排行月份 */
-  .filter-card .filters > div:has(#fAnalyst){order:1 !important;}
-  .filter-card .filters > div:has(#fStatus){order:2 !important;}
-  .filter-card .filters > div:has(#fMonth){order:3 !important;}
-
-  /* 第二排：持股起日｜持股迄日｜股票搜尋 */
-  .filter-card .filters > div:has(#fFrom){order:4 !important;}
-  .filter-card .filters > div:has(#fTo){order:5 !important;}
-  .filter-card .filters > div:has(#fKeyword){order:6 !important;}
-
   .filter-card .filters .form-actions{
-    order:7 !important;
     grid-column:1 / -1 !important;
     width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    margin-top:2px !important;
+    height:42px !important;
   }
-
-  .filter-card .filters .form-actions button{
-    width:100% !important;
-    height:40px !important;
-    min-height:40px !important;
-    max-height:40px !important;
-    box-sizing:border-box !important;
-  }
-}
-
-
-/* v82：手機版兩排欄位完全同寬 */
-@media(max-width:700px){
-  .filter-card .filters{
-    display:grid !important;
-    grid-template-columns:repeat(3, 1fr) !important;
-    column-gap:6px !important;
-    row-gap:8px !important;
-  }
-
-  /* 六個查詢欄位都固定只佔 1 欄 */
-  .filter-card .filters > div:has(#fAnalyst),
-  .filter-card .filters > div:has(#fStatus),
-  .filter-card .filters > div:has(#fMonth),
-  .filter-card .filters > div:has(#fFrom),
-  .filter-card .filters > div:has(#fTo),
-  .filter-card .filters > div:has(#fKeyword){
-    grid-column:span 1 !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:none !important;
-    box-sizing:border-box !important;
-  }
-
-  .filter-card #fAnalyst,
-  .filter-card #fStatus,
-  .filter-card #fMonth,
-  .filter-card #fFrom,
-  .filter-card #fTo,
-  .filter-card #fKeyword{
-    width:100% !important;
-    min-width:0 !important;
-    max-width:none !important;
-    height:40px !important;
-    box-sizing:border-box !important;
-  }
-}
-
-
-/* v84：主要管理者－分析師管理 */
-.analyst-manage-card{
-  width:min(92vw,520px) !important;
-}
-.analyst-manage-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  margin-bottom:14px;
-}
-.analyst-manage-head h3{
-  margin:0 0 4px;
-}
-.analyst-manage-note{
-  font-size:11px;
-}
-.analyst-add-row{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px;
-  margin-bottom:14px;
-}
-.analyst-add-row input{
-  width:100%;
-  min-width:0;
-}
-.analyst-manage-list{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  max-height:50vh;
-  overflow:auto;
-}
-.analyst-manage-item{
-  display:grid;
-  grid-template-columns:30px minmax(0,1fr);
-  gap:8px;
-  align-items:center;
-  padding:8px 10px;
-  border:1px solid rgba(212,175,55,.22);
-  border-radius:8px;
-  background:rgba(255,255,255,.025);
-}
-.analyst-manage-index{
-  font-size:11px;
-  opacity:.55;
-  text-align:center;
-}
-.analyst-manage-name{
-  font-weight:800;
-}
-@media(max-width:700px){
-  #manageAnalystsBtn{
-    width:100%;
-    margin-top:6px;
-  }
-}
-
-
-/* v85：股價更新診斷與錯誤提示 */
-.price-fetch-error{
-  display:inline-block;
-  margin-top:3px;
-  font-size:9px;
-  line-height:1.35;
-  opacity:.72;
-  max-width:280px;
-  white-space:normal;
-}
-@media(max-width:700px){
-  #testPriceApiBtn{
-    width:100%;
-    margin-top:6px;
-  }
-}
-
-
-/* v86：股價更新期間保持資料可見 */
-body.price-writing #tbody{
-  opacity:.82;
-}
-body.price-writing #refreshAllBtn{
-  pointer-events:none;
 }
 
 </style>
@@ -2046,17 +1763,17 @@ body.price-writing #refreshAllBtn{
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">分析師即時追蹤｜出場結算｜百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">10 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button><button id="testPriceApiBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">✓ 測試股價來源</button><button id="manageAnalystsBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">＋ 新增分析師</button><span class="fugle-badge">Fugle 優先</span>
+        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
 </div>
 
-        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜行情：Fugle → TWSE/TPEx → Yahoo 備援</div>
+        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
@@ -2066,10 +1783,18 @@ body.price-writing #refreshAllBtn{
   <div class="grid">
     
 
-    <section class="card span12 admin-only hidden" id="entryCard">
+    <section class="card span12 shared-open-card">
+      <div class="section-title">
+        <h2>同時持有中股票</h2>
+        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+      </div>
+      <div id="sharedOpenPositions" class="shared-open-list"></div>
+    </section>
+
+<section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option><option>蔡明彰</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -2083,20 +1808,10 @@ body.price-writing #refreshAllBtn{
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
     </section>
-
-<section class="card span12 shared-open-card">
-      <div class="section-title">
-        <h2>同時持有中股票</h2>
-        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
-      </div>
-      <div id="sharedOpenPositions" class="shared-open-list"></div>
-    </section>
-
-
 <section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
-        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option><option>蔡明彰</option></select></div>
+        <div><label>分析師</label><select id="fAnalyst"><option value="">全部</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option></select></div>
         <div><label>排行月份</label><input id="fMonth" type="month"></div>
         <div><label>持股起日</label><input id="fFrom" type="date"></div>
         <div><label>持股迄日</label><input id="fTo" type="date"></div>
@@ -2182,24 +1897,6 @@ body.price-writing #refreshAllBtn{
   </div>
 </div>
 
-
-<div class="modal" id="analystManageModal">
-  <div class="modal-card analyst-manage-card">
-    <div class="analyst-manage-head">
-      <div>
-        <h3>分析師管理</h3>
-        <div class="muted analyst-manage-note">僅主要管理者可新增分析師</div>
-      </div>
-      <button id="closeAnalystManage" class="ghost" type="button">關閉</button>
-    </div>
-    <div class="analyst-add-row">
-      <input id="newAnalystName" type="text" placeholder="輸入分析師名稱" maxlength="30">
-      <button id="addAnalystBtn" class="primary" type="button">新增</button>
-    </div>
-    <div id="analystManageList" class="analyst-manage-list"></div>
-  </div>
-</div>
-
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -2232,94 +1929,13 @@ const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let trades={};
-let priceBulkWriting=false;
- let isAdmin=false; let editingId=null;
+let trades={}; let isAdmin=false; let editingId=null;
 let adminRole='';
 const ADMIN_PASSWORD='51685168';
 const ADMIN2_PASSWORD='16888';
 const isMainAdmin=()=>isAdmin&&adminRole==='main';
 const isAdmin2=()=>isAdmin&&adminRole==='admin2';
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
-
-const DEFAULT_ANALYSTS=[
-  '投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸',
-  '運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡明彰'
-];
-const ANALYST_STORAGE_KEY='analystPerformanceAnalysts';
-
-function getAnalystNames(){
-  let custom=[];
-  try{
-    const raw=localStorage.getItem(ANALYST_STORAGE_KEY);
-    if(raw){
-      const parsed=JSON.parse(raw);
-      if(Array.isArray(parsed))custom=parsed.filter(Boolean).map(x=>String(x).trim()).filter(Boolean);
-    }
-  }catch(e){}
-  const fromTrades=Object.values(trades||{}).map(x=>String(x?.analyst||'').trim()).filter(Boolean);
-  return [...new Set([...DEFAULT_ANALYSTS,...custom,...fromTrades])];
-}
-
-function saveCustomAnalyst(name){
-  const clean=String(name||'').trim();
-  if(!clean)return false;
-  const current=getAnalystNames();
-  if(current.includes(clean))return false;
-  const custom=current.filter(x=>!DEFAULT_ANALYSTS.includes(x));
-  custom.push(clean);
-  localStorage.setItem(ANALYST_STORAGE_KEY,JSON.stringify(custom));
-  return true;
-}
-
-function syncAnalystSelects(){
-  const names=getAnalystNames();
-
-  const fillSelect=(sel,keepValue=true)=>{
-    const el=$(sel);
-    if(!el)return;
-    const old=keepValue?el.value:'';
-    el.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
-    if(old && names.includes(old))el.value=old;
-  };
-
-  fillSelect('#analyst');
-  const f=$('#fAnalyst');
-  if(f){
-    const old=f.value;
-    f.innerHTML='<option value="">全部</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
-    if(old && names.includes(old))f.value=old;
-  }
-
-  renderAnalystQuickFilter?.();
-}
-
-function renderAnalystManageList(){
-  const box=$('#analystManageList');
-  if(!box)return;
-  const names=getAnalystNames();
-  box.innerHTML=names.map((n,i)=>`
-    <div class="analyst-manage-item">
-      <span class="analyst-manage-index">${i+1}</span>
-      <span class="analyst-manage-name">${esc(n)}</span>
-    </div>
-  `).join('');
-}
-
-function openAnalystManage(){
-  if(!isMainAdmin())return;
-  renderAnalystManageList();
-  const input=$('#newAnalystName');
-  if(input)input.value='';
-  $('#analystManageModal')?.classList.add('show');
-  setTimeout(()=>input?.focus(),0);
-}
-
-function closeAnalystManage(){
-  $('#analystManageModal')?.classList.remove('show');
-}
-
-
 const fmt=n=>Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2});
 const fmtMoney=n=>(Number(n||0)>=0?'+':'')+fmt(n);
 const pct=n=>(Number(n||0)>=0?'+':'')+Number(n||0).toFixed(2)+'%';
@@ -2582,7 +2198,7 @@ function renderAnalystQuickFilter(){
   const el=$('#analystQuickFilter');
   if(!el)return;
   const current=$('#fAnalyst')?.value||'';
-  const names=getAnalystNames();
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
     names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
 }
@@ -2764,7 +2380,7 @@ function renderRank(){
 }
 let profitChart=null;
 function analystSummary(){
-  const names=getAnalystNames();
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -2785,7 +2401,7 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=getAnalystNames();
+  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩'];
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -2993,6 +2609,7 @@ function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&l
 function bindRows(){
   $$('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
   $$('[data-del]').forEach(b=>b.onclick=()=>deleteTrade(b.dataset.del));
+  $$('[data-up]').forEach(b=>b.onclick=()=>refreshOne(b.dataset.up));
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
@@ -3137,8 +2754,6 @@ async function settleTrade(id){
 $('#clearFilterBtn').onclick=()=>{$('#fMonth').value='';$('#fAnalyst').value='';$('#fStatus').value='';$('#fKeyword').value='';$('#fFrom').value='';$('#fTo').value='';render()};
 
 // ---- 股價更新 v16：以「已完成收盤價」為主，避免即時錯價污染資料 ----
-const FUGLE_API_KEY='OWFhMTEwZDUtOGFiNS00NTYxLWFkZmQtNjA5ODk4ZTY0Mzc1IGM5ZjdhNmMxLTMwNjAtNGFjMi1iMmEwLTA4NjdmZTNhZmQwNQ==';
-const FUGLE_STOCK_API='https://api.fugle.tw/marketdata/v1.0/stock';
 const PRICE_MAX_DEVIATION=0.15; // 一般台股多為 ±10%，預留誤差；異常價格直接拒絕
 const twNow=()=>{
   const parts=new Intl.DateTimeFormat('en-CA',{
@@ -3147,38 +2762,11 @@ const twNow=()=>{
   }).formatToParts(new Date());
   return Object.fromEntries(parts.map(x=>[x.type,x.value]));
 };
-function twTodayISO(){
-  const p=twNow();
-  return `${p.year}-${p.month}-${p.day}`;
-}
-function isTWClockMarketOpen(){
+function isTWMarketOpen(){
   const p=twNow(), wd=p.weekday;
   if(wd==='Sat'||wd==='Sun')return false;
   const m=(+p.hour)*60+(+p.minute);
-  return m>=540 && m<815; // 09:00 ~ 13:35
-}
-function normalizeQuoteDate(v){
-  const s=String(v||'').trim();
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
-  if(/^\d{8}$/.test(s))return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
-  return '';
-}
-function isLiveQuoteDate(dateValue){
-  const d=normalizeQuoteDate(dateValue);
-  return Boolean(d && d===twTodayISO());
-}
-function isTWMarketOpen(){
-  return isTWClockMarketOpen();
-}
-function isTimestampToday(ts){
-  const n=Number(ts);
-  if(!Number.isFinite(n)||n<=0)return false;
-  const d=new Date(n*1000);
-  const parts=new Intl.DateTimeFormat('en-CA',{
-    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'
-  }).formatToParts(d);
-  const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
-  return `${p.year}-${p.month}-${p.day}`===twTodayISO();
+  return m>=540 && m<815; // 09:00 ~ 13:35：尚未視為今日收盤完成
 }
 function sanePrice(price,reference){
   price=Number(price); reference=Number(reference);
@@ -3186,93 +2774,11 @@ function sanePrice(price,reference){
   if(!Number.isFinite(reference)||reference<=0)return true;
   return Math.abs(price/reference-1)<=PRICE_MAX_DEVIATION;
 }
-async function fetchJsonViaProxy(url,{timeout=4500}={}){
+async function fetchJsonViaProxy(url){
   const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),timeout);
-  try{
-    const r=await fetch(proxy,{cache:'no-store',signal:controller.signal});
-    if(!r.ok)throw new Error(`HTTP ${r.status}`);
-    return await r.json();
-  }finally{
-    clearTimeout(timer);
-  }
-}
-
-
-// Fugle 富果行情：第一順位。官方文件使用 X-API-KEY 驗證。
-// 盤中管理者可取最後成交價；一般模式仍以已完成收盤價為主。
-async function fetchFuglePrice(sym,{allowIntraday=false}={}){
-  const url=`${FUGLE_STOCK_API}/intraday/quote/${encodeURIComponent(sym)}`;
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),5500);
-  try{
-    const r=await fetch(url,{
-      method:'GET',
-      headers:{'X-API-KEY':FUGLE_API_KEY},
-      cache:'no-store',
-      signal:controller.signal
-    });
-    if(!r.ok){
-      let msg='';
-      try{ msg=(await r.json())?.message||''; }catch(e){}
-      throw new Error(`Fugle HTTP ${r.status}${msg?`：${msg}`:''}`);
-    }
-    const d=await r.json();
-    const prev=Number(d.previousClose);
-    const close=Number(d.closePrice);
-    const last=Number(d.lastPrice ?? d.lastTrade?.price ?? d.closePrice);
-    const marketOpen=isTWClockMarketOpen() && isLiveQuoteDate(d.date);
-
-    if(marketOpen && allowIntraday && sanePrice(last,prev)){
-      return {
-        price:last,
-        reference:prev,
-        source:'Fugle 盤中即時價',
-        mode:'intraday'
-      };
-    }
-
-    // 盤中若不允許即時價，使用前一交易日收盤。
-    if(marketOpen && sanePrice(prev,null)){
-      return {
-        price:prev,
-        reference:prev,
-        source:'Fugle 前一交易日收盤',
-        mode:'closed'
-      };
-    }
-
-    if(sanePrice(close,prev)){
-      return {
-        price:close,
-        reference:prev,
-        source:'Fugle 收盤價',
-        mode:'closed'
-      };
-    }
-
-    if(sanePrice(last,prev)){
-      return {
-        price:last,
-        reference:prev,
-        source:'Fugle 最近成交價',
-        mode:'closed'
-      };
-    }
-
-    if(sanePrice(prev,null)){
-      return {
-        price:prev,
-        reference:prev,
-        source:'Fugle 最近收盤',
-        mode:'closed'
-      };
-    }
-    throw new Error('Fugle 無有效價格');
-  }finally{
-    clearTimeout(timer);
-  }
+  const r=await fetch(proxy,{cache:'no-store'});
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  return await r.json();
 }
 
 // TWSE / TPEx 官方 MIS。
@@ -3288,7 +2794,7 @@ async function fetchTWSEPrice(sym,{allowIntraday=false}={}){
 
       const prev=Number(d.y);
       const last=Number(d.z);
-      const marketOpen=isTWClockMarketOpen() && (!d.d || isLiveQuoteDate(d.d));
+      const marketOpen=isTWMarketOpen();
       const marketName=ch.startsWith('tse_')?'TWSE':'TPEx';
 
       // 管理者盤中可寫入即時成交價；一般使用者不允許。
@@ -3360,7 +2866,7 @@ async function fetchYahooClose(sym){
 
         // 盤中時 Yahoo 的最後一根日K可能仍在變動，因此取倒數第二個已完成日K。
         let pick=valid[valid.length-1];
-        if(isTWClockMarketOpen() && isTimestampToday(valid[valid.length-1]?.ts) && valid.length>=2)pick=valid[valid.length-2];
+        if(isTWMarketOpen() && valid.length>=2)pick=valid[valid.length-2];
 
         const prev=Number(meta.previousClose ?? meta.chartPreviousClose);
         if(!sanePrice(pick.price,prev))continue;
@@ -3379,56 +2885,14 @@ async function fetchYahooClose(sym){
   throw new Error('Yahoo close failed');
 }
 
-
-const PRICE_CACHE=new Map();
-const PRICE_CACHE_MS=30000;
-
-function getCachedPrice(symbol,allowIntraday){
-  const key=`${symbol}|${allowIntraday?'I':'C'}`;
-  const hit=PRICE_CACHE.get(key);
-  if(!hit)return null;
-  if(Date.now()-hit.at>PRICE_CACHE_MS){
-    PRICE_CACHE.delete(key);
-    return null;
-  }
-  return hit.value;
-}
-function setCachedPrice(symbol,allowIntraday,value){
-  const key=`${symbol}|${allowIntraday?'I':'C'}`;
-  PRICE_CACHE.set(key,{at:Date.now(),value});
-  return value;
-}
-
 async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
-
-  const cached=getCachedPrice(sym,allowIntraday);
-  if(cached)return {...cached,source:`${cached.source}（快取）`};
-
-  let fugleErr='',twseErr='';
   try{
-    const q=await fetchFuglePrice(sym,{allowIntraday});
-    return setCachedPrice(sym,allowIntraday,q);
+    return await fetchTWSEPrice(sym,{allowIntraday});
   }catch(e0){
-    fugleErr=e0?.message||String(e0);
-    console.warn('Fugle 行情失敗，改用 TWSE/TPEx',sym,e0);
-  }
-
-  try{
-    const q=await fetchTWSEPrice(sym,{allowIntraday});
-    return setCachedPrice(sym,allowIntraday,q);
-  }catch(e1){
-    twseErr=e1?.message||String(e1);
-    console.warn('TWSE/TPEx 行情失敗，改用 Yahoo',sym,e1);
-  }
-
-  try{
-    const q=await fetchYahooClose(sym);
-    return setCachedPrice(sym,allowIntraday,q);
-  }catch(e2){
-    const yahooErr=e2?.message||String(e2);
-    throw new Error(`行情來源皆失敗｜Fugle: ${fugleErr||'失敗'}｜TWSE/TPEx: ${twseErr||'失敗'}｜Yahoo: ${yahooErr}`);
+    // 備援只回傳收盤資料，不提供盤中即時價，避免第三方錯價污染。
+    return await fetchYahooClose(sym);
   }
 }
 
@@ -3465,7 +2929,7 @@ function openPriceConfirm(items){
         </div>
         <div>
           <input type="number" step="0.01" min="0" data-price-index="${i}" value="${Number(x.price||0)}">
-          <div class="price-confirm-source">${esc(x.source||'手動')}${x.error?`<br><span class="price-fetch-error">${esc(x.error)}</span>`:''}</div>
+          <div class="price-confirm-source">${esc(x.source||'手動')}</div>
         </div>
         <div class="price-confirm-source">${x.mode==='intraday'?'盤中即時':'收盤價'}<br><span class="same-stock-sync-note">同代號持股同步</span></div>
       </div>
@@ -3492,7 +2956,7 @@ function openPriceConfirm(items){
   });
 }
 
-async function syncSameStockCurrentPrice(symbol,price,source,{renderNow=true}={}){
+async function syncSameStockCurrentPrice(symbol,price,source){
   const normalized=String(symbol||'').trim();
   if(!normalized)throw new Error('股票代號不存在');
 
@@ -3506,27 +2970,13 @@ async function syncSameStockCurrentPrice(symbol,price,source,{renderNow=true}={}
 
   if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
 
-  // 一次 multipath update，避免同一檔多筆持股造成多次 onValue / render。
-  const patch={};
-  sameStockIds.forEach(tid=>{
-    patch[`${tid}/currentPrice`]=price;
-    patch[`${tid}/priceUpdatedAt`]=updatedAt;
-    patch[`${tid}/priceSource`]=source||'手動確認';
-  });
-
-  // 先更新本機資料，畫面立即反映，不必等 Firebase 回傳。
-  sameStockIds.forEach(tid=>{
-    if(!trades[tid])return;
-    trades[tid]={
-      ...trades[tid],
+  await Promise.all(sameStockIds.map(tid=>
+    update(ref(db,`analystPerformance/trades/${tid}`),{
       currentPrice:price,
       priceUpdatedAt:updatedAt,
       priceSource:source||'手動確認'
-    };
-  });
-
-  if(renderNow)render();
-  await update(tradesRef,patch);
+    })
+  ));
   return sameStockIds.length;
 }
 
@@ -3607,72 +3057,40 @@ async function refreshOne(id){
   }
 }
 
-
-async function mapWithConcurrency(items,limit,worker,onProgress){
-  const results=new Array(items.length);
-  let cursor=0,done=0;
-  const runners=Array.from({length:Math.min(limit,items.length)},async()=>{
-    while(true){
-      const i=cursor++;
-      if(i>=items.length)break;
-      try{
-        results[i]=await worker(items[i],i);
-      }finally{
-        done++;
-        onProgress?.(done,items.length);
-      }
-    }
-  });
-  await Promise.all(runners);
-  return results;
-}
-
 $('#refreshAllBtn').onclick=async()=>{
-  if(!isMainAdmin())return;
+  const ids=Object.keys(trades).filter(id=>calc(trades[id]).open);
+  if(!ids.length)return alert('目前沒有持有中的股票可更新');
 
-  const openEntries=Object.entries(trades).filter(([id,tr])=>tr && calc(tr).open);
-  if(!openEntries.length)return alert('目前沒有持有中的股票可更新');
-
-  // 同股票只抓一次，避免同一檔被多位分析師持有時重複呼叫 API。
-  const symbolMap=new Map();
-  openEntries.forEach(([id,tr])=>{
-    const symbol=String(tr.symbol||'').trim();
-    if(!symbol)return;
-    if(!symbolMap.has(symbol)){
-      symbolMap.set(symbol,{
-        id,
-        symbol,
-        stockName:tr.stockName||'',
-        oldPrice:Number(tr.currentPrice||tr.entryPrice||0)
-      });
-    }
-  });
-
-  const unique=[...symbolMap.values()];
   const btn=$('#refreshAllBtn');
   btn.disabled=true;
-  btn.textContent=`抓取價格中 0/${unique.length}`;
+  btn.textContent='抓取價格中…';
 
-  // 最多同時 5 檔，避免瞬間大量請求造成 429 或瀏覽器連線壅塞。
-  const items=await mapWithConcurrency(
-    unique,
-    5,
-    async base=>{
-      try{
-        const q=await getLatestPrice(base.symbol,{allowIntraday:isMainAdmin()});
-        return {...base,price:q.price,source:q.source,mode:q.mode,error:''};
-      }catch(e){
-        return {
-          ...base,
-          price:base.oldPrice,
-          source:'行情抓取失敗，可手動輸入',
-          mode:'manual',
-          error:e?.message||'行情來源皆失敗'
-        };
-      }
-    },
-    (done,total)=>{btn.textContent=`抓取價格中 ${done}/${total}`;}
-  );
+  const items=[];
+  for(const id of ids){
+    const tr=trades[id];
+    try{
+      const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
+      items.push({
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:q.price,
+        source:q.source,
+        mode:q.mode
+      });
+    }catch(e){
+      items.push({
+        id,
+        symbol:tr.symbol,
+        stockName:tr.stockName,
+        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
+        price:Number(tr.currentPrice||tr.entryPrice||0),
+        source:'行情抓取失敗，可手動輸入',
+        mode:'manual'
+      });
+    }
+  }
 
   btn.disabled=false;
   updatePriceModeUI();
@@ -3683,76 +3101,22 @@ $('#refreshAllBtn').onclick=async()=>{
   btn.disabled=true;
   btn.textContent='寫入中…';
 
-  let success=0,fail=0,syncedRows=0;
-  const bulkPatch={};
-  const localUpdates=[];
-  const bulkUpdatedAt=nowText();
-
-  // 先把本次所有股票要更新的持股整理成一個 Firebase multipath patch。
+  let success=0,fail=0;
   for(const item of confirmed){
     try{
-      const normalized=String(item.symbol||'').trim();
-      const sameStockIds=Object.entries(trades||{})
-        .filter(([tid,tr])=>tr && String(tr.symbol||'').trim()===normalized && calc(tr).open)
-        .map(([tid])=>tid);
-
-      if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
-
-      sameStockIds.forEach(tid=>{
-        bulkPatch[`${tid}/currentPrice`]=item.price;
-        bulkPatch[`${tid}/priceUpdatedAt`]=bulkUpdatedAt;
-        bulkPatch[`${tid}/priceSource`]=item.source||'手動確認';
-        localUpdates.push({
-          id:tid,
-          price:item.price,
-          source:item.source||'手動確認'
-        });
-      });
-
+      await writeManualOrFetchedPrice(item.id,item);
       success++;
-      syncedRows+=sameStockIds.length;
     }catch(e){
       fail++;
-      console.error('價格寫入整理失敗',item.symbol,e);
+      console.error('價格寫入失敗',item.symbol,e);
     }
   }
 
-  try{
-    if(Object.keys(bulkPatch).length){
-      priceBulkWriting=true;
-      document.body.classList.add('price-writing');
-
-      // 本機先更新，底下表格不會因等待 Firebase 而消失。
-      localUpdates.forEach(x=>{
-        if(!trades[x.id])return;
-        trades[x.id]={
-          ...trades[x.id],
-          currentPrice:x.price,
-          priceUpdatedAt:bulkUpdatedAt,
-          priceSource:x.source
-        };
-      });
-
-      // 只重畫一次。
-      render();
-
-      // Firebase 也只寫一次；完成後 onValue 再做最終校正。
-      await update(tradesRef,bulkPatch);
-    }
-  }catch(e){
-    console.error('批次價格寫入失敗',e);
-    alert(`價格寫入 Firebase 失敗：${e?.message||'未知錯誤'}\n畫面會保留目前資料，請稍後再試。`);
-  }finally{
-    priceBulkWriting=false;
-    document.body.classList.remove('price-writing');
-  }
-
-  $('#lastRefresh').textContent=`價格更新：${bulkUpdatedAt}｜股票 ${success}${fail?`、失敗 ${fail}`:''}`;
+  $('#lastRefresh').textContent=`價格更新：${nowText()}｜成功 ${success}${fail?`、失敗 ${fail}`:''}`;
   btn.disabled=false;
   updatePriceModeUI();
-  render();
 
-  alert(`價格更新完成\n成功：${success} 檔股票${fail?`\n失敗：${fail} 檔`:''}\n同步持股資料：${syncedRows} 筆\n\n行情順位：Fugle → TWSE/TPEx → Yahoo`);
+  alert(`價格更新完成\n成功：${success} 筆${fail?`\n失敗：${fail} 筆`:''}\n\n所有價格皆經確認後才寫入。`);
 };
 
 document.addEventListener('click',e=>{
@@ -3890,44 +3254,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAnalystTradesModal();
 });
 
-
-$('#testPriceApiBtn')?.addEventListener('click',async()=>{
-  if(!isMainAdmin())return;
-  const btn=$('#testPriceApiBtn');
-  const old=btn.textContent;
-  btn.disabled=true; btn.textContent='測試中…';
-  PRICE_CACHE.clear();
-  try{
-    const q=await getLatestPrice('2330',{allowIntraday:true});
-    alert(`股價來源測試成功\n2330 台積電：${fmt(q.price)}\n來源：${q.source}\n模式：${q.mode==='intraday'?'盤中即時':'收盤/最近成交'}`);
-  }catch(e){
-    alert(`股價來源測試失敗\n${e?.message||'未知錯誤'}`);
-  }finally{
-    btn.disabled=false; btn.textContent=old;
-  }
-});
-
-$('#manageAnalystsBtn')?.addEventListener('click',openAnalystManage);
-$('#closeAnalystManage')?.addEventListener('click',closeAnalystManage);
-$('#analystManageModal')?.addEventListener('click',e=>{
-  if(e.target?.id==='analystManageModal')closeAnalystManage();
-});
-$('#addAnalystBtn')?.addEventListener('click',()=>{
-  if(!isMainAdmin())return;
-  const input=$('#newAnalystName');
-  const name=String(input?.value||'').trim();
-  if(!name)return alert('請輸入分析師名稱');
-  if(!saveCustomAnalyst(name))return alert('此分析師已存在');
-  syncAnalystSelects();
-  renderAnalystManageList();
-  renderAll?.();
-  if(input)input.value='';
-  alert(`已新增分析師：${name}`);
-});
-$('#newAnalystName')?.addEventListener('keydown',e=>{
-  if(e.key==='Enter')$('#addAnalystBtn')?.click();
-});
-
 onValue(
   tradesRef,
   snap=>{
@@ -3940,7 +3266,6 @@ if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='郭榮哲投
 if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='徐紹軒')x.analyst='運達徐紹軒';});
 if(incoming!==null) trades=incoming;
     else trades={};
-    syncAnalystSelects();
     render();
   },
   err=>{

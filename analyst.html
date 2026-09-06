@@ -2014,6 +2014,24 @@ body{
   }
 }
 
+
+/* v85：股價更新診斷與錯誤提示 */
+.price-fetch-error{
+  display:inline-block;
+  margin-top:3px;
+  font-size:9px;
+  line-height:1.35;
+  opacity:.72;
+  max-width:280px;
+  white-space:normal;
+}
+@media(max-width:700px){
+  #testPriceApiBtn{
+    width:100%;
+    margin-top:6px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2022,7 +2040,7 @@ body{
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">分析師即時追蹤｜出場結算｜百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button><button id="manageAnalystsBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">＋ 新增分析師</button><span class="fugle-badge">Fugle 優先</span>
+        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button><button id="testPriceApiBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">✓ 測試股價來源</button><button id="manageAnalystsBtn" class="refresh-hero admin-only main-admin-only hidden" type="button">＋ 新增分析師</button><span class="fugle-badge">Fugle 優先</span>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
@@ -3119,11 +3137,38 @@ const twNow=()=>{
   }).formatToParts(new Date());
   return Object.fromEntries(parts.map(x=>[x.type,x.value]));
 };
-function isTWMarketOpen(){
+function twTodayISO(){
+  const p=twNow();
+  return `${p.year}-${p.month}-${p.day}`;
+}
+function isTWClockMarketOpen(){
   const p=twNow(), wd=p.weekday;
   if(wd==='Sat'||wd==='Sun')return false;
   const m=(+p.hour)*60+(+p.minute);
-  return m>=540 && m<815; // 09:00 ~ 13:35：尚未視為今日收盤完成
+  return m>=540 && m<815; // 09:00 ~ 13:35
+}
+function normalizeQuoteDate(v){
+  const s=String(v||'').trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  if(/^\d{8}$/.test(s))return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
+  return '';
+}
+function isLiveQuoteDate(dateValue){
+  const d=normalizeQuoteDate(dateValue);
+  return Boolean(d && d===twTodayISO());
+}
+function isTWMarketOpen(){
+  return isTWClockMarketOpen();
+}
+function isTimestampToday(ts){
+  const n=Number(ts);
+  if(!Number.isFinite(n)||n<=0)return false;
+  const d=new Date(n*1000);
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(d);
+  const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  return `${p.year}-${p.month}-${p.day}`===twTodayISO();
 }
 function sanePrice(price,reference){
   price=Number(price); reference=Number(reference);
@@ -3131,11 +3176,17 @@ function sanePrice(price,reference){
   if(!Number.isFinite(reference)||reference<=0)return true;
   return Math.abs(price/reference-1)<=PRICE_MAX_DEVIATION;
 }
-async function fetchJsonViaProxy(url){
+async function fetchJsonViaProxy(url,{timeout=4500}={}){
   const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const r=await fetch(proxy,{cache:'no-store'});
-  if(!r.ok)throw new Error(`HTTP ${r.status}`);
-  return await r.json();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeout);
+  try{
+    const r=await fetch(proxy,{cache:'no-store',signal:controller.signal});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  }finally{
+    clearTimeout(timer);
+  }
 }
 
 
@@ -3161,7 +3212,7 @@ async function fetchFuglePrice(sym,{allowIntraday=false}={}){
     const prev=Number(d.previousClose);
     const close=Number(d.closePrice);
     const last=Number(d.lastPrice ?? d.lastTrade?.price ?? d.closePrice);
-    const marketOpen=isTWMarketOpen();
+    const marketOpen=isTWClockMarketOpen() && isLiveQuoteDate(d.date);
 
     if(marketOpen && allowIntraday && sanePrice(last,prev)){
       return {
@@ -3227,7 +3278,7 @@ async function fetchTWSEPrice(sym,{allowIntraday=false}={}){
 
       const prev=Number(d.y);
       const last=Number(d.z);
-      const marketOpen=isTWMarketOpen();
+      const marketOpen=isTWClockMarketOpen() && (!d.d || isLiveQuoteDate(d.d));
       const marketName=ch.startsWith('tse_')?'TWSE':'TPEx';
 
       // 管理者盤中可寫入即時成交價；一般使用者不允許。
@@ -3299,7 +3350,7 @@ async function fetchYahooClose(sym){
 
         // 盤中時 Yahoo 的最後一根日K可能仍在變動，因此取倒數第二個已完成日K。
         let pick=valid[valid.length-1];
-        if(isTWMarketOpen() && valid.length>=2)pick=valid[valid.length-2];
+        if(isTWClockMarketOpen() && isTimestampToday(valid[valid.length-1]?.ts) && valid.length>=2)pick=valid[valid.length-2];
 
         const prev=Number(meta.previousClose ?? meta.chartPreviousClose);
         if(!sanePrice(pick.price,prev))continue;
@@ -3318,21 +3369,56 @@ async function fetchYahooClose(sym){
   throw new Error('Yahoo close failed');
 }
 
+
+const PRICE_CACHE=new Map();
+const PRICE_CACHE_MS=30000;
+
+function getCachedPrice(symbol,allowIntraday){
+  const key=`${symbol}|${allowIntraday?'I':'C'}`;
+  const hit=PRICE_CACHE.get(key);
+  if(!hit)return null;
+  if(Date.now()-hit.at>PRICE_CACHE_MS){
+    PRICE_CACHE.delete(key);
+    return null;
+  }
+  return hit.value;
+}
+function setCachedPrice(symbol,allowIntraday,value){
+  const key=`${symbol}|${allowIntraday?'I':'C'}`;
+  PRICE_CACHE.set(key,{at:Date.now(),value});
+  return value;
+}
+
 async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
 
-  // 1. Fugle → 2. TWSE/TPEx → 3. Yahoo
+  const cached=getCachedPrice(sym,allowIntraday);
+  if(cached)return {...cached,source:`${cached.source}（快取）`};
+
+  let fugleErr='',twseErr='';
   try{
-    return await fetchFuglePrice(sym,{allowIntraday});
+    const q=await fetchFuglePrice(sym,{allowIntraday});
+    return setCachedPrice(sym,allowIntraday,q);
   }catch(e0){
+    fugleErr=e0?.message||String(e0);
     console.warn('Fugle 行情失敗，改用 TWSE/TPEx',sym,e0);
-    try{
-      return await fetchTWSEPrice(sym,{allowIntraday});
-    }catch(e1){
-      console.warn('TWSE/TPEx 行情失敗，改用 Yahoo',sym,e1);
-      return await fetchYahooClose(sym);
-    }
+  }
+
+  try{
+    const q=await fetchTWSEPrice(sym,{allowIntraday});
+    return setCachedPrice(sym,allowIntraday,q);
+  }catch(e1){
+    twseErr=e1?.message||String(e1);
+    console.warn('TWSE/TPEx 行情失敗，改用 Yahoo',sym,e1);
+  }
+
+  try{
+    const q=await fetchYahooClose(sym);
+    return setCachedPrice(sym,allowIntraday,q);
+  }catch(e2){
+    const yahooErr=e2?.message||String(e2);
+    throw new Error(`行情來源皆失敗｜Fugle: ${fugleErr||'失敗'}｜TWSE/TPEx: ${twseErr||'失敗'}｜Yahoo: ${yahooErr}`);
   }
 }
 
@@ -3369,7 +3455,7 @@ function openPriceConfirm(items){
         </div>
         <div>
           <input type="number" step="0.01" min="0" data-price-index="${i}" value="${Number(x.price||0)}">
-          <div class="price-confirm-source">${esc(x.source||'手動')}</div>
+          <div class="price-confirm-source">${esc(x.source||'手動')}${x.error?`<br><span class="price-fetch-error">${esc(x.error)}</span>`:''}</div>
         </div>
         <div class="price-confirm-source">${x.mode==='intraday'?'盤中即時':'收盤價'}<br><span class="same-stock-sync-note">同代號持股同步</span></div>
       </div>
@@ -3497,6 +3583,26 @@ async function refreshOne(id){
   }
 }
 
+
+async function mapWithConcurrency(items,limit,worker,onProgress){
+  const results=new Array(items.length);
+  let cursor=0,done=0;
+  const runners=Array.from({length:Math.min(limit,items.length)},async()=>{
+    while(true){
+      const i=cursor++;
+      if(i>=items.length)break;
+      try{
+        results[i]=await worker(items[i],i);
+      }finally{
+        done++;
+        onProgress?.(done,items.length);
+      }
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+
 $('#refreshAllBtn').onclick=async()=>{
   if(!isMainAdmin())return;
 
@@ -3523,28 +3629,26 @@ $('#refreshAllBtn').onclick=async()=>{
   btn.disabled=true;
   btn.textContent=`抓取價格中 0/${unique.length}`;
 
-  let done=0;
-  const tasks=unique.map(async base=>{
-    let item;
-    try{
-      const q=await getLatestPrice(base.symbol,{allowIntraday:isAdmin});
-      item={...base,price:q.price,source:q.source,mode:q.mode};
-    }catch(e){
-      item={
-        ...base,
-        price:base.oldPrice,
-        source:'行情抓取失敗，可手動輸入',
-        mode:'manual'
-      };
-    }finally{
-      done++;
-      btn.textContent=`抓取價格中 ${done}/${unique.length}`;
-    }
-    return item;
-  });
-
-  // 平行抓取不同股票；同股票不重複抓。
-  const items=await Promise.all(tasks);
+  // 最多同時 5 檔，避免瞬間大量請求造成 429 或瀏覽器連線壅塞。
+  const items=await mapWithConcurrency(
+    unique,
+    5,
+    async base=>{
+      try{
+        const q=await getLatestPrice(base.symbol,{allowIntraday:isMainAdmin()});
+        return {...base,price:q.price,source:q.source,mode:q.mode,error:''};
+      }catch(e){
+        return {
+          ...base,
+          price:base.oldPrice,
+          source:'行情抓取失敗，可手動輸入',
+          mode:'manual',
+          error:e?.message||'行情來源皆失敗'
+        };
+      }
+    },
+    (done,total)=>{btn.textContent=`抓取價格中 ${done}/${total}`;}
+  );
 
   btn.disabled=false;
   updatePriceModeUI();
@@ -3709,6 +3813,22 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAnalystTradesModal();
 });
 
+
+$('#testPriceApiBtn')?.addEventListener('click',async()=>{
+  if(!isMainAdmin())return;
+  const btn=$('#testPriceApiBtn');
+  const old=btn.textContent;
+  btn.disabled=true; btn.textContent='測試中…';
+  PRICE_CACHE.clear();
+  try{
+    const q=await getLatestPrice('2330',{allowIntraday:true});
+    alert(`股價來源測試成功\n2330 台積電：${fmt(q.price)}\n來源：${q.source}\n模式：${q.mode==='intraday'?'盤中即時':'收盤/最近成交'}`);
+  }catch(e){
+    alert(`股價來源測試失敗\n${e?.message||'未知錯誤'}`);
+  }finally{
+    btn.disabled=false; btn.textContent=old;
+  }
+});
 
 $('#manageAnalystsBtn')?.addEventListener('click',openAnalystManage);
 $('#closeAnalystManage')?.addEventListener('click',closeAnalystManage);

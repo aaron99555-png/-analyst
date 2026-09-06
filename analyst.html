@@ -3193,17 +3193,45 @@ $('#importDataFile')?.addEventListener('change',async e=>{
 
 
 function resetFiltersToDefault(){
-  const ids=['fAnalyst','fMonth','fFrom','fTo','fStatus','fKeyword'];
-  ids.forEach(id=>{
+  // 每次重新整理／重新開啟頁面，一律回到「清除篩選」狀態
+  const defaults={
+    fAnalyst:'',
+    fMonth:'',
+    fFrom:'',
+    fTo:'',
+    fStatus:'',
+    fKeyword:''
+  };
+  Object.entries(defaults).forEach(([id,value])=>{
     const el=$('#'+id);
-    if(!el)return;
-    el.value='';
+    if(el)el.value=value;
   });
+
   if(typeof performanceSort!=='undefined'){
     performanceSort={key:'entryDate',dir:'desc'};
   }
+
+  try{
+    [
+      'analystFilters',
+      'performanceFilters',
+      'filterState',
+      'analystPerformanceFilters',
+      'fAnalyst','fMonth','fFrom','fTo','fStatus','fKeyword'
+    ].forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+
   updateRankRangeStatus();
 }
+
+
+window.addEventListener('pageshow',()=>{
+  resetFiltersToDefault();
+  try{
+    renderAnalystQuickFilter();
+    render();
+  }catch(e){}
+});
 
 function initDateQueryPickers(){
   const entry=$('#entryQueryDate');

@@ -1550,7 +1550,7 @@ body{
 }
 
 
-/* v73：排行榜分析師交易簡表 */
+/* v73：排行榜分析師持股狀況 */
 .rank-name-btn{
   appearance:none;
   border:0;
@@ -1793,6 +1793,49 @@ body{
   }
 }
 
+
+/* v84：分析師名字可點擊查看持股狀況 */
+.table-analyst-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  padding:0;
+  margin:0;
+  color:#f7e7ad;
+  font:inherit;
+  font-weight:850;
+  cursor:pointer;
+  text-align:left;
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:3px;
+}
+.table-analyst-btn:hover{color:#ffd66b;}
+
+
+/* v85：出場股票標示部分出場／全部出場 */
+.exit-kind{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:2px 7px;
+  border-radius:999px;
+  font-size:10px;
+  line-height:1.5;
+  font-weight:900;
+  white-space:nowrap;
+}
+.exit-kind.partial{
+  color:#ffd66b;
+  background:rgba(212,175,55,.14);
+  border:1px solid rgba(212,175,55,.42);
+}
+.exit-kind.full{
+  color:#d9dee8;
+  background:rgba(148,163,184,.10);
+  border:1px solid rgba(148,163,184,.26);
+}
+
 </style>
 </head>
 <body>
@@ -1942,7 +1985,7 @@ body{
   <div class="modal-card analyst-trades-modal-card">
     <div class="analyst-trades-modal-head">
       <div>
-        <h3 id="analystTradesTitle">分析師交易簡表</h3>
+        <h3 id="analystTradesTitle">分析師持股狀況</h3>
         <div id="analystTradesRange" class="analyst-trades-range">—</div>
       </div>
       <button id="closeAnalystTrades" class="ghost analyst-trades-close" type="button">關閉</button>
@@ -2158,6 +2201,7 @@ function renderTodayExits(){
       </div>
       <div class="today-entry-meta">
         <span class="today-analyst">${esc(tr.analyst||'—')}</span>
+        <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
@@ -2288,7 +2332,7 @@ function render(){
   const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
   let html='', openN=0, unreal=0, realized=0;
   rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
-    html+=`<tr><td><b>${esc(t.analyst)}</b></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
+    html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span>${fmt(t.currentPrice||t.entryPrice)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
 </td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${isMainAdmin()&&c.open?`<button class="mini" data-up="${id}">更新價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
@@ -2324,7 +2368,7 @@ function renderAnalystTradesModal(name){
     .filter(x=>!x.c.open)
     .sort((a,b)=>String(b.tr.exitDate||'').localeCompare(String(a.tr.exitDate||'')));
 
-  if(title)title.textContent=`${name}｜進出買賣簡表`;
+  if(title)title.textContent=`${name}｜目前持股狀況`;
   if(range)range.textContent=$('#rankRangeStatus')?.textContent||'統計區間：全部期間';
 
   const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
@@ -2834,6 +2878,7 @@ async function settleTrade(id){
       exitPrice,
       currentPrice:exitPrice,
       settledAt:stamp,
+      exitType:'full',
       updatedAt:stamp
     });
     return;
@@ -2852,6 +2897,7 @@ async function settleTrade(id){
     settledAt:stamp,
     updatedAt:stamp,
     partialSettlement:true,
+    exitType:'partial',
     sourceTradeId:id
   };
 
@@ -3397,6 +3443,14 @@ $('#closeAnalystTrades')?.addEventListener('click',closeAnalystTradesModal);
 $('#analystTradesModal')?.addEventListener('click',e=>{
   if(e.target?.id==='analystTradesModal')closeAnalystTradesModal();
 });
+
+document.addEventListener('click',e=>{
+  const btn=e.target?.closest?.('[data-rank-analyst]');
+  if(!btn)return;
+  const name=btn.dataset.rankAnalyst||'';
+  if(name)renderAnalystTradesModal(name);
+});
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAnalystTradesModal();
 });

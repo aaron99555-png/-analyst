@@ -2002,6 +2002,32 @@ body{
   .date-query-box{flex-wrap:wrap;}
 }
 
+
+/* v96：進出場標題/複製與日期控制分行 */
+.date-card-title{
+  display:block !important;
+}
+.date-card-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  width:100%;
+  margin-bottom:9px;
+}
+.date-card-heading h2{margin:0;}
+.date-card-title .date-query-box{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:7px;
+}
+@media(max-width:700px){
+  .date-card-heading{margin-bottom:8px;}
+  .date-card-title .date-query-box{width:100%;}
+}
+
 </style>
 </head>
 <body>
@@ -2068,9 +2094,11 @@ body{
 
     <section class="card span3 today-entry-card">
       <div class="section-title date-card-title">
-        <h2 id="entryCardTitle">今日進場股票</h2>
+        <div class="date-card-heading">
+          <h2 id="entryCardTitle">今日進場股票</h2>
+          <button id="copyEntryBtn" class="mini ghost" type="button">複製</button>
+        </div>
         <div class="date-query-box">
-          <button id="copyEntryBtn" class="mini ghost" type="button">複製進場</button>
           <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
           <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
@@ -2080,9 +2108,11 @@ body{
 
     <section class="card span3 today-exit-card">
       <div class="section-title date-card-title">
-        <h2 id="exitCardTitle">今日出場股票</h2>
+        <div class="date-card-heading">
+          <h2 id="exitCardTitle">今日出場股票</h2>
+          <button id="copyExitBtn" class="mini ghost" type="button">複製</button>
+        </div>
         <div class="date-query-box">
-          <button id="copyExitBtn" class="mini ghost" type="button">複製出場</button>
           <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
           <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>

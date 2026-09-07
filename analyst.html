@@ -1877,6 +1877,55 @@ body{
   }
 }
 
+
+/* v90：績效排行榜三模式切換 */
+.rank-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.rank-toolbar .rank-period{margin:0 !important;}
+.rank-metric-switch{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px;
+  padding:3px;
+  border:1px solid rgba(212,175,55,.28);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+}
+.rank-metric-switch button{
+  border:0;
+  border-radius:7px;
+  padding:7px 10px;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:850;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.rank-metric-switch button.active{
+  background:linear-gradient(135deg,#d4af37,#f0d77b);
+  color:#111;
+}
+@media(max-width:700px){
+  .rank-toolbar{display:block;}
+  .rank-metric-switch{
+    width:100%;
+    margin-top:8px;
+    box-sizing:border-box;
+  }
+  .rank-metric-switch button{
+    min-width:0;
+    padding:8px 4px;
+    font-size:11px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2457,15 +2506,24 @@ function getSharedHoldingGroups(){
 
 function buildSharedHoldingsCopyText(){
   const shared=getSharedHoldingGroups();
-  const lines=[`【共同持股清單】`];
+  const d=today().replaceAll('-','/');
+  const lines=[`|${d}`, ` 【分析師共同持股清單】`, ''];
+
   if(!shared.length){
     lines.push('目前沒有 2 位以上分析師共同持有的股票');
-    return lines.join('\n');
+  }else{
+    shared.forEach(g=>{
+      const names=[...g.analysts];
+      lines.push(`${g.symbol}${g.stockName?' '+g.stockName:''}｜${names.length}位｜`);
+      lines.push(names.join('、'));
+    });
   }
-  shared.forEach(g=>{
-    const names=[...g.analysts];
-    lines.push(`${g.symbol}${g.stockName?' '+g.stockName:''}｜${names.length}位共同持有｜${names.join('、')}`);
-  });
+
+  lines.push('');
+  lines.push('⚠️ 停損是紀律，停利是藝術。');
+  lines.push('⚠️ 位階決定勝率，部位決定存活。');
+  lines.push('⚠️ 趨勢-族群-題材-位階-動能-風控');
+
   return lines.join('\n');
 }
 
@@ -2555,33 +2613,65 @@ $('#copySharedHoldingsBtn')?.addEventListener('click',async()=>{
   alert(ok?'已複製共同持股清單':'複製失敗，請再試一次');
 });
 
+let rankMetric='total';
+
 function renderRank(){
   const data=analystSummary();
-  const totalRank=data.filter(r=>r.tradesCount>0).sort((a,b)=>b.totalPerf-a.totalPerf);
-  const realizedRank=data.filter(r=>r.closedCount>0).sort((a,b)=>b.realizedPerf-a.realizedPerf);
-  const noTrade=data.filter(r=>r.tradesCount===0);
-  const noClosed=data.filter(r=>r.tradesCount>0 && r.closedCount===0);
 
-  const rankRows=(rows,metric)=>rows.map((r,i)=>{
-    const perf=metric==='realized'?r.realizedPerf:r.totalPerf;
+  const configs={
+    total:{
+      label:'總績效',
+      note:'已實現＋未實現',
+      perf:r=>r.totalPerf,
+      money:r=>r.total,
+      eligible:r=>r.tradesCount>0,
+      empty:'目前篩選條件下尚無交易資料'
+    },
+    unrealized:{
+      label:'未實現績效',
+      note:'目前持有中部位',
+      perf:r=>r.unrealizedPerf,
+      money:r=>r.unrealized,
+      eligible:r=>r.openCount>0,
+      empty:'目前尚無持有中部位'
+    },
+    realized:{
+      label:'已實現績效',
+      note:'已結算部位',
+      perf:r=>r.realizedPerf,
+      money:r=>r.realized,
+      eligible:r=>r.closedCount>0,
+      empty:'目前尚無已結算交易'
+    }
+  };
+
+  const cfg=configs[rankMetric]||configs.total;
+  const ranked=data.filter(cfg.eligible).sort((a,b)=>cfg.perf(b)-cfg.perf(a));
+  const noTrade=data.filter(r=>r.tradesCount===0);
+
+  const rankRows=ranked.map((r,i)=>{
+    const perf=cfg.perf(r);
+    const money=cfg.money(r);
     return `<div class="rank-row rank-compact">
       <div class="rank-no">${i+1}</div>
       <button class="rank-name rank-name-btn" type="button" data-rank-analyst="${esc(r.name)}">${esc(r.name)}</button>
-      <div><div class="k">${metric==='realized'?'已實現績效':'總績效'}</div><div class="rank-value ${perf>=0?'pos':'neg'}">${pct(perf)}</div></div>
-      <div><div class="k">損益金額</div><div class="rank-value ${r.total>=0?'pos':'neg'}">${fmtMoney(metric==='realized'?r.realized:r.total)}</div></div>
+      <div><div class="k">${cfg.label}</div><div class="rank-value ${perf>=0?'pos':'neg'}">${pct(perf)}</div></div>
+      <div><div class="k">損益金額</div><div class="rank-value ${money>=0?'pos':'neg'}">${fmtMoney(money)}</div></div>
     </div>`;
   }).join('');
 
   const monthLabel=$('#fMonth')?.value ? $('#fMonth').value.replace('-',' / ') : '全部期間';
-  let html=`<div class="rank-period">排行期間：${monthLabel}</div>`+`
-    <div class="rank-group">
-      <div class="rank-group-title">總績效排行 <span>已實現＋未實現</span></div>
-      ${rankRows(totalRank,'total') || '<div class="empty-rank">目前篩選條件下尚無交易資料</div>'}
+  let html=`<div class="rank-toolbar">
+      <div class="rank-period">排行期間：${monthLabel}</div>
+      <div class="rank-metric-switch" role="group" aria-label="績效排行切換">
+        <button type="button" data-rank-metric="total" class="${rankMetric==='total'?'active':''}">總績效</button>
+        <button type="button" data-rank-metric="unrealized" class="${rankMetric==='unrealized'?'active':''}">未實現績效</button>
+        <button type="button" data-rank-metric="realized" class="${rankMetric==='realized'?'active':''}">已實現績效</button>
+      </div>
     </div>
     <div class="rank-group">
-      <div class="rank-group-title">已實現績效排行 <span>依已實現績效 %</span></div>
-      ${rankRows(realizedRank,'realized') || '<div class="empty-rank">目前尚無已結算交易</div>'}
-      ${noClosed.length?`<div class="rank-note">尚未結算：${noClosed.map(x=>esc(x.name)).join('、')}</div>`:''}
+      <div class="rank-group-title">${cfg.label}排行 <span>${cfg.note}</span></div>
+      ${rankRows || `<div class="empty-rank">${cfg.empty}</div>`}
     </div>`;
 
   if(noTrade.length){
@@ -2598,6 +2688,11 @@ function renderRank(){
 
   $('#rankList').innerHTML=html;
 
+  $$('[data-rank-metric]').forEach(btn=>btn.onclick=()=>{
+    rankMetric=btn.dataset.rankMetric||'total';
+    renderRank();
+  });
+
   $$('[data-rank-analyst]').forEach(btn=>{
     btn.onclick=()=>renderAnalystTradesModal(btn.dataset.rankAnalyst||'');
   });
@@ -2609,13 +2704,14 @@ function renderRank(){
     $('#entryCard').scrollIntoView({behavior:'smooth',block:'start'});
   });
 }
+
 let profitChart=null;
 function analystSummary(){
   const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡總蔡明彰'];
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
-    let total=0,unrealized=0,realized=0,totalCost=0,realizedCost=0,openCount=0,closedCount=0;
+    let total=0,unrealized=0,realized=0,totalCost=0,realizedCost=0,unrealizedCost=0,openCount=0,closedCount=0;
     ts.forEach(t=>{
       const c=calc(t);
       const cost=(+t.entryPrice||0)*(+t.shares||0);
@@ -2623,12 +2719,13 @@ function analystSummary(){
       unrealized+=c.unreal;
       realized+=c.realized;
       totalCost+=cost;
-      if(c.open)openCount++;
+      if(c.open){openCount++;unrealizedCost+=cost;}
       else{ closedCount++; realizedCost+=cost; }
     });
     const totalPerf=totalCost?total/totalCost*100:0;
     const realizedPerf=realizedCost?realized/realizedCost*100:0;
-    return {name,total,unrealized,realized,totalCost,realizedCost,openCount,closedCount,tradesCount:ts.length,totalPerf,realizedPerf};
+    const unrealizedPerf=unrealizedCost?unrealized/unrealizedCost*100:0;
+    return {name,total,unrealized,realized,totalCost,realizedCost,unrealizedCost,openCount,closedCount,tradesCount:ts.length,totalPerf,realizedPerf,unrealizedPerf};
   });
 }
 function analystSummaryAll(){
@@ -2636,7 +2733,7 @@ function analystSummaryAll(){
   const source=Object.values(trades);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
-    let total=0,unrealized=0,realized=0,totalCost=0,realizedCost=0,openCount=0,closedCount=0;
+    let total=0,unrealized=0,realized=0,totalCost=0,realizedCost=0,unrealizedCost=0,openCount=0,closedCount=0;
     ts.forEach(t=>{
       const c=calc(t);
       const cost=(+t.entryPrice||0)*(+t.shares||0);
@@ -2644,12 +2741,13 @@ function analystSummaryAll(){
       unrealized+=c.unreal;
       realized+=c.realized;
       totalCost+=cost;
-      if(c.open)openCount++;
+      if(c.open){openCount++;unrealizedCost+=cost;}
       else{closedCount++;realizedCost+=cost;}
     });
     const totalPerf=totalCost?total/totalCost*100:0;
     const realizedPerf=realizedCost?realized/realizedCost*100:0;
-    return {name,total,unrealized,realized,totalCost,realizedCost,openCount,closedCount,tradesCount:ts.length,totalPerf,realizedPerf};
+    const unrealizedPerf=unrealizedCost?unrealized/unrealizedCost*100:0;
+    return {name,total,unrealized,realized,totalCost,realizedCost,unrealizedCost,openCount,closedCount,tradesCount:ts.length,totalPerf,realizedPerf,unrealizedPerf};
   });
 }
 

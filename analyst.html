@@ -1963,7 +1963,7 @@ body{
 
 
 /* v92：視覺化新增雷達圖、持股狀態甜甜圈，移除共同持股圖 */
-.visual-tabs-five{grid-template-columns:repeat(5,minmax(0,1fr));}
+.visual-tabs-six{grid-template-columns:repeat(6,minmax(0,1fr));}
 .visual-radar-controls{
   display:flex;
   align-items:center;
@@ -1980,8 +1980,8 @@ body{
   max-width:320px;
 }
 @media(max-width:700px){
-  .visual-tabs-five{grid-template-columns:repeat(2,minmax(0,1fr));}
-  .visual-tabs-five button:last-child{grid-column:1 / -1;}
+  .visual-tabs-six{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .visual-tabs-six button:last-child{grid-column:auto;}
   .visual-radar-controls{
     align-items:stretch;
     flex-direction:column;
@@ -2092,16 +2092,17 @@ body{
         <h2>視覺化分析</h2>
         <span class="status">自動依最新資料更新</span>
       </div>
-      <div class="visual-tabs visual-tabs-five" role="group" aria-label="視覺化分析切換">
-        <button type="button" class="active" data-visual-mode="trend">績效走勢</button>
+      <div class="visual-tabs visual-tabs-six" role="group" aria-label="視覺化分析切換">
+        <button type="button" class="active" data-visual-mode="profitcompare">損益比較</button>
+        <button type="button" data-visual-mode="trend">績效走勢</button>
         <button type="button" data-visual-mode="winrate">勝率</button>
         <button type="button" data-visual-mode="radar">績效雷達</button>
         <button type="button" data-visual-mode="status">持股狀態</button>
         <button type="button" data-visual-mode="contribution">損益貢獻</button>
       </div>
-      <div id="visualRadarControls" class="visual-radar-controls hidden">
-        <label for="visualRadarAnalyst">分析師</label>
-        <select id="visualRadarAnalyst" aria-label="選擇雷達圖分析師"></select>
+      <div id="visualAnalystControls" class="visual-radar-controls hidden">
+        <label for="visualAnalystSelect">分析師</label>
+        <select id="visualAnalystSelect" aria-label="選擇分析師"></select>
       </div>
       <div id="visualChartTitle" class="visual-chart-title">累積已實現績效走勢</div>
       <div id="visualChartNote" class="chart-scope-note">依已結算交易的出場日期累積計算，不以歷史盤中價格回推</div>
@@ -2109,22 +2110,7 @@ body{
       <div id="visualEmpty" class="empty-rank hidden">目前沒有可顯示的資料</div>
     </section>
 
-    <section class="card span12 legacy-chart-card">
-      <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
-      <div class="chart-grid">
-        <div class="chart-box">
-  <h3>分析師損益比較｜全部期間</h3>
-  <div class="chart-scope-note">此圖固定顯示全部交易資料，不受上方篩選影響</div>
-  <div class="profit-legend" aria-label="損益圖例">
-    <span><i class="legend-dot unrealized"></i>未實現損益</span>
-    <span><i class="legend-dot realized"></i>已實現損益</span>
-    <span><i class="legend-dot total"></i>總損益</span>
-  </div>
-  <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
-</div>
-        
-      </div>
-    </section>
+    
 
     
 
@@ -2479,9 +2465,9 @@ document.addEventListener('click',e=>{
 });
 
 
-let visualMode='trend';
+let visualMode='profitcompare';
 let visualAnalyticsChart=null;
-let visualRadarAnalyst='';
+let visualSelectedAnalyst='';
 
 function visualAllTrades(){
   return Object.values(trades||{}).filter(Boolean);
@@ -2533,17 +2519,17 @@ function normalizeRadarValue(value, values, invert=false){
   return Math.max(0,Math.min(100,score));
 }
 
-function ensureRadarAnalystOptions(){
-  const sel=$('#visualRadarAnalyst');
+function ensureVisualAnalystOptions(){
+  const sel=$('#visualAnalystSelect');
   if(!sel)return;
   const rows=radarRows();
-  const current=visualRadarAnalyst || sel.value;
+  const current=visualSelectedAnalyst || sel.value;
   sel.innerHTML=rows.map(r=>`<option value="${esc(r.name)}">${esc(r.name)}</option>`).join('');
   if(current && rows.some(r=>r.name===current))sel.value=current;
   else if(rows.length){
     sel.value=rows.slice().sort((a,b)=>b.totalPerf-a.totalPerf)[0].name;
   }
-  visualRadarAnalyst=sel.value||'';
+  visualSelectedAnalyst=sel.value||'';
 }
 
 function renderVisualAnalytics(){
@@ -2556,11 +2542,14 @@ function renderVisualAnalytics(){
   const wrap=canvas.parentElement;
   const title=$('#visualChartTitle');
   const note=$('#visualChartNote');
-  const radarControls=$('#visualRadarControls');
+  const analystControls=$('#visualAnalystControls');
 
   empty?.classList.add('hidden');
   if(wrap)wrap.style.display='block';
-  radarControls?.classList.toggle('hidden',visualMode!=='radar');
+
+  const needsAnalyst=visualMode==='radar'||visualMode==='status';
+  analystControls?.classList.toggle('hidden',!needsAnalyst);
+  if(needsAnalyst)ensureVisualAnalystOptions();
 
   const fail=(msg)=>{
     if(wrap)wrap.style.display='none';
@@ -2594,6 +2583,27 @@ function renderVisualAnalytics(){
     return;
   }
 
+  if(visualMode==='profitcompare'){
+    title.textContent='分析師損益比較｜全部期間';
+    note.textContent='比較未實現損益、已實現損益與總損益；固定顯示全部交易資料';
+    const rows=analystSummaryAll().filter(r=>r.tradesCount>0);
+    if(!rows.length)return fail('目前沒有可比較的分析師交易資料');
+    const opt=visualBaseOptions(false);
+    visualAnalyticsChart=new Chart(canvas,{
+      type:'bar',
+      data:{
+        labels:rows.map(r=>r.name),
+        datasets:[
+          {label:'未實現損益',data:rows.map(r=>Math.round(r.unrealized))},
+          {label:'已實現損益',data:rows.map(r=>Math.round(r.realized))},
+          {label:'總損益',data:rows.map(r=>Math.round(r.total))}
+        ]
+      },
+      options:opt
+    });
+    return;
+  }
+
   if(visualMode==='winrate'){
     title.textContent='分析師勝率排行榜';
     note.textContent='以已結算交易計算：獲利筆數 ÷ 已結算筆數';
@@ -2616,12 +2626,11 @@ function renderVisualAnalytics(){
   }
 
   if(visualMode==='radar'){
-    ensureRadarAnalystOptions();
     const rows=radarRows();
     if(!rows.length)return fail('目前沒有可建立雷達圖的分析師資料');
-    const selected=rows.find(r=>r.name===visualRadarAnalyst) || rows[0];
-    visualRadarAnalyst=selected.name;
-    const sel=$('#visualRadarAnalyst');
+    const selected=rows.find(r=>r.name===visualSelectedAnalyst) || rows[0];
+    visualSelectedAnalyst=selected.name;
+    const sel=$('#visualAnalystSelect');
     if(sel)sel.value=selected.name;
 
     title.textContent=`${selected.name}｜績效雷達圖`;
@@ -2666,15 +2675,20 @@ function renderVisualAnalytics(){
   }
 
   if(visualMode==='status'){
-    title.textContent='持股狀態分布';
-    note.textContent='依目前交易紀錄統計：持有中、部分出場後持有、部分出場、全部出場';
+    const name=visualSelectedAnalyst;
+    const own=all.filter(t=>t.analyst===name);
+    if(!name || !own.length)return fail('此分析師目前沒有可統計的交易資料');
+
+    title.textContent=`${name}｜持股狀態分布`;
+    note.textContent='僅統計所選分析師：持有中、部分出場後持有、部分出場、全部出場';
+
     const counts={
       '持有中':0,
       '部分出場後持有':0,
       '部分出場':0,
       '全部出場':0
     };
-    all.forEach(t=>{
+    own.forEach(t=>{
       const c=calc(t);
       if(c.open){
         if(t.partialSettlement)counts['部分出場後持有']++;
@@ -2686,7 +2700,8 @@ function renderVisualAnalytics(){
       }
     });
     const rows=Object.entries(counts).filter(([,v])=>v>0);
-    if(!rows.length)return fail('目前沒有可統計的持股狀態資料');
+    if(!rows.length)return fail('此分析師目前沒有可統計的持股狀態資料');
+
     visualAnalyticsChart=new Chart(canvas,{
       type:'doughnut',
       data:{
@@ -2734,9 +2749,9 @@ document.addEventListener('click',e=>{
   renderVisualAnalytics();
 });
 
-$('#visualRadarAnalyst')?.addEventListener('change',e=>{
-  visualRadarAnalyst=e.target.value||'';
-  if(visualMode==='radar')renderVisualAnalytics();
+$('#visualAnalystSelect')?.addEventListener('change',e=>{
+  visualSelectedAnalyst=e.target.value||'';
+  if(visualMode==='radar'||visualMode==='status')renderVisualAnalytics();
 });
 
 function render(){

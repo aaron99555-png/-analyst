@@ -1811,7 +1811,7 @@ body{
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
         <div><label>進場價(收盤價)</label><input id="entryPrice" type="number" step="0.01"></div>
-        <div><label>股數</label><input id="shares" type="number" step="1" value="1000"></div>
+        <div><label>股數 <span style="font-size:10px;opacity:.65">可零股</span></label><input id="shares" type="number" step="0.001" min="0.001" value="1000"></div>
         <div><label>停損價</label><input id="stopLoss" type="number" step="0.01"></div>
         <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
         <div class="main-admin-form-only"><label>出場日期</label><input id="exitDate" type="date"></div>
@@ -2740,25 +2740,90 @@ async function settleTrade(id){
   const t=trades[id];
   if(!canSettleTrade(t))return;
   if(!t)return;
+
   const c=calc(t);
   if(!c.open)return alert('此筆已完成結算');
+
+  const totalShares=Number(t.shares)||0;
+  if(!(totalShares>0))return alert('此筆持有股數不正確');
+
+  const sellText=prompt(
+    `結算 ${t.symbol} ${t.stockName||''}\n目前持有：${fmt(totalShares)} 股\n\n請輸入本次賣出股數（可輸入零股）：`,
+    String(totalShares)
+  );
+  if(sellText===null)return;
+
+  const sellShares=Number(sellText);
+  if(!(sellShares>0))return alert('請輸入正確的賣出股數');
+  if(sellShares>totalShares)return alert(`賣出股數不可超過目前持有的 ${fmt(totalShares)} 股`);
+
   const defaultPrice=Number(t.currentPrice||t.entryPrice||0);
-  const priceText=prompt(`結算 ${t.symbol} ${t.stockName||''}\n請輸入出場價格：`, defaultPrice || '');
+  const priceText=prompt(`本次賣出 ${fmt(sellShares)} 股\n請輸入出場價格：`, defaultPrice || '');
   if(priceText===null)return;
   const exitPrice=Number(priceText);
   if(!(exitPrice>0))return alert('請輸入正確的出場價格');
+
   const dateText=prompt('請輸入出場日期（YYYY-MM-DD）：', today());
   if(dateText===null)return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(dateText))return alert('出場日期格式請使用 YYYY-MM-DD');
-  const realized=(exitPrice-(Number(t.entryPrice)||0))*(Number(t.shares)||0);
-  if(!confirm(`確認結算？\n\n${t.analyst}｜${t.symbol} ${t.stockName||''}\n進場價：${fmt(t.entryPrice)}\n出場價：${fmt(exitPrice)}\n已實現損益：${fmtMoney(realized)}\n績效：${pct((exitPrice-(Number(t.entryPrice)||0))/(Number(t.entryPrice)||1)*100)}`))return;
-  await update(ref(db,`analystPerformance/trades/${id}`),{
+
+  const entryPrice=Number(t.entryPrice)||0;
+  const realized=(exitPrice-entryPrice)*sellShares;
+  const remaining=Number((totalShares-sellShares).toFixed(6));
+  const isFull=remaining<=0.0000001;
+
+  if(!confirm(
+    `確認${isFull?'全部結算':'部分結算'}？\n\n`+
+    `${t.analyst}｜${t.symbol} ${t.stockName||''}\n`+
+    `本次賣出：${fmt(sellShares)} 股\n`+
+    `剩餘持有：${isFull?'0':fmt(remaining)} 股\n`+
+    `進場價：${fmt(t.entryPrice)}\n`+
+    `出場價：${fmt(exitPrice)}\n`+
+    `本次已實現損益：${fmtMoney(realized)}\n`+
+    `本次績效：${pct((exitPrice-entryPrice)/(entryPrice||1)*100)}`
+  ))return;
+
+  const stamp=nowText();
+
+  if(isFull){
+    // 全部賣出：沿用原本完整結算邏輯
+    await update(ref(db,`analystPerformance/trades/${id}`),{
+      exitDate:dateText,
+      exitPrice,
+      currentPrice:exitPrice,
+      settledAt:stamp,
+      updatedAt:stamp
+    });
+    return;
+  }
+
+  // 部分賣出：新增一筆「已結算」交易，原交易保留剩餘股數繼續統計
+  const closedRef=push(ref(db,'analystPerformance/trades'));
+  const closedTrade={
+    ...t,
+    shares:sellShares,
     exitDate:dateText,
     exitPrice,
     currentPrice:exitPrice,
-    settledAt:nowText(),
-    updatedAt:nowText()
-  });
+    priceUpdatedAt:stamp,
+    priceSource:'部分結算',
+    settledAt:stamp,
+    updatedAt:stamp,
+    partialSettlement:true,
+    sourceTradeId:id
+  };
+
+  // 原持倉只減少股數，仍保持未結算狀態
+  const remainingUpdate={
+    shares:remaining,
+    updatedAt:stamp,
+    partialSettlement:true
+  };
+
+  await Promise.all([
+    set(closedRef,closedTrade),
+    update(ref(db,`analystPerformance/trades/${id}`),remainingUpdate)
+  ]);
 }
 
 

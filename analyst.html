@@ -1993,6 +1993,15 @@ body{
   }
 }
 
+
+/* v95：排行榜/進出場/單筆績效複製 */
+.section-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.copy-perf-btn{margin-left:6px;}
+@media(max-width:700px){
+  .section-actions{width:100%;justify-content:space-between;}
+  .date-query-box{flex-wrap:wrap;}
+}
+
 </style>
 </head>
 <body>
@@ -2061,6 +2070,7 @@ body{
       <div class="section-title date-card-title">
         <h2 id="entryCardTitle">今日進場股票</h2>
         <div class="date-query-box">
+          <button id="copyEntryBtn" class="mini ghost" type="button">複製進場</button>
           <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
           <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
@@ -2072,6 +2082,7 @@ body{
       <div class="section-title date-card-title">
         <h2 id="exitCardTitle">今日出場股票</h2>
         <div class="date-query-box">
+          <button id="copyExitBtn" class="mini ghost" type="button">複製出場</button>
           <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
           <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
@@ -2082,7 +2093,10 @@ body{
     <section class="card span3">
       <div class="section-title rank-title-row">
         <h2>績效排行榜</h2>
-        <span class="status" id="rankRangeStatus">統計區間：全部期間</span>
+        <div class="section-actions">
+          <button id="copyRankBtn" class="mini ghost" type="button">複製排行榜</button>
+          <span class="status" id="rankRangeStatus">統計區間：全部期間</span>
+        </div>
       </div>
       <div class="rank-rule-note">依總績效 % 排名（含已實現＋未實現）</div>
       <div id="rankList" class="rank-list"></div>
@@ -2374,6 +2388,8 @@ function renderTodayExits(){
         <span class="today-analyst">${esc(tr.analyst||'—')}</span>
         <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
+        <span class="${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
+        <button class="mini ghost copy-perf-btn" type="button" data-copy-exit-perf="${id}">複製績效</button>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>
@@ -2753,6 +2769,104 @@ $('#visualAnalystSelect')?.addEventListener('change',e=>{
   visualSelectedAnalyst=e.target.value||'';
   if(visualMode==='radar'||visualMode==='status')renderVisualAnalytics();
 });
+
+
+function currentRankConfig(){
+  return {
+    total:{label:'總績效',perf:r=>r.totalPerf,money:r=>r.total,eligible:r=>r.tradesCount>0},
+    unrealized:{label:'未實現績效',perf:r=>r.unrealizedPerf,money:r=>r.unrealized,eligible:r=>r.openCount>0},
+    realized:{label:'已實現績效',perf:r=>r.realizedPerf,money:r=>r.realized,eligible:r=>r.closedCount>0}
+  }[rankMetric] || {label:'總績效',perf:r=>r.totalPerf,money:r=>r.total,eligible:r=>r.tradesCount>0};
+}
+
+function buildRankCopyText(){
+  const cfg=currentRankConfig();
+  const data=analystSummary().filter(cfg.eligible).sort((a,b)=>cfg.perf(b)-cfg.perf(a));
+  const range=$('#rankRangeStatus')?.textContent?.replace('統計區間：','') || '全部期間';
+  const lines=[`【分析師績效排行榜｜${cfg.label}】`,`區間：${range}`,''];
+
+  if(!data.length){
+    lines.push('目前無符合條件的排行資料');
+  }else{
+    data.forEach((r,i)=>{
+      lines.push(`${i+1}. ${r.name}｜${pct(cfg.perf(r))}｜${fmtMoney(cfg.money(r))}`);
+    });
+  }
+
+  return lines.join('\n');
+}
+
+function getEntryRowsByDate(){
+  const d=$('#entryQueryDate')?.value || today();
+  return Object.entries(trades||{})
+    .map(([id,t])=>({id,t,c:calc(t)}))
+    .filter(x=>x.t?.entryDate===d)
+    .sort((a,b)=>String(a.t.analyst||'').localeCompare(String(b.t.analyst||''),'zh-Hant'));
+}
+
+function buildEntryCopyText(){
+  const d=$('#entryQueryDate')?.value || today();
+  const rows=getEntryRowsByDate();
+  const lines=[`【${d} 分析師進場清單】`,''];
+
+  if(!rows.length){
+    lines.push('今日無進場資料');
+  }else{
+    rows.forEach(({t})=>{
+      lines.push(`${t.symbol||''} ${t.stockName||''}｜${t.analyst||''}｜進場價 ${fmt(t.entryPrice)}｜股數 ${fmt(t.shares)}`);
+    });
+  }
+  return lines.join('\n');
+}
+
+function getExitRowsByDate(){
+  const d=$('#exitQueryDate')?.value || today();
+  return Object.entries(trades||{})
+    .map(([id,t])=>({id,t,c:calc(t)}))
+    .filter(x=>x.t?.exitDate===d && !x.c.open)
+    .sort((a,b)=>String(a.t.analyst||'').localeCompare(String(b.t.analyst||''),'zh-Hant'));
+}
+
+function exitStatusText(t){
+  const partial=t.exitType==='partial'||(!t.exitType&&t.partialSettlement&&t.sourceTradeId);
+  return partial?'部分出場':'全部出場';
+}
+
+function buildExitCopyText(){
+  const d=$('#exitQueryDate')?.value || today();
+  const rows=getExitRowsByDate();
+  const lines=[`【${d} 分析師出場清單】`,''];
+
+  if(!rows.length){
+    lines.push('今日無出場資料');
+  }else{
+    rows.forEach(({t,c})=>{
+      lines.push(`${t.symbol||''} ${t.stockName||''}｜${t.analyst||''}｜${exitStatusText(t)}｜出場價 ${fmt(t.exitPrice)}｜績效 ${pct(c.perf)}｜損益 ${fmtMoney(c.realized)}`);
+    });
+  }
+  return lines.join('\n');
+}
+
+function buildSingleExitPerformanceText(t){
+  const c=calc(t);
+  const status=exitStatusText(t);
+  return [
+    `【${t.analyst||''}｜${t.symbol||''} ${t.stockName||''}】`,
+    `${status}`,
+    `進場：${t.entryDate||'—'}｜${fmt(t.entryPrice)}`,
+    `出場：${t.exitDate||'—'}｜${fmt(t.exitPrice)}`,
+    `績效：${pct(c.perf)}`,
+    `損益：${fmtMoney(c.realized)}`
+  ].join('\n');
+}
+
+async function copyWithButton(btn,text,ok='已複製'){
+  const success=await copyTextSmart(text);
+  if(!btn)return;
+  const old=btn.textContent;
+  btn.textContent=success?ok:'複製失敗';
+  setTimeout(()=>{btn.textContent=old;},1400);
+}
 
 function render(){
   if(isAdmin2()){
@@ -4204,6 +4318,20 @@ document.addEventListener('click', async (e)=>{
     alert('操作失敗：'+(err?.message||'未知錯誤'));
   }
 }, true);
+
+
+$('#copyRankBtn')?.addEventListener('click',e=>copyWithButton(e.currentTarget,buildRankCopyText()));
+$('#copyEntryBtn')?.addEventListener('click',e=>copyWithButton(e.currentTarget,buildEntryCopyText()));
+$('#copyExitBtn')?.addEventListener('click',e=>copyWithButton(e.currentTarget,buildExitCopyText()));
+
+document.addEventListener('click',e=>{
+  const btn=e.target?.closest?.('[data-copy-exit-perf]');
+  if(!btn)return;
+  const id=btn.dataset.copyExitPerf;
+  const tr=trades?.[id];
+  if(tr)copyWithButton(btn,buildSingleExitPerformanceText(tr));
+});
+
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>

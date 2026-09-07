@@ -1926,6 +1926,73 @@ body{
   }
 }
 
+
+/* v91：四合一視覺化分析 */
+.legacy-chart-card{display:none !important;}
+.visual-tabs{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+  margin:10px 0 14px;
+  padding:4px;
+  border:1px solid rgba(212,175,55,.25);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+.visual-tabs button{
+  border:0;
+  border-radius:8px;
+  min-height:38px;
+  padding:8px 10px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:850;
+  cursor:pointer;
+}
+.visual-tabs button.active{
+  color:#111;
+  background:linear-gradient(135deg,#d4af37,#f0d77b);
+}
+.visual-chart-title{font-size:15px;font-weight:900;margin:2px 0 3px;}
+.visual-chart-wrap{position:relative;height:390px;margin-top:10px;}
+@media(max-width:700px){
+  .visual-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .visual-tabs button{font-size:12px;padding:8px 4px;}
+  .visual-chart-wrap{height:360px;}
+}
+
+
+/* v92：視覺化新增雷達圖、持股狀態甜甜圈，移除共同持股圖 */
+.visual-tabs-five{grid-template-columns:repeat(5,minmax(0,1fr));}
+.visual-radar-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 12px;
+}
+.visual-radar-controls label{
+  font-size:12px;
+  font-weight:850;
+  color:var(--muted);
+}
+.visual-radar-controls select{
+  min-width:190px;
+  max-width:320px;
+}
+@media(max-width:700px){
+  .visual-tabs-five{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .visual-tabs-five button:last-child{grid-column:1 / -1;}
+  .visual-radar-controls{
+    align-items:stretch;
+    flex-direction:column;
+    gap:5px;
+  }
+  .visual-radar-controls select{
+    width:100%;
+    max-width:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2020,7 +2087,29 @@ body{
       <div class="rank-rule-note">依總績效 % 排名（含已實現＋未實現）</div>
       <div id="rankList" class="rank-list"></div>
     </section>
-<section class="card span12">
+<section class="card span12 visual-analytics-card">
+      <div class="section-title">
+        <h2>視覺化分析</h2>
+        <span class="status">自動依最新資料更新</span>
+      </div>
+      <div class="visual-tabs visual-tabs-five" role="group" aria-label="視覺化分析切換">
+        <button type="button" class="active" data-visual-mode="trend">績效走勢</button>
+        <button type="button" data-visual-mode="winrate">勝率</button>
+        <button type="button" data-visual-mode="radar">績效雷達</button>
+        <button type="button" data-visual-mode="status">持股狀態</button>
+        <button type="button" data-visual-mode="contribution">損益貢獻</button>
+      </div>
+      <div id="visualRadarControls" class="visual-radar-controls hidden">
+        <label for="visualRadarAnalyst">分析師</label>
+        <select id="visualRadarAnalyst" aria-label="選擇雷達圖分析師"></select>
+      </div>
+      <div id="visualChartTitle" class="visual-chart-title">累積已實現績效走勢</div>
+      <div id="visualChartNote" class="chart-scope-note">依已結算交易的出場日期累積計算，不以歷史盤中價格回推</div>
+      <div class="visual-chart-wrap"><canvas id="visualAnalyticsChart"></canvas></div>
+      <div id="visualEmpty" class="empty-rank hidden">目前沒有可顯示的資料</div>
+    </section>
+
+    <section class="card span12 legacy-chart-card">
       <div class="section-title"><h2>績效圖表</h2><span class="status">自動依最新資料更新</span></div>
       <div class="chart-grid">
         <div class="chart-box">
@@ -2389,6 +2478,267 @@ document.addEventListener('click',e=>{
   }
 });
 
+
+let visualMode='trend';
+let visualAnalyticsChart=null;
+let visualRadarAnalyst='';
+
+function visualAllTrades(){
+  return Object.values(trades||{}).filter(Boolean);
+}
+
+function destroyVisualChart(){
+  if(visualAnalyticsChart){
+    visualAnalyticsChart.destroy();
+    visualAnalyticsChart=null;
+  }
+}
+
+function visualBaseOptions(horizontal=false){
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+    indexAxis:horizontal?'y':'x',
+    interaction:{mode:'nearest',intersect:false},
+    plugins:{
+      legend:{labels:{color:'#f6f0df',boxWidth:12,font:{size:10}}},
+      tooltip:{callbacks:{}}
+    },
+    scales:{
+      x:{ticks:{color:'#b9b4a8',font:{size:10}},grid:{color:'rgba(217,178,76,.08)'}},
+      y:{ticks:{color:'#b9b4a8',font:{size:10}},grid:{color:'rgba(217,178,76,.10)'}}
+    }
+  };
+}
+
+function radarRows(){
+  const all=visualAllTrades();
+  return analystSummaryAll().map(r=>{
+    const closed=all.filter(t=>t.analyst===r.name && !calc(t).open);
+    const wins=closed.filter(t=>calc(t).realized>0);
+    const losses=closed.filter(t=>calc(t).realized<0);
+    const winrate=closed.length?wins.length/closed.length*100:0;
+    const avgWin=wins.length?wins.reduce((s,t)=>s+calc(t).perf,0)/wins.length:0;
+    const avgLoss=losses.length?Math.abs(losses.reduce((s,t)=>s+calc(t).perf,0)/losses.length):0;
+    return {...r,winrate,avgWin,avgLoss};
+  }).filter(r=>r.tradesCount>0);
+}
+
+function normalizeRadarValue(value, values, invert=false){
+  const nums=values.map(v=>Number(v)||0);
+  const min=Math.min(...nums), max=Math.max(...nums);
+  if(max===min)return 50;
+  let score=(Number(value)-min)/(max-min)*100;
+  if(invert)score=100-score;
+  return Math.max(0,Math.min(100,score));
+}
+
+function ensureRadarAnalystOptions(){
+  const sel=$('#visualRadarAnalyst');
+  if(!sel)return;
+  const rows=radarRows();
+  const current=visualRadarAnalyst || sel.value;
+  sel.innerHTML=rows.map(r=>`<option value="${esc(r.name)}">${esc(r.name)}</option>`).join('');
+  if(current && rows.some(r=>r.name===current))sel.value=current;
+  else if(rows.length){
+    sel.value=rows.slice().sort((a,b)=>b.totalPerf-a.totalPerf)[0].name;
+  }
+  visualRadarAnalyst=sel.value||'';
+}
+
+function renderVisualAnalytics(){
+  const canvas=$('#visualAnalyticsChart');
+  if(!canvas || typeof Chart==='undefined')return;
+  destroyVisualChart();
+
+  const all=visualAllTrades();
+  const empty=$('#visualEmpty');
+  const wrap=canvas.parentElement;
+  const title=$('#visualChartTitle');
+  const note=$('#visualChartNote');
+  const radarControls=$('#visualRadarControls');
+
+  empty?.classList.add('hidden');
+  if(wrap)wrap.style.display='block';
+  radarControls?.classList.toggle('hidden',visualMode!=='radar');
+
+  const fail=(msg)=>{
+    if(wrap)wrap.style.display='none';
+    if(empty){empty.textContent=msg;empty.classList.remove('hidden');}
+  };
+
+  if(visualMode==='trend'){
+    title.textContent='累積已實現績效走勢';
+    note.textContent='依已結算交易的出場日期累積計算，不以歷史盤中價格回推';
+    const closed=all.filter(t=>!calc(t).open && t.exitDate && (+t.entryPrice||0)>0 && (+t.shares||0)>0);
+    if(!closed.length)return fail('目前尚無已結算交易，無法建立績效走勢');
+
+    const dates=[...new Set(closed.map(t=>t.exitDate))].sort();
+    const names=[...new Set(closed.map(t=>t.analyst).filter(Boolean))];
+    const datasets=names.map(name=>{
+      const own=closed.filter(t=>t.analyst===name);
+      let pnl=0,cost=0;
+      const data=dates.map(d=>{
+        own.filter(t=>t.exitDate===d).forEach(t=>{
+          const c=calc(t);
+          pnl+=c.realized;
+          cost+=(+t.entryPrice||0)*(+t.shares||0);
+        });
+        return cost?pnl/cost*100:0;
+      });
+      return {label:name,data,tension:.25,borderWidth:2,pointRadius:2};
+    });
+    const opt=visualBaseOptions(false);
+    opt.scales.y.ticks.callback=v=>v+'%';
+    visualAnalyticsChart=new Chart(canvas,{type:'line',data:{labels:dates,datasets},options:opt});
+    return;
+  }
+
+  if(visualMode==='winrate'){
+    title.textContent='分析師勝率排行榜';
+    note.textContent='以已結算交易計算：獲利筆數 ÷ 已結算筆數';
+    const rows=analystSummaryAll().map(r=>{
+      const own=all.filter(t=>t.analyst===r.name && !calc(t).open);
+      const wins=own.filter(t=>calc(t).realized>0).length;
+      return {...r,wins,winrate:own.length?wins/own.length*100:0};
+    }).filter(r=>r.closedCount>0).sort((a,b)=>b.winrate-a.winrate);
+    if(!rows.length)return fail('目前尚無已結算交易，無法計算勝率');
+    const opt=visualBaseOptions(true);
+    opt.plugins.legend.display=false;
+    opt.scales.x.ticks.callback=v=>v+'%';
+    opt.scales.x.min=0; opt.scales.x.max=100;
+    visualAnalyticsChart=new Chart(canvas,{
+      type:'bar',
+      data:{labels:rows.map(r=>r.name),datasets:[{label:'勝率 %',data:rows.map(r=>Number(r.winrate.toFixed(2)))}]},
+      options:opt
+    });
+    return;
+  }
+
+  if(visualMode==='radar'){
+    ensureRadarAnalystOptions();
+    const rows=radarRows();
+    if(!rows.length)return fail('目前沒有可建立雷達圖的分析師資料');
+    const selected=rows.find(r=>r.name===visualRadarAnalyst) || rows[0];
+    visualRadarAnalyst=selected.name;
+    const sel=$('#visualRadarAnalyst');
+    if(sel)sel.value=selected.name;
+
+    title.textContent=`${selected.name}｜績效雷達圖`;
+    note.textContent='五項指標以目前所有有交易分析師做 0～100 相對標準化；平均虧損越小，分數越高';
+
+    const totalVals=rows.map(r=>r.totalPerf);
+    const unrealVals=rows.map(r=>r.unrealizedPerf);
+    const realVals=rows.map(r=>r.realizedPerf);
+    const winVals=rows.map(r=>r.winrate);
+    const lossVals=rows.map(r=>r.avgLoss);
+
+    const data=[
+      normalizeRadarValue(selected.totalPerf,totalVals),
+      normalizeRadarValue(selected.unrealizedPerf,unrealVals),
+      normalizeRadarValue(selected.realizedPerf,realVals),
+      normalizeRadarValue(selected.winrate,winVals),
+      normalizeRadarValue(selected.avgLoss,lossVals,true)
+    ];
+
+    visualAnalyticsChart=new Chart(canvas,{
+      type:'radar',
+      data:{
+        labels:['總績效','未實現績效','已實現績效','勝率','虧損控制'],
+        datasets:[{label:selected.name,data,borderWidth:2,pointRadius:3}]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#f6f0df',font:{size:11}}}},
+        scales:{r:{
+          beginAtZero:true,
+          min:0,
+          max:100,
+          ticks:{display:false,stepSize:20},
+          angleLines:{color:'rgba(217,178,76,.16)'},
+          grid:{color:'rgba(217,178,76,.18)'},
+          pointLabels:{color:'#f6f0df',font:{size:12,weight:'700'}}
+        }}
+      }
+    });
+    return;
+  }
+
+  if(visualMode==='status'){
+    title.textContent='持股狀態分布';
+    note.textContent='依目前交易紀錄統計：持有中、部分出場後持有、部分出場、全部出場';
+    const counts={
+      '持有中':0,
+      '部分出場後持有':0,
+      '部分出場':0,
+      '全部出場':0
+    };
+    all.forEach(t=>{
+      const c=calc(t);
+      if(c.open){
+        if(t.partialSettlement)counts['部分出場後持有']++;
+        else counts['持有中']++;
+      }else{
+        const partial=t.exitType==='partial'||(!t.exitType&&t.partialSettlement&&t.sourceTradeId);
+        if(partial)counts['部分出場']++;
+        else counts['全部出場']++;
+      }
+    });
+    const rows=Object.entries(counts).filter(([,v])=>v>0);
+    if(!rows.length)return fail('目前沒有可統計的持股狀態資料');
+    visualAnalyticsChart=new Chart(canvas,{
+      type:'doughnut',
+      data:{
+        labels:rows.map(r=>r[0]),
+        datasets:[{label:'筆數',data:rows.map(r=>r[1]),borderWidth:2}]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        cutout:'62%',
+        plugins:{
+          legend:{position:'bottom',labels:{color:'#f6f0df',padding:16,font:{size:11}}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}：${ctx.raw} 筆`}}
+        }
+      }
+    });
+    return;
+  }
+
+  title.textContent='股票損益貢獻排行';
+  note.textContent='合併同股票所有分析師部位，以目前總損益排序，顯示影響最大的前 12 檔';
+  const map={};
+  all.forEach(t=>{
+    const s=String(t.symbol||'').trim().toUpperCase();
+    if(!s)return;
+    if(!map[s])map[s]={symbol:s,name:t.stockName||'',pnl:0};
+    map[s].pnl+=calc(t).total;
+  });
+  const rows=Object.values(map).sort((a,b)=>Math.abs(b.pnl)-Math.abs(a.pnl)).slice(0,12);
+  if(!rows.length)return fail('目前沒有可計算的股票損益資料');
+  const opt=visualBaseOptions(true);
+  opt.plugins.legend.display=false;
+  visualAnalyticsChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels:rows.map(r=>`${r.symbol}${r.name?' '+r.name:''}`),datasets:[{label:'總損益',data:rows.map(r=>Math.round(r.pnl))}]},
+    options:opt
+  });
+}
+
+document.addEventListener('click',e=>{
+  const btn=e.target?.closest?.('[data-visual-mode]');
+  if(!btn)return;
+  visualMode=btn.dataset.visualMode||'trend';
+  $$('[data-visual-mode]').forEach(b=>b.classList.toggle('active',b.dataset.visualMode===visualMode));
+  renderVisualAnalytics();
+});
+
+$('#visualRadarAnalyst')?.addEventListener('change',e=>{
+  visualRadarAnalyst=e.target.value||'';
+  if(visualMode==='radar')renderVisualAnalytics();
+});
+
 function render(){
   if(isAdmin2()){
     const a=$('#analyst');
@@ -2412,7 +2762,7 @@ function render(){
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
   setMetric('#mClosed',rows.length-openN,false);
-  renderRank(); renderCharts(); bindRows();
+  renderRank(); renderCharts(); renderVisualAnalytics(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}
 

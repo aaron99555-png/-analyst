@@ -1836,6 +1836,47 @@ body{
   border:1px solid rgba(148,163,184,.26);
 }
 
+
+/* v86：複製清單 + 降低雲端重繪干擾 */
+.shared-open-title-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.analyst-trades-head-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+#copyAnalystHoldingsBtn,
+#copySharedHoldingsBtn{
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .shared-open-title-row{
+    align-items:flex-start !important;
+  }
+  .shared-open-title-actions{
+    width:100%;
+    justify-content:space-between;
+  }
+  .analyst-trades-modal-head{
+    gap:8px;
+  }
+  .analyst-trades-head-actions{
+    gap:4px;
+  }
+  #copyAnalystHoldingsBtn,
+  #closeAnalystTrades{
+    padding-left:8px !important;
+    padding-right:8px !important;
+    font-size:11px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1860,9 +1901,12 @@ body{
 
   <div class="grid">
 <section class="card span12 shared-open-card">
-      <div class="section-title">
+      <div class="section-title shared-open-title-row">
         <h2>同時持有中股票</h2>
-        <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+        <div class="shared-open-title-actions">
+          <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+          <button id="copySharedHoldingsBtn" class="mini ghost" type="button">複製共同持股</button>
+        </div>
       </div>
       <div id="sharedOpenPositions" class="shared-open-list"></div>
     </section>
@@ -1988,7 +2032,10 @@ body{
         <h3 id="analystTradesTitle">分析師持股狀況</h3>
         <div id="analystTradesRange" class="analyst-trades-range">—</div>
       </div>
-      <button id="closeAnalystTrades" class="ghost analyst-trades-close" type="button">關閉</button>
+      <div class="analyst-trades-head-actions">
+        <button id="copyAnalystHoldingsBtn" class="ghost" type="button">複製持股清單</button>
+        <button id="closeAnalystTrades" class="ghost analyst-trades-close" type="button">關閉</button>
+      </div>
     </div>
     <div id="analystTradesBody" class="analyst-trades-body"></div>
   </div>
@@ -2214,31 +2261,7 @@ function renderSharedOpenPositions(){
   const box=$('#sharedOpenPositions');
   if(!box)return;
 
-  const groups={};
-  Object.entries(trades||{}).forEach(([id,tr])=>{
-    if(!tr)return;
-    const c=calc(tr);
-    if(!c.open)return;
-
-    const symbol=String(tr.symbol||'').trim().toUpperCase();
-    if(!symbol)return;
-
-    if(!groups[symbol]){
-      groups[symbol]={
-        symbol,
-        stockName:String(tr.stockName||'').trim(),
-        analysts:new Set()
-      };
-    }
-    if(!groups[symbol].stockName && tr.stockName){
-      groups[symbol].stockName=String(tr.stockName).trim();
-    }
-    if(tr.analyst)groups[symbol].analysts.add(tr.analyst);
-  });
-
-  const shared=Object.values(groups)
-    .filter(g=>g.analysts.size>=2)
-    .sort((a,b)=>b.analysts.size-a.analysts.size || a.symbol.localeCompare(b.symbol));
+  const shared=getSharedHoldingGroups();
 
   if(!shared.length){
     box.innerHTML='<div class="shared-open-empty">目前沒有 2 位以上分析師同時持有的未結算股票</div>';
@@ -2349,7 +2372,105 @@ function analystTradeListSource(){
   return filteredTrades();
 }
 
+
+let currentAnalystModalName='';
+
+async function copyTextSmart(text){
+  const value=String(text||'').trim();
+  if(!value)return false;
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=value;
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok=document.execCommand('copy');
+    ta.remove();
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
+
+function buildAnalystHoldingsCopyText(name){
+  const rows=analystTradeListSource()
+    .filter(tr=>tr && tr.analyst===name)
+    .map(tr=>({tr,c:calc(tr)}));
+
+  const openRows=rows
+    .filter(x=>x.c.open)
+    .sort((a,b)=>String(b.tr.entryDate||'').localeCompare(String(a.tr.entryDate||'')));
+  const closedRows=rows
+    .filter(x=>!x.c.open)
+    .sort((a,b)=>String(b.tr.exitDate||'').localeCompare(String(a.tr.exitDate||'')));
+
+  const lines=[`【${name}｜持股清單】`];
+
+  lines.push(`持有中（${openRows.length}檔）`);
+  if(openRows.length){
+    openRows.forEach(({tr,c})=>{
+      const status=tr.partialSettlement?'部分出場後持有':'持有中';
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${status}｜進場 ${tr.entryDate||'—'}｜進場價 ${fmt(tr.entryPrice)}｜目前價 ${fmt(tr.currentPrice||tr.entryPrice)}｜績效 ${pct(c.perf)}`);
+    });
+  }else{
+    lines.push('無');
+  }
+
+  lines.push('');
+  lines.push(`已結算（${closedRows.length}檔）`);
+  if(closedRows.length){
+    closedRows.forEach(({tr,c})=>{
+      const exitStatus=(tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId))?'部分出場':'全部出場';
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${tr.entryDate||'—'} ${fmt(tr.entryPrice)}｜出場 ${tr.exitDate||'—'} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
+    });
+  }else{
+    lines.push('無');
+  }
+
+  return lines.join('\n');
+}
+
+function getSharedHoldingGroups(){
+  const groups={};
+  Object.values(trades||{}).forEach(tr=>{
+    if(!tr || !calc(tr).open)return;
+    const symbol=String(tr.symbol||'').trim().toUpperCase();
+    if(!symbol)return;
+    if(!groups[symbol]){
+      groups[symbol]={symbol,stockName:String(tr.stockName||'').trim(),analysts:new Set()};
+    }
+    if(!groups[symbol].stockName && tr.stockName)groups[symbol].stockName=String(tr.stockName).trim();
+    if(tr.analyst)groups[symbol].analysts.add(tr.analyst);
+  });
+  return Object.values(groups)
+    .filter(g=>g.analysts.size>=2)
+    .sort((a,b)=>b.analysts.size-a.analysts.size || a.symbol.localeCompare(b.symbol));
+}
+
+function buildSharedHoldingsCopyText(){
+  const shared=getSharedHoldingGroups();
+  const lines=[`【共同持股清單】`];
+  if(!shared.length){
+    lines.push('目前沒有 2 位以上分析師共同持有的股票');
+    return lines.join('\n');
+  }
+  shared.forEach(g=>{
+    const names=[...g.analysts];
+    lines.push(`${g.symbol}${g.stockName?' '+g.stockName:''}｜${names.length}位共同持有｜${names.join('、')}`);
+  });
+  return lines.join('\n');
+}
+
 function renderAnalystTradesModal(name){
+  currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
   const body=$('#analystTradesBody');
   const title=$('#analystTradesTitle');
@@ -2421,6 +2542,18 @@ function renderAnalystTradesModal(name){
 function closeAnalystTradesModal(){
   $('#analystTradesModal')?.classList.remove('show');
 }
+
+
+$('#copyAnalystHoldingsBtn')?.addEventListener('click',async()=>{
+  if(!currentAnalystModalName)return;
+  const ok=await copyTextSmart(buildAnalystHoldingsCopyText(currentAnalystModalName));
+  alert(ok?'已複製分析師持股清單':'複製失敗，請再試一次');
+});
+
+$('#copySharedHoldingsBtn')?.addEventListener('click',async()=>{
+  const ok=await copyTextSmart(buildSharedHoldingsCopyText());
+  alert(ok?'已複製共同持股清單':'複製失敗，請再試一次');
+});
 
 function renderRank(){
   const data=analystSummary();
@@ -3519,6 +3652,35 @@ $('#quickPriceValue')?.addEventListener('keydown',e=>{
 });
 $('#quickPriceUpdateBtn')?.addEventListener('click',quickUpdateCurrentPrice);
 
+let cloudRenderTimer=null;
+let cloudFirstLoad=true;
+const CLOUD_RENDER_DELAY=30000;
+
+function isUserTyping(){
+  const a=document.activeElement;
+  if(!a)return false;
+  return a.matches?.('input, textarea, select, [contenteditable="true"]');
+}
+
+function scheduleCloudRender(){
+  clearTimeout(cloudRenderTimer);
+
+  // 首次載入立即顯示；後續雲端變更延後 30 秒，避免打字被重繪。
+  if(cloudFirstLoad){
+    cloudFirstLoad=false;
+    render();
+    return;
+  }
+
+  cloudRenderTimer=setTimeout(function tryRender(){
+    if(isUserTyping()){
+      cloudRenderTimer=setTimeout(tryRender,4000);
+      return;
+    }
+    render();
+  },CLOUD_RENDER_DELAY);
+}
+
 onValue(
   tradesRef,
   snap=>{
@@ -3531,7 +3693,7 @@ if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='郭榮哲投
 if(incoming) Object.values(incoming).forEach(x=>{if(x&&x.analyst==='徐紹軒')x.analyst='運達徐紹軒';});
 if(incoming!==null) trades=incoming;
     else trades={};
-    render();
+    scheduleCloudRender();
   },
   err=>{
     console.error('Firebase 讀取失敗：',err);

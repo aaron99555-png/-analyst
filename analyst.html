@@ -2961,6 +2961,42 @@ const ADMIN2_PASSWORD='16888';
 const isMainAdmin=()=>isAdmin&&adminRole==='main';
 const isAdmin2=()=>isAdmin&&adminRole==='admin2';
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
+
+const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰'];
+const ADMIN2_ANALYSTS=['團團'];
+
+function visibleAnalystNames(){
+  return isAdmin2()?ADMIN2_ANALYSTS:PUBLIC_ANALYSTS;
+}
+function canViewTrade(t){
+  if(!t)return false;
+  return isAdmin2()?t.analyst==='團團':t.analyst!=='團團';
+}
+function refreshAnalystVisibilityOptions(){
+  const names=visibleAnalystNames();
+
+  const filter=$('#fAnalyst');
+  if(filter){
+    const old=filter.value;
+    filter.innerHTML='<option value="">全部</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
+    if(names.includes(old))filter.value=old;
+    else filter.value='';
+  }
+
+  const form=$('#analyst');
+  if(form){
+    const old=form.value;
+    form.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
+    if(isAdmin2()){
+      form.value='團團';
+      form.disabled=true;
+    }else{
+      form.disabled=false;
+      if(names.includes(old))form.value=old;
+      else if(names.length)form.value=names[0];
+    }
+  }
+}
 const fmt=n=>Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2});
 const fmtMoney=n=>(Number(n||0)>=0?'+':'')+fmt(n);
 const pct=n=>(Number(n||0)>=0?'+':'')+Number(n||0).toFixed(2)+'%';
@@ -3038,6 +3074,7 @@ let performanceSort={key:'entryDate',dir:'desc'};
 function filteredEntries(){
   const a=$('#fAnalyst').value, month=$('#fMonth')?.value||'', from=$('#fFrom').value, to=$('#fTo').value, st=$('#fStatus').value, kw=$('#fKeyword').value.trim().toLowerCase();
   return Object.entries(trades).filter(([id,t])=>{
+    if(!canViewTrade(t))return false;
     const c=calc(t); const d=t.entryDate||'';
     const monthOK=!month || d.startsWith(month);
     return (!a||t.analyst===a)&&monthOK&&(!from||d>=from)&&(!to||d<=to)&&(!st||(st==='open'?c.open:!c.open))&&(!kw||`${t.symbol||''} ${t.stockName||''}`.toLowerCase().includes(kw));
@@ -3113,7 +3150,7 @@ function renderTodayExits(){
   if(title)title.textContent=`${shortMD(d)}出場股票`;
 
   const rows=Object.entries(trades||{})
-    .filter(([id,tr])=>tr && tr.exitDate===d)
+    .filter(([id,tr])=>tr && canViewTrade(tr) && tr.exitDate===d)
     .sort((a,b)=>String(a[1].analyst||'').localeCompare(String(b[1].analyst||''),'zh-Hant'));
 
   if(!rows.length){
@@ -3175,7 +3212,7 @@ function renderTodayEntries(){
   if(title)title.textContent=`${shortMD(d)}進場股票`;
 
   const rows=Object.entries(trades)
-    .filter(([id,tr])=>(tr.entryDate||'')===d)
+    .filter(([id,tr])=>canViewTrade(tr) && (tr.entryDate||'')===d)
     .sort((a,b)=>(a[1].analyst||'').localeCompare(b[1].analyst||'','zh-Hant'));
 
   if(!rows.length){
@@ -3202,7 +3239,7 @@ function renderAnalystQuickFilter(){
   const el=$('#analystQuickFilter');
   if(!el)return;
   const current=$('#fAnalyst')?.value||'';
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡總蔡明彰'];
+  const names=visibleAnalystNames();
   el.innerHTML=`<button class="analyst-chip ${!current?'active':''}" data-quick-analyst="">全部</button>`+
     names.map(n=>`<button class="analyst-chip ${current===n?'active':''}" data-quick-analyst="${esc(n)}">${esc(n)}</button>`).join('');
 }
@@ -3253,7 +3290,7 @@ let visualAnalyticsChart=null;
 let visualSelectedAnalyst='';
 
 function visualAllTrades(){
-  return Object.values(trades||{}).filter(Boolean);
+  return Object.values(trades||{}).filter(t=>t&&canViewTrade(t));
 }
 
 function destroyVisualChart(){
@@ -3578,7 +3615,7 @@ function getEntryRowsByDate(){
   const d=$('#entryQueryDate')?.value || today();
   return Object.entries(trades||{})
     .map(([id,t])=>({id,t,c:calc(t)}))
-    .filter(x=>x.t?.entryDate===d)
+    .filter(x=>canViewTrade(x.t) && x.t?.entryDate===d)
     .sort((a,b)=>String(a.t.analyst||'').localeCompare(String(b.t.analyst||''),'zh-Hant'));
 }
 
@@ -3601,7 +3638,7 @@ function getExitRowsByDate(){
   const d=$('#exitQueryDate')?.value || today();
   return Object.entries(trades||{})
     .map(([id,t])=>({id,t,c:calc(t)}))
-    .filter(x=>x.t?.exitDate===d && !x.c.open)
+    .filter(x=>canViewTrade(x.t) && x.t?.exitDate===d && !x.c.open)
     .sort((a,b)=>String(a.t.analyst||'').localeCompare(String(b.t.analyst||''),'zh-Hant'));
 }
 
@@ -3747,7 +3784,7 @@ function buildAnalystHoldingsCopyText(name){
 function getSharedHoldingGroups(){
   const groups={};
   Object.values(trades||{}).forEach(tr=>{
-    if(!tr || !calc(tr).open)return;
+    if(!tr || !canViewTrade(tr) || !calc(tr).open)return;
     const symbol=String(tr.symbol||'').trim().toUpperCase();
     if(!symbol)return;
     if(!groups[symbol]){
@@ -3787,6 +3824,7 @@ function buildSharedHoldingsCopyText(){
 }
 
 function renderAnalystTradesModal(name){
+  if(!visibleAnalystNames().includes(name))return;
   currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
   const body=$('#analystTradesBody');
@@ -3966,7 +4004,7 @@ function renderRank(){
 
 let profitChart=null;
 function analystSummary(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡總蔡明彰'];
+  const names=visibleAnalystNames();
   const source=filteredTrades();
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
@@ -3988,8 +4026,8 @@ function analystSummary(){
   });
 }
 function analystSummaryAll(){
-  const names=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','團團','運達黃培碩','蔡總蔡明彰'];
-  const source=Object.values(trades);
+  const names=visibleAnalystNames();
+  const source=Object.values(trades).filter(canViewTrade);
   return names.map(name=>{
     const ts=source.filter(t=>t.analyst===name);
     let total=0,unrealized=0,realized=0,totalCost=0,realizedCost=0,unrealizedCost=0,openCount=0,closedCount=0;
@@ -4227,6 +4265,7 @@ function setAdmin(v,role=''){
   const formTitle=$('#formTitle');
   if(formTitle)formTitle.textContent=isAdmin2()?'新增團團交易':'新增交易';
   $$('.main-admin-form-only').forEach(x=>x.classList.toggle('hidden',isAdmin2()));
+  refreshAnalystVisibilityOptions();
   render();
   updatePriceModeUI();
 }
@@ -4244,7 +4283,10 @@ function updatePriceModeUI(){
   }
 }
 if(localStorage.getItem('analystAdmin')==='1')setAdmin(true,localStorage.getItem('analystAdminRole')||'main');
-else updatePriceModeUI();
+else{
+  refreshAnalystVisibilityOptions();
+  updatePriceModeUI();
+}
 
 $('#adminBtn').onclick=()=>{$('#loginModal').classList.add('show');$('#adminPwd').focus()}; $('#closeLogin').onclick=()=>$('#loginModal').classList.remove('show');
 $('#doLogin').onclick=()=>{
@@ -4636,7 +4678,7 @@ async function syncSameStockCurrentPrice(symbol,price,source){
   const sameStockIds=Object.entries(trades||{})
     .filter(([tid,tr])=>{
       if(!tr)return false;
-      return String(tr.symbol||'').trim()===normalized && calc(tr).open;
+      return canViewTrade(tr) && String(tr.symbol||'').trim()===normalized && calc(tr).open;
     })
     .map(([tid])=>tid);
 
@@ -4771,7 +4813,7 @@ async function runWithConcurrency(tasks,limit=4){
 }
 
 $('#refreshAllBtn').onclick=async()=>{
-  const openEntries=Object.entries(trades||{}).filter(([id,tr])=>tr&&calc(tr).open);
+  const openEntries=Object.entries(trades||{}).filter(([id,tr])=>tr&&canViewTrade(tr)&&calc(tr).open);
   if(!openEntries.length)return alert('目前沒有持有中的股票可更新');
 
   const btn=$('#refreshAllBtn');

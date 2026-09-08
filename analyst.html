@@ -2857,6 +2857,14 @@ html[data-theme="dark"] .section-title{
         <button type="button" data-visual-mode="status">持股狀態</button>
         <button type="button" data-visual-mode="contribution">損益貢獻</button>
       </div>
+      <div id="visualTrendControls" class="visual-radar-controls hidden">
+        <label for="visualTrendMetric">績效類型</label>
+        <select id="visualTrendMetric" aria-label="選擇績效走勢類型">
+          <option value="total">總績效</option>
+          <option value="unrealized">未實現績效</option>
+          <option value="realized">已實現績效</option>
+        </select>
+      </div>
       <div id="visualAnalystControls" class="visual-radar-controls hidden">
         <label for="visualAnalystSelect">分析師</label>
         <select id="visualAnalystSelect" aria-label="選擇分析師"></select>
@@ -3290,6 +3298,7 @@ initTheme();
 let visualMode='profitcompare';
 let visualAnalyticsChart=null;
 let visualSelectedAnalyst='';
+let visualTrendMetric='total';
 
 function visualAllTrades(){
   return Object.values(trades||{}).filter(t=>t&&canViewTrade(t));
@@ -3376,12 +3385,14 @@ function renderVisualAnalytics(){
   const title=$('#visualChartTitle');
   const note=$('#visualChartNote');
   const analystControls=$('#visualAnalystControls');
+  const trendControls=$('#visualTrendControls');
 
   empty?.classList.add('hidden');
   if(wrap)wrap.style.display='block';
 
   const needsAnalyst=visualMode==='radar'||visualMode==='status';
   analystControls?.classList.toggle('hidden',!needsAnalyst);
+  trendControls?.classList.toggle('hidden',visualMode!=='trend');
   if(needsAnalyst)ensureVisualAnalystOptions();
 
   const fail=(msg)=>{
@@ -3390,29 +3401,74 @@ function renderVisualAnalytics(){
   };
 
   if(visualMode==='trend'){
-    title.textContent='累積已實現績效走勢';
-    note.textContent='依已結算交易的出場日期累積計算，不以歷史盤中價格回推';
-    const closed=all.filter(t=>!calc(t).open && t.exitDate && (+t.entryPrice||0)>0 && (+t.shares||0)>0);
-    if(!closed.length)return fail('目前尚無已結算交易，無法建立績效走勢');
+    const metric=visualTrendMetric||'total';
+    const metricLabel=metric==='realized'?'已實現績效':metric==='unrealized'?'未實現績效':'總績效';
+    title.textContent=`${metricLabel}走勢`;
 
-    const dates=[...new Set(closed.map(t=>t.exitDate))].sort();
-    const names=[...new Set(closed.map(t=>t.analyst).filter(Boolean))];
+    const valid=all.filter(t=>(+t.entryPrice||0)>0 && (+t.shares||0)>0 && t.entryDate);
+    if(!valid.length)return fail('目前沒有可建立績效走勢的交易資料');
+
+    const eventDates=[...new Set(valid.flatMap(t=>{
+      const ds=[t.entryDate];
+      if(t.exitDate)ds.push(t.exitDate);
+      return ds.filter(Boolean);
+    }))].sort();
+    const names=[...new Set(valid.map(t=>t.analyst).filter(Boolean))];
+
+    if(metric==='realized'){
+      note.textContent='依已結算交易的出場日期累積計算已實現績效';
+    }else if(metric==='unrealized'){
+      note.textContent='依目前持有中部位的最新價格計算；走勢以各部位進場日期逐步納入';
+    }else{
+      note.textContent='總績效＝累積已實現＋目前未實現；未實現部分採最新價格計算';
+    }
+
     const datasets=names.map(name=>{
-      const own=closed.filter(t=>t.analyst===name);
-      let pnl=0,cost=0;
-      const data=dates.map(d=>{
-        own.filter(t=>t.exitDate===d).forEach(t=>{
+      const own=valid.filter(t=>t.analyst===name);
+      const data=eventDates.map(d=>{
+        let pnl=0,cost=0;
+
+        own.forEach(t=>{
+          const entryCost=(+t.entryPrice||0)*(+t.shares||0);
+          if(!entryCost || t.entryDate>d)return;
           const c=calc(t);
-          pnl+=c.realized;
-          cost+=(+t.entryPrice||0)*(+t.shares||0);
+
+          if(metric==='realized'){
+            if(!c.open && t.exitDate && t.exitDate<=d){
+              pnl+=c.realized;
+              cost+=entryCost;
+            }
+            return;
+          }
+
+          if(metric==='unrealized'){
+            if(c.open){
+              pnl+=c.unreal;
+              cost+=entryCost;
+            }
+            return;
+          }
+
+          // 總績效：已出場部位在出場日後計入已實現；
+          // 目前仍持有部位以最新價格計算未實現。
+          if(c.open){
+            pnl+=c.unreal;
+            cost+=entryCost;
+          }else if(t.exitDate && t.exitDate<=d){
+            pnl+=c.realized;
+            cost+=entryCost;
+          }
         });
-        return cost?pnl/cost*100:0;
+
+        return cost?pnl/cost*100:null;
       });
-      return {label:name,data,tension:.25,borderWidth:2,pointRadius:2};
-    });
+      return {label:name,data,tension:.25,borderWidth:2,pointRadius:2,spanGaps:true};
+    }).filter(ds=>ds.data.some(v=>v!==null));
+
+    if(!datasets.length)return fail(`目前沒有${metricLabel}可顯示`);
     const opt=visualBaseOptions(false);
     opt.scales.y.ticks.callback=v=>v+'%';
-    visualAnalyticsChart=new Chart(canvas,{type:'line',data:{labels:dates,datasets},options:opt});
+    visualAnalyticsChart=new Chart(canvas,{type:'line',data:{labels:eventDates,datasets},options:opt});
     return;
   }
 
@@ -3585,6 +3641,11 @@ document.addEventListener('click',e=>{
 $('#visualAnalystSelect')?.addEventListener('change',e=>{
   visualSelectedAnalyst=e.target.value||'';
   if(visualMode==='radar'||visualMode==='status')renderVisualAnalytics();
+});
+
+$('#visualTrendMetric')?.addEventListener('change',e=>{
+  visualTrendMetric=e.target.value||'total';
+  if(visualMode==='trend')renderVisualAnalytics();
 });
 
 

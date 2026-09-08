@@ -2745,6 +2745,40 @@ html[data-theme="dark"] .section-title{
 #quickPriceUpdateBtn:disabled{cursor:wait;opacity:.72;}
 #quickPriceHint{min-height:18px;}
 
+
+/* v114：確保更新股價按鈕可點擊 */
+#refreshAllBtn,
+#quickPriceUpdateBtn,
+[data-up]{
+  pointer-events:auto !important;
+  position:relative;
+  z-index:2;
+}
+
+
+/* v115：排行榜分析師持股清單－管理員1快捷操作 */
+.analyst-trade-admin-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:10px;
+  padding-top:9px;
+  border-top:1px solid rgba(148,163,184,.16);
+}
+.analyst-trade-admin-actions button{
+  min-width:88px;
+  min-height:34px;
+  font-size:12px;
+  font-weight:850;
+}
+@media(max-width:700px){
+  .analyst-trade-admin-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .analyst-trade-admin-actions button{width:100%;}
+}
+
 </style>
 </head>
 <body>
@@ -3891,6 +3925,24 @@ function buildSharedHoldingsCopyText(){
   return lines.join('\n');
 }
 
+
+function tradeIdFromObject(target){
+  for(const [id,tr] of Object.entries(trades||{})){
+    if(tr===target)return id;
+  }
+  // Firebase 重新載入後物件參考不同時，以主要交易欄位做備援比對。
+  const candidates=Object.entries(trades||{}).filter(([id,tr])=>
+    tr &&
+    tr.analyst===target?.analyst &&
+    String(tr.symbol||'')===String(target?.symbol||'') &&
+    String(tr.entryDate||'')===String(target?.entryDate||'') &&
+    Number(tr.entryPrice||0)===Number(target?.entryPrice||0) &&
+    Number(tr.shares||0)===Number(target?.shares||0) &&
+    String(tr.exitDate||'')===String(target?.exitDate||'')
+  );
+  return candidates.length===1?candidates[0][0]:'';
+}
+
 function renderAnalystTradesModal(name){
   if(!visibleAnalystNames().includes(name))return;
   currentAnalystModalName=name||'';
@@ -3916,7 +3968,14 @@ function renderAnalystTradesModal(name){
   if(range)range.textContent=$('#rankRangeStatus')?.textContent||'統計區間：全部期間';
 
   const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
-  const openHtml=openRows.length?openRows.map(({tr,c})=>`
+  const openHtml=openRows.length?openRows.map(({tr,c})=>{
+    const tradeId=tradeIdFromObject(tr);
+    const adminActions=isMainAdmin()&&tradeId?`
+      <div class="analyst-trade-admin-actions">
+        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">修改股價</button>
+        <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
+      </div>`:'';
+    return `
     <div class="analyst-trade-item open">
       <div class="analyst-trade-top">
         <a class="stock-link analyst-trade-stock" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer">${stockLabel(tr)}</a>
@@ -3925,11 +3984,13 @@ function renderAnalystTradesModal(name){
       <div class="analyst-trade-grid">
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
-        <span>目前價 <b>${fmt(tr.currentPrice)}</b></span>
+        <span>目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
+        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
-    </div>
-  `).join(''):'<div class="analyst-trade-empty">目前沒有持有中的股票</div>';
+      ${adminActions}
+    </div>`;
+  }).join(''):'<div class="analyst-trade-empty">目前沒有持有中的股票</div>';
 
   const closedHtml=closedRows.length?closedRows.map(({tr,c})=>`
     <div class="analyst-trade-item closed">
@@ -4817,6 +4878,7 @@ async function refreshOne(id){
   if(!tr)return;
   const btn=document.querySelector(`[data-up="${id}"]`);
   if(btn){btn.disabled=true;btn.textContent='抓價中…'}
+  if($('#lastRefresh'))$('#lastRefresh').textContent=`正在更新 ${tr.symbol} 股價…`;
   try{
     let item;
     try{
@@ -4877,7 +4939,15 @@ async function runWithConcurrency(tasks,limit=4){
   return results;
 }
 
-$('#refreshAllBtn').onclick=async()=>{
+$('#refreshAllBtn')?.addEventListener('click',async(e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(!isMainAdmin()){
+    alert('一鍵更新股價僅限主管理員使用');
+    return;
+  }
+
   const openEntries=Object.entries(trades||{}).filter(([id,tr])=>tr&&canViewTrade(tr)&&calc(tr).open);
   if(!openEntries.length)return alert('目前沒有持有中的股票可更新');
 
@@ -4961,8 +5031,8 @@ $('#refreshAllBtn').onclick=async()=>{
     btn.disabled=false;
     updatePriceModeUI();
   }
-};
 
+});
 document.addEventListener('click',e=>{
   const btn=e.target.closest('[data-manual-price]');
   if(btn){
@@ -5130,6 +5200,38 @@ document.addEventListener('click',e=>{
   if(name)renderAnalystTradesModal(name);
 });
 
+document.addEventListener('click',async e=>{
+  const priceBtn=e.target?.closest?.('[data-modal-price]');
+  const settleBtn=e.target?.closest?.('[data-modal-settle]');
+  if(!priceBtn && !settleBtn)return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(!isMainAdmin()){
+    alert('此功能僅限管理員1使用');
+    return;
+  }
+
+  try{
+    if(priceBtn){
+      const id=priceBtn.dataset.modalPrice;
+      await manualCurrentPrice(id);
+    }else if(settleBtn){
+      const id=settleBtn.dataset.modalSettle;
+      await settleTrade(id);
+    }
+
+    // Firebase 回傳前先用目前本機資料重畫；回傳後 onValue 會再次同步。
+    if(currentAnalystModalName){
+      setTimeout(()=>renderAnalystTradesModal(currentAnalystModalName),50);
+    }
+  }catch(err){
+    console.error('排行榜清單操作失敗',err);
+    alert('操作失敗：'+(err?.message||'未知錯誤'));
+  }
+});
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAnalystTradesModal();
 });
@@ -5237,6 +5339,7 @@ $('#quickPriceValue')?.addEventListener('keydown',e=>{
   }
 });
 $('#quickPriceUpdateBtn')?.addEventListener('click',quickUpdateCurrentPrice);
+if($('#quickPriceUpdateBtn'))$('#quickPriceUpdateBtn').onclick=quickUpdateCurrentPrice;
 
 let cloudRenderTimer=null;
 let cloudFirstLoad=true;
@@ -5311,18 +5414,25 @@ if(incoming!==null) trades=incoming;
 
 // v42：動態清單操作按鈕統一事件委派
 document.addEventListener('click', async (e)=>{
-  const btn=e.target.closest('button');
-  if(!btn || !isAdmin)return;
+  const btn=e.target?.closest?.('button');
+  if(!btn)return;
 
   const settleId=btn.getAttribute('data-settle');
   const editId=btn.getAttribute('data-edit');
   const delId=btn.getAttribute('data-del');
   const upId=btn.getAttribute('data-up');
 
+  // 沒有任何資料操作屬性就交給其他按鈕事件處理。
+  if(!settleId && !editId && !delId && !upId)return;
+
   try{
     if(upId){
       e.preventDefault();
-      e.stopImmediatePropagation();
+      e.stopPropagation();
+      if(!isMainAdmin()){
+        alert('更新股價功能僅限主管理員使用');
+        return;
+      }
       await refreshOne(upId);
       return;
     }
@@ -5362,6 +5472,36 @@ document.addEventListener('click',e=>{
   const tr=trades?.[id];
   if(tr)copyWithButton(btn,buildSingleExitPerformanceText(tr));
 });
+
+
+// v114：股價更新按鈕最後一道保險。
+// 若其他事件委派失效，仍能直接執行單筆更新。
+document.addEventListener('click',async e=>{
+  const btn=e.target?.closest?.('[data-up]');
+  if(!btn)return;
+  if(btn.dataset.priceClickRunning==='1')return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(!isMainAdmin()){
+    alert('更新股價功能僅限主管理員使用');
+    return;
+  }
+
+  const id=btn.getAttribute('data-up');
+  if(!id)return;
+
+  btn.dataset.priceClickRunning='1';
+  try{
+    await refreshOne(id);
+  }catch(err){
+    console.error('單筆股價更新失敗',err);
+    alert('更新股價失敗：'+(err?.message||'未知錯誤'));
+  }finally{
+    delete btn.dataset.priceClickRunning;
+  }
+},false);
 
 </script>
 

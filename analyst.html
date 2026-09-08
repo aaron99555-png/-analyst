@@ -4627,9 +4627,12 @@ function openPriceConfirm(items){
 
 async function syncSameStockCurrentPrice(symbol,price,source){
   const normalized=String(symbol||'').trim();
+  const numericPrice=Number(price);
   if(!normalized)throw new Error('股票代號不存在');
+  if(!Number.isFinite(numericPrice)||numericPrice<=0)throw new Error('價格格式異常');
 
   const updatedAt=nowText();
+  const priceSource=source||'手動確認';
   const sameStockIds=Object.entries(trades||{})
     .filter(([tid,tr])=>{
       if(!tr)return false;
@@ -4639,13 +4642,30 @@ async function syncSameStockCurrentPrice(symbol,price,source){
 
   if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
 
+  // 先完成 Firebase 寫入。
   await Promise.all(sameStockIds.map(tid=>
     update(ref(db,`analystPerformance/trades/${tid}`),{
-      currentPrice:price,
+      currentPrice:numericPrice,
       priceUpdatedAt:updatedAt,
-      priceSource:source||'手動確認'
+      priceSource
     })
   ));
+
+  // Firebase 成功後立即同步本機資料並重畫，
+  // 不再等待 onValue 回傳才看到「目前價」變化。
+  sameStockIds.forEach(tid=>{
+    if(!trades[tid])return;
+    trades[tid]={
+      ...trades[tid],
+      currentPrice:numericPrice,
+      priceUpdatedAt:updatedAt,
+      priceSource
+    };
+  });
+
+  clearTimeout(cloudRenderTimer);
+  render();
+
   return sameStockIds.length;
 }
 
@@ -4717,8 +4737,17 @@ async function refreshOne(id){
 
     const confirmed=await openPriceConfirm([item]);
     if(!confirmed)return;
-    const synced=await writeManualOrFetchedPrice(id,confirmed[0]);
-    $('#lastRefresh').textContent=`價格更新：${nowText()}${synced>1?`｜同股同步 ${synced} 筆`:''}`;
+
+    const finalItem=confirmed[0];
+    const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
+    const newPrice=Number(finalItem.price||0);
+    const synced=await writeManualOrFetchedPrice(id,finalItem);
+
+    $('#lastRefresh').textContent=`價格更新：${nowText()}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}${synced>1?`｜同股同步 ${synced} 筆`:''}`;
+
+    if(oldPrice===newPrice){
+      console.info(`${tr.symbol} 行情抓取成功，但價格與目前價相同：${newPrice}`);
+    }
   }catch(e){
     alert(`${tr.symbol} 更新失敗。\n${e?.message||'請確認輸入價格'}`);
   }finally{

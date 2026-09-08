@@ -2398,6 +2398,348 @@ html[data-theme="light"] .podium .neg{
   color:#08763a !important;
 }
 
+
+/* v102：整體視覺美化 */
+:root{
+  --radius-lg:20px;
+  --radius-md:14px;
+  --shadow-soft:0 10px 30px rgba(0,0,0,.08);
+  --shadow-hover:0 14px 34px rgba(0,0,0,.12);
+}
+
+/* 版面呼吸感 */
+body{
+  line-height:1.55;
+}
+.topbar{
+  padding:18px 20px !important;
+  border-radius:0 0 18px 18px;
+}
+.brand{
+  gap:12px !important;
+}
+.logo{
+  width:48px !important;
+  height:48px !important;
+  border-radius:15px !important;
+  font-size:22px !important;
+  box-shadow:0 8px 20px rgba(217,178,76,.22);
+}
+.brand h1{
+  font-size:clamp(24px,2.4vw,34px) !important;
+  letter-spacing:.2px;
+}
+.brand .sub{
+  margin-top:2px;
+  font-size:13px;
+}
+.grid{
+  gap:16px !important;
+}
+.card{
+  border-radius:var(--radius-lg) !important;
+  padding:18px !important;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{
+  transform:translateY(-1px);
+}
+.section-title{
+  margin-bottom:14px !important;
+}
+.section-title h2{
+  font-size:18px !important;
+  letter-spacing:.2px;
+}
+.status{
+  font-size:12px;
+}
+
+/* 按鈕 */
+button,
+input[type="button"],
+input[type="submit"]{
+  border-radius:11px !important;
+  min-height:36px;
+  padding:8px 13px !important;
+  font-weight:700;
+  transition:transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease;
+}
+button:hover{
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(0);
+}
+button.primary{
+  box-shadow:0 6px 16px rgba(183,139,34,.18);
+}
+
+/* 表單 */
+input,
+select,
+textarea{
+  border-radius:11px !important;
+  min-height:40px;
+  padding:9px 11px !important;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none !important;
+  box-shadow:0 0 0 3px rgba(183,139,34,.12) !important;
+}
+
+/* 淺色主題精緻化 */
+html[data-theme="light"] body{
+  background:
+    radial-gradient(circle at top right, rgba(201,169,92,.10), transparent 28%),
+    linear-gradient(180deg,#f7f4ee 0%,#f2efe8 100%) !important;
+}
+html[data-theme="light"] .topbar{
+  background:rgba(255,255,255,.90) !important;
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid #ded8cc !important;
+  box-shadow:0 8px 24px rgba(69,55,25,.06);
+}
+html[data-theme="light"] .logo{
+  background:linear-gradient(145deg,#d8b75e,#a97917) !important;
+  color:#17130a !important;
+}
+html[data-theme="light"] .card{
+  background:rgba(255,255,255,.96) !important;
+  border:1px solid #ded8cc !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+html[data-theme="light"] .card:hover{
+  box-shadow:var(--shadow-hover) !important;
+}
+html[data-theme="light"] .section-title{
+  padding-bottom:9px;
+  border-bottom:1px solid #eee8dd;
+}
+html[data-theme="light"] .section-title h2{
+  color:#262019 !important;
+}
+html[data-theme="light"] .baseline-title-note{
+  background:#efe4bd !important;
+  color:#76570d !important;
+  padding:3px 8px;
+  border-radius:999px;
+  margin-left:8px;
+  font-size:11px;
+  vertical-align:middle;
+}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{
+  background:#fffdfa !important;
+  border:1px solid #cfc6b8 !important;
+}
+html[data-theme="light"] input:focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus{
+  border-color:#b28a31 !important;
+}
+html[data-theme="light"] button:not(.primary):not(.danger),
+html[data-theme="light"] .ghost,
+html[data-theme="light"] .mini.ghost{
+  background:linear-gradient(180deg,#fff,#f7f2e8) !important;
+  border:1px solid #c9bfad !important;
+  color:#352f26 !important;
+}
+html[data-theme="light"] button:not(.primary):not(.danger):hover{
+  background:#efe6d5 !important;
+  border-color:#a99775 !important;
+}
+html[data-theme="light"] button.primary{
+  background:linear-gradient(145deg,#d2ad50,#b48825) !important;
+  border-color:#9f7820 !important;
+  color:#17130a !important;
+}
+html[data-theme="light"] .analyst-chip{
+  border-radius:999px !important;
+  padding-inline:13px !important;
+}
+html[data-theme="light"] .analyst-chip.active,
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active{
+  background:linear-gradient(145deg,#dfc06c,#c79a35) !important;
+  border-color:#ac8122 !important;
+  color:#1d170d !important;
+}
+html[data-theme="light"] .visual-tabs,
+html[data-theme="light"] .rank-metric-switch{
+  padding:4px !important;
+  border-radius:13px !important;
+  background:#eee8dc !important;
+}
+
+/* 排行榜 */
+.rank-group{
+  overflow:hidden;
+}
+.rank-row{
+  border-radius:13px !important;
+  margin-bottom:8px !important;
+  padding:11px 13px !important;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.rank-row:hover{
+  transform:translateX(2px);
+}
+html[data-theme="light"] .rank-row{
+  background:linear-gradient(180deg,#ffffff,#fbf8f2) !important;
+  border:1px solid #e1dacd !important;
+}
+html[data-theme="light"] .rank-row:nth-child(1){
+  border-left:4px solid #c49a30 !important;
+}
+html[data-theme="light"] .rank-row:nth-child(2){
+  border-left:4px solid #9b9b9b !important;
+}
+html[data-theme="light"] .rank-row:nth-child(3){
+  border-left:4px solid #b66f42 !important;
+}
+
+/* 進出場清單 */
+.today-entry-item,
+.shared-open-item{
+  border-radius:14px !important;
+  padding:12px 13px !important;
+  transition:background .15s ease, transform .15s ease;
+}
+html[data-theme="light"] .today-entry-item,
+html[data-theme="light"] .shared-open-item{
+  background:#fcfaf6 !important;
+  border:1px solid #e7e0d4 !important;
+}
+html[data-theme="light"] .today-entry-item:hover,
+html[data-theme="light"] .shared-open-item:hover{
+  background:#f8f2e7 !important;
+}
+.today-entry-stock b,
+.shared-open-stock{
+  font-size:15px;
+}
+.today-entry-meta{
+  gap:7px !important;
+}
+
+/* 圖表與視覺化 */
+.chart-box,
+.visual-chart-wrap{
+  border-radius:16px !important;
+}
+html[data-theme="light"] .chart-box,
+html[data-theme="light"] .visual-chart-wrap{
+  background:linear-gradient(180deg,#fffdfa,#faf6ef) !important;
+  border:1px solid #e5ddcf !important;
+}
+.visual-tabs{
+  gap:4px !important;
+}
+.visual-tabs button{
+  border-radius:9px !important;
+}
+
+/* 表格 */
+table{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  overflow:hidden;
+}
+th{
+  font-size:12px !important;
+  letter-spacing:.15px;
+}
+td{
+  font-size:13px !important;
+}
+html[data-theme="light"] th{
+  background:#eee8dc !important;
+}
+html[data-theme="light"] tbody tr:hover td{
+  background:#f7f1e6 !important;
+}
+
+/* modal */
+.modal-card{
+  border-radius:20px !important;
+}
+html[data-theme="light"] .modal-card{
+  background:#fffdfa !important;
+  border:1px solid #ddd3c4 !important;
+  box-shadow:0 24px 60px rgba(0,0,0,.18) !important;
+}
+
+/* Footer */
+footer{
+  opacity:.86;
+  padding:18px 8px 24px !important;
+}
+
+/* 深色模式也做小幅質感提升 */
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(circle at top right,rgba(217,178,76,.08),transparent 26%),
+    #0b0b0b !important;
+}
+html[data-theme="dark"] .card{
+  border-color:rgba(217,178,76,.18) !important;
+  box-shadow:0 10px 26px rgba(0,0,0,.24);
+}
+html[data-theme="dark"] .section-title{
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(217,178,76,.12);
+}
+
+/* 手機版 */
+@media(max-width:700px){
+  .topbar{
+    padding:14px 12px !important;
+    border-radius:0 0 14px 14px;
+  }
+  .logo{
+    width:42px !important;
+    height:42px !important;
+  }
+  .grid{
+    gap:12px !important;
+  }
+  .card{
+    border-radius:16px !important;
+    padding:14px !important;
+  }
+  .section-title h2{
+    font-size:16px !important;
+  }
+  .rank-row,
+  .today-entry-item,
+  .shared-open-item{
+    padding:10px 11px !important;
+  }
+  button{
+    min-height:34px;
+  }
+  .visual-tabs{
+    overflow-x:auto;
+    flex-wrap:nowrap !important;
+    scrollbar-width:none;
+  }
+  .visual-tabs::-webkit-scrollbar{display:none;}
+  .visual-tabs button{
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+}
+
+
+/* v104：股價抓取進度 */
+#refreshAllBtn:disabled,
+[data-up]:disabled{cursor:wait;opacity:.78;}
+
 </style>
 </head>
 <body>
@@ -2894,7 +3236,6 @@ function applyTheme(theme){
     btn.setAttribute('aria-label',mode==='dark'?'切換為淺色模式':'切換為深色模式');
   }
   // Chart.js canvas needs a redraw so labels/grid remain readable after theme change.
-  try{renderCharts();}catch(e){}
   try{renderVisualAnalytics();}catch(e){}
 }
 function initTheme(){
@@ -3328,7 +3669,7 @@ function render(){
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
   setMetric('#mClosed',rows.length-openN,false);
-  renderRank(); renderCharts(); renderVisualAnalytics(); bindRows();
+  renderRank(); renderVisualAnalytics(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}
 
@@ -3423,18 +3764,20 @@ function getSharedHoldingGroups(){
 function buildSharedHoldingsCopyText(){
   const shared=getSharedHoldingGroups();
   const d=today().replaceAll('-','/');
-  const lines=[`|${d}`, ` 【分析師共同持股清單】`, ''];
+  const lines=[`|${d} 【分析師共同持股清單】`, ''];
 
   if(!shared.length){
     lines.push('目前沒有 2 位以上分析師共同持有的股票');
   }else{
-    shared.forEach(g=>{
+    shared.forEach((g,index)=>{
       const names=[...g.analysts];
       lines.push(`${g.symbol}${g.stockName?' '+g.stockName:''}｜${names.length}位｜`);
       lines.push(names.join('、'));
+      if(index<shared.length-1)lines.push('');
     });
   }
 
+  lines.push('');
   lines.push('');
   lines.push('⚠️ 停損是紀律，停利是藝術。');
   lines.push('⚠️ 位階決定勝率，部位決定存活。');
@@ -4086,11 +4429,25 @@ function sanePrice(price,reference){
   if(!Number.isFinite(reference)||reference<=0)return true;
   return Math.abs(price/reference-1)<=PRICE_MAX_DEVIATION;
 }
+const PRICE_FETCH_TIMEOUT=4500;
+
 async function fetchJsonViaProxy(url){
   const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const r=await fetch(proxy,{cache:'no-store'});
-  if(!r.ok)throw new Error(`HTTP ${r.status}`);
-  return await r.json();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+  try{
+    const r=await fetch(proxy,{
+      cache:'no-store',
+      signal:controller.signal
+    });
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  }catch(e){
+    if(e?.name==='AbortError')throw new Error('行情來源逾時');
+    throw e;
+  }finally{
+    clearTimeout(timer);
+  }
 }
 
 // TWSE / TPEx 官方 MIS。
@@ -4332,7 +4689,7 @@ async function refreshOne(id){
   const tr=trades[id];
   if(!tr)return;
   const btn=document.querySelector(`[data-up="${id}"]`);
-  if(btn){btn.disabled=true;btn.textContent='抓價中'}
+  if(btn){btn.disabled=true;btn.textContent='抓價中…'}
   try{
     let item;
     try{
@@ -4369,66 +4726,105 @@ async function refreshOne(id){
   }
 }
 
+async function runWithConcurrency(tasks,limit=4){
+  const results=new Array(tasks.length);
+  let next=0;
+  async function worker(){
+    while(true){
+      const i=next++;
+      if(i>=tasks.length)return;
+      try{results[i]=await tasks[i]();}
+      catch(e){results[i]={error:e};}
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(limit,tasks.length)},worker));
+  return results;
+}
+
 $('#refreshAllBtn').onclick=async()=>{
-  const ids=Object.keys(trades).filter(id=>calc(trades[id]).open);
-  if(!ids.length)return alert('目前沒有持有中的股票可更新');
+  const openEntries=Object.entries(trades||{}).filter(([id,tr])=>tr&&calc(tr).open);
+  if(!openEntries.length)return alert('目前沒有持有中的股票可更新');
 
   const btn=$('#refreshAllBtn');
   btn.disabled=true;
   btn.textContent='抓取價格中…';
 
-  const items=[];
-  for(const id of ids){
-    const tr=trades[id];
-    try{
-      const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
-      items.push({
-        id,
-        symbol:tr.symbol,
-        stockName:tr.stockName,
-        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
-        price:q.price,
-        source:q.source,
-        mode:q.mode
-      });
-    }catch(e){
-      items.push({
-        id,
-        symbol:tr.symbol,
-        stockName:tr.stockName,
-        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
-        price:Number(tr.currentPrice||tr.entryPrice||0),
-        source:'行情抓取失敗，可手動輸入',
-        mode:'manual'
-      });
+  try{
+    // 同一股票只抓一次，避免不同分析師持有同股時重複請求造成卡頓。
+    const uniqueMap=new Map();
+    openEntries.forEach(([id,tr])=>{
+      const symbol=String(tr.symbol||'').trim();
+      if(symbol && !uniqueMap.has(symbol)){
+        uniqueMap.set(symbol,{
+          id,
+          symbol,
+          stockName:tr.stockName,
+          oldPrice:Number(tr.currentPrice||tr.entryPrice||0)
+        });
+      }
+    });
+    const unique=[...uniqueMap.values()];
+
+    let done=0;
+    const tasks=unique.map(base=>async()=>{
+      try{
+        const q=await getLatestPrice(base.symbol,{allowIntraday:isAdmin});
+        return {...base,price:q.price,source:q.source,mode:q.mode};
+      }catch(e){
+        return {
+          ...base,
+          price:base.oldPrice,
+          source:`行情抓取失敗${e?.message?`：${e.message}`:''}，可手動輸入`,
+          mode:'manual'
+        };
+      }finally{
+        done++;
+        btn.textContent=`抓取價格中 ${done}/${unique.length}`;
+      }
+    });
+
+    // 最多同時抓 4 檔，速度較快又不會一次塞太多請求。
+    const items=await runWithConcurrency(tasks,4);
+
+    btn.disabled=false;
+    updatePriceModeUI();
+
+    const confirmed=await openPriceConfirm(items);
+    if(!confirmed)return;
+
+    btn.disabled=true;
+    btn.textContent='寫入中…';
+
+    // 同代號只寫一次；syncSameStockCurrentPrice 會同步所有分析師的同股持倉。
+    const confirmedBySymbol=new Map();
+    confirmed.forEach(item=>{
+      const symbol=String(trades[item.id]?.symbol||item.symbol||'').trim();
+      if(symbol&&!confirmedBySymbol.has(symbol))confirmedBySymbol.set(symbol,item);
+    });
+
+    let success=0,fail=0,doneWrite=0;
+    for(const item of confirmedBySymbol.values()){
+      try{
+        await writeManualOrFetchedPrice(item.id,item);
+        success++;
+      }catch(e){
+        fail++;
+        console.error('價格寫入失敗',item.symbol,e);
+      }finally{
+        doneWrite++;
+        btn.textContent=`寫入中 ${doneWrite}/${confirmedBySymbol.size}`;
+      }
     }
+
+    $('#lastRefresh').textContent=`價格更新：${nowText()}｜成功 ${success}${fail?`、失敗 ${fail}`:''}`;
+    alert(`價格更新完成\n成功：${success} 檔${fail?`\n失敗：${fail} 檔`:''}`);
+  }catch(e){
+    console.error('批次股價更新失敗',e);
+    alert(`股價更新失敗：${e?.message||'未知錯誤'}`);
+  }finally{
+    btn.disabled=false;
+    updatePriceModeUI();
   }
-
-  btn.disabled=false;
-  updatePriceModeUI();
-
-  const confirmed=await openPriceConfirm(items);
-  if(!confirmed)return;
-
-  btn.disabled=true;
-  btn.textContent='寫入中…';
-
-  let success=0,fail=0;
-  for(const item of confirmed){
-    try{
-      await writeManualOrFetchedPrice(item.id,item);
-      success++;
-    }catch(e){
-      fail++;
-      console.error('價格寫入失敗',item.symbol,e);
-    }
-  }
-
-  $('#lastRefresh').textContent=`價格更新：${nowText()}｜成功 ${success}${fail?`、失敗 ${fail}`:''}`;
-  btn.disabled=false;
-  updatePriceModeUI();
-
-  alert(`價格更新完成\n成功：${success} 筆${fail?`\n失敗：${fail} 筆`:''}\n\n所有價格皆經確認後才寫入。`);
 };
 
 document.addEventListener('click',e=>{
@@ -4668,32 +5064,54 @@ $('#quickPriceUpdateBtn')?.addEventListener('click',quickUpdateCurrentPrice);
 
 let cloudRenderTimer=null;
 let cloudFirstLoad=true;
-const CLOUD_RENDER_DELAY=30000;
+const CLOUD_RENDER_DELAY=800;
+const CLOUD_TYPING_GRACE=1200;
+const CLOUD_MAX_DEFER=5000;
+let lastUserInputAt=0;
 
-function isUserTyping(){
-  const a=document.activeElement;
-  if(!a)return false;
-  return a.matches?.('input, textarea, select, [contenteditable="true"]');
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el?.matches?.('input, textarea, [contenteditable="true"]')){
+    lastUserInputAt=Date.now();
+  }
+},true);
+
+function isUserActivelyTyping(){
+  return Date.now()-lastUserInputAt < CLOUD_TYPING_GRACE;
 }
 
 function scheduleCloudRender(){
   clearTimeout(cloudRenderTimer);
 
-  // 首次載入立即顯示；後續雲端變更延後 30 秒，避免打字被重繪。
+  // 首次載入立即顯示；後續雲端更新約 0.8 秒內刷新。
+  // 只有「真的正在輸入」時才短暫延後，不再因游標停在欄位而無限卡住。
   if(cloudFirstLoad){
     cloudFirstLoad=false;
     render();
     return;
   }
 
+  const scheduledAt=Date.now();
   cloudRenderTimer=setTimeout(function tryRender(){
-    if(isUserTyping()){
-      cloudRenderTimer=setTimeout(tryRender,4000);
+    const deferredFor=Date.now()-scheduledAt;
+    if(isUserActivelyTyping() && deferredFor<CLOUD_MAX_DEFER){
+      cloudRenderTimer=setTimeout(tryRender,500);
       return;
     }
     render();
   },CLOUD_RENDER_DELAY);
 }
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    clearTimeout(cloudRenderTimer);
+    render();
+  }
+});
+window.addEventListener('focus',()=>{
+  clearTimeout(cloudRenderTimer);
+  render();
+});
 
 onValue(
   tradesRef,

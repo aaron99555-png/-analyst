@@ -2779,6 +2779,13 @@ html[data-theme="dark"] .section-title{
   .analyst-trade-admin-actions button{width:100%;}
 }
 
+
+/* v116：手動更新價按鈕 */
+[data-up],
+[data-modal-price]{
+  cursor:pointer !important;
+}
+
 </style>
 </head>
 <body>
@@ -2794,7 +2801,7 @@ html[data-theme="dark"] .section-title{
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
 </div>
 
-        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
+        <div class="price-note"><b>更新價：自動抓 TWSE／TPEx 最新行情，失敗再用 Yahoo 備援</b>｜<b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
       <button id="adminBtn" class="primary">管理者登入</button>
@@ -3972,7 +3979,7 @@ function renderAnalystTradesModal(name){
     const tradeId=tradeIdFromObject(tr);
     const adminActions=isMainAdmin()&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">修改股價</button>
+        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新最新價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
     return `
@@ -3985,7 +3992,7 @@ function renderAnalystTradesModal(name){
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span>目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
-        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span>
+        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
       ${adminActions}
@@ -4849,26 +4856,71 @@ async function writeManualOrFetchedPrice(id,item){
 
 
 async function manualCurrentPrice(id){
-  if(!isMainAdmin())return;
+  if(!isMainAdmin()){
+    alert('更新股價功能僅限管理員1使用');
+    return false;
+  }
+
   const tr=trades[id];
-  if(!tr)return;
+  if(!tr){
+    alert('找不到這筆交易資料，請重新整理頁面後再試');
+    return false;
+  }
+
   const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
-  const input=prompt(`${tr.symbol} ${tr.stockName||''}\n請輸入目前價\n（正確價位一律以收盤為基準）`,oldPrice||'');
-  if(input===null)return;
+  const input=prompt(
+    `${tr.symbol} ${tr.stockName||''}\n請輸入新的目前價：`,
+    oldPrice||''
+  );
+  if(input===null)return false;
+
   const price=Number(input);
-  if(!Number.isFinite(price)||price<=0)return alert('請輸入正確的價格');
-  if(!confirm(`確認更新 ${tr.symbol} ${tr.stockName||''}\n目前價：${fmt(oldPrice)} → ${fmt(price)}`))return;
+  if(!Number.isFinite(price)||price<=0){
+    alert('請輸入正確的價格');
+    return false;
+  }
+
+  if(!confirm(
+    `確認更新股價？\n\n`+
+    `${tr.analyst||''}\n`+
+    `${tr.symbol} ${tr.stockName||''}\n`+
+    `目前價：${fmt(oldPrice)} → ${fmt(price)}`
+  ))return false;
+
   try{
     const result=await syncSameStockCurrentPrice(
       tr.symbol,
       price,
-      '管理者手動輸入'
+      '管理員1手動更新'
     );
-    if(result.count>1){
-      alert(`${tr.symbol} 已同步更新 ${result.count} 筆持有中資料\n更新時間：${result.updatedAt}`);
+
+    // syncSameStockCurrentPrice 已更新 Firebase + 本機資料，
+    // 再立即重畫主表與目前開啟中的排行榜分析師清單。
+    clearTimeout(cloudRenderTimer);
+    render();
+
+    if(currentAnalystModalName){
+      renderAnalystTradesModal(currentAnalystModalName);
     }
+
+    if($('#lastRefresh')){
+      $('#lastRefresh').textContent=
+        `價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(price)}｜同步 ${result.count} 筆`;
+    }
+
+    alert(
+      `✅ 股價更新完成\n\n`+
+      `${tr.symbol} ${tr.stockName||''}\n`+
+      `${fmt(oldPrice)} → ${fmt(price)}\n`+
+      `更新時間：${result.updatedAt}`+
+      (result.count>1?`\n同股同步：${result.count} 筆`:'')
+    );
+
+    return true;
   }catch(e){
-    alert(`手動更新失敗：${e?.message||'未知錯誤'}`);
+    console.error('手動更新股價失敗',e);
+    alert(`更新失敗：${e?.message||'未知錯誤'}`);
+    return false;
   }
 }
 
@@ -4877,7 +4929,7 @@ async function refreshOne(id){
   const tr=trades[id];
   if(!tr)return;
   const btn=document.querySelector(`[data-up="${id}"]`);
-  if(btn){btn.disabled=true;btn.textContent='抓價中…'}
+  if(btn){btn.disabled=true;btn.textContent='抓網路最新價…'}
   if($('#lastRefresh'))$('#lastRefresh').textContent=`正在更新 ${tr.symbol} 股價…`;
   try{
     let item;
@@ -4899,7 +4951,7 @@ async function refreshOne(id){
         stockName:tr.stockName,
         oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
         price:Number(tr.currentPrice||tr.entryPrice||0),
-        source:'行情抓取失敗，可手動輸入',
+        source:'TWSE／Yahoo 抓價失敗，可於確認視窗手動輸入',
         mode:'manual'
       };
     }
@@ -4912,7 +4964,20 @@ async function refreshOne(id){
     const newPrice=Number(finalItem.price||0);
     const result=await writeManualOrFetchedPrice(id,finalItem);
 
-    $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}${result.count>1?`｜同股同步 ${result.count} 筆`:''}`;
+    $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}｜${finalItem.source||'網路行情'}${result.count>1?`｜同股同步 ${result.count} 筆`:''}`;
+
+    // 排行榜彈窗若開啟，立刻反映新價格。
+    if(currentAnalystModalName){
+      renderAnalystTradesModal(currentAnalystModalName);
+    }
+
+    alert(
+      `✅ 已更新網路最新價格\n\n`+
+      `${tr.symbol} ${tr.stockName||''}\n`+
+      `${fmt(oldPrice)} → ${fmt(newPrice)}\n`+
+      `來源：${finalItem.source||'網路行情'}\n`+
+      `時間：${result.updatedAt}`
+    );
 
     if(oldPrice===newPrice){
       console.info(`${tr.symbol} 行情抓取成功，但價格與目前價相同：${newPrice}`);
@@ -5216,15 +5281,16 @@ document.addEventListener('click',async e=>{
   try{
     if(priceBtn){
       const id=priceBtn.dataset.modalPrice;
-      await manualCurrentPrice(id);
+      await refreshOne(id);
+      if(currentAnalystModalName){
+        renderAnalystTradesModal(currentAnalystModalName);
+      }
     }else if(settleBtn){
       const id=settleBtn.dataset.modalSettle;
       await settleTrade(id);
-    }
-
-    // Firebase 回傳前先用目前本機資料重畫；回傳後 onValue 會再次同步。
-    if(currentAnalystModalName){
-      setTimeout(()=>renderAnalystTradesModal(currentAnalystModalName),50);
+      if(currentAnalystModalName){
+        setTimeout(()=>renderAnalystTradesModal(currentAnalystModalName),150);
+      }
     }
   }catch(err){
     console.error('排行榜清單操作失敗',err);
@@ -5430,7 +5496,7 @@ document.addEventListener('click', async (e)=>{
       e.preventDefault();
       e.stopPropagation();
       if(!isMainAdmin()){
-        alert('更新股價功能僅限主管理員使用');
+        alert('更新股價功能僅限管理員1使用');
         return;
       }
       await refreshOne(upId);

@@ -2753,7 +2753,7 @@ html[data-theme="dark"] .section-title{
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">12 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新全部收盤價</button>
+        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新證交所股價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
@@ -4342,7 +4342,7 @@ function updatePriceModeUI(){
   const btn=$('#refreshAllBtn');
   const note=document.querySelector('.price-note');
   if(btn){
-    btn.textContent=isMainAdmin()?'⟳ 更新價格（盤中可即時）':'⟳ 一鍵更新全部收盤價';
+    btn.textContent=isMainAdmin()?'⟳ 一鍵更新證交所股價':'⟳ 一鍵更新證交所股價';
   }
   if(note){
     note.innerHTML=isMainAdmin()
@@ -4564,64 +4564,57 @@ async function fetchJsonViaProxy(url){
 // 交易時段內一律使用 y（前一交易日收盤），收盤完成後才使用 z（今日最後成交/收盤）。
 async function fetchTWSEPrice(sym,{allowIntraday=false}={}){
   const channels=[`tse_${sym}.tw`,`otc_${sym}.tw`];
-  for(const ch of channels){
+
+  async function fetchChannel(ch){
     const u=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${encodeURIComponent(ch)}&json=1&delay=0&_=${Date.now()}`;
+    let j=null;
+
+    // 優先直接向官方 MIS 取價；瀏覽器若因 CORS 阻擋，再使用 proxy 備援。
     try{
-      const j=await fetchJsonViaProxy(u);
-      const d=j?.msgArray?.[0];
-      if(!d || String(d.c||'').trim()!==String(sym).trim())continue;
-
-      const prev=Number(d.y);
-      const last=Number(d.z);
-      const marketOpen=isTWMarketOpen();
-      const marketName=ch.startsWith('tse_')?'TWSE':'TPEx';
-
-      // 管理者盤中可寫入即時成交價；一般使用者不允許。
-      if(marketOpen && allowIntraday && sanePrice(last,prev)){
-        return {
-          price:last,
-          reference:prev,
-          source:`${marketName} 盤中即時價`,
-          mode:'intraday'
-        };
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+      try{
+        const r=await fetch(u,{cache:'no-store',signal:controller.signal});
+        if(r.ok)j=await r.json();
+      }finally{
+        clearTimeout(timer);
       }
+    }catch(_){}
 
-      // 一般使用者盤中只能取最近一個已完成收盤價。
-      if(marketOpen && sanePrice(prev,null)){
-        return {
-          price:prev,
-          reference:prev,
-          source:`${marketName} 前一交易日收盤`,
-          mode:'closed'
-        };
-      }
+    if(!j)j=await fetchJsonViaProxy(u);
 
-      // 收盤後採最後成交/收盤價。
-      if(sanePrice(last,prev)){
-        return {
-          price:last,
-          reference:prev,
-          source:`${marketName} 收盤`,
-          mode:'closed'
-        };
-      }
+    const d=j?.msgArray?.[0];
+    if(!d || String(d.c||'').trim()!==String(sym).trim())return null;
 
-      if(sanePrice(prev,null)){
-        return {
-          price:prev,
-          reference:prev,
-          source:`${marketName} 最近收盤`,
-          mode:'closed'
-        };
-      }
-    }catch(e){
-      console.warn('官方行情失敗',ch,e);
+    const prev=Number(d.y);
+    const last=Number(d.z);
+    const marketOpen=isTWMarketOpen();
+    const marketName=ch.startsWith('tse_')?'TWSE':'TPEx';
+
+    if(marketOpen && allowIntraday && sanePrice(last,prev)){
+      return {price:last,reference:prev,source:`${marketName} 盤中即時價`,mode:'intraday'};
     }
+
+    // 收盤後優先今日最後成交價；盤中若不允許即時價則使用前一完成收盤價。
+    if(!marketOpen && sanePrice(last,prev)){
+      return {price:last,reference:prev,source:`${marketName} 官方收盤價`,mode:'closed'};
+    }
+    if(Number.isFinite(prev)&&prev>0){
+      return {price:prev,reference:prev,source:`${marketName} 最近完成收盤價`,mode:'closed'};
+    }
+    if(Number.isFinite(last)&&last>0){
+      return {price:last,reference:prev,source:`${marketName} 官方行情`,mode:marketOpen?'intraday':'closed'};
+    }
+    return null;
   }
-  throw new Error('TWSE/TPEx price failed');
+
+  // 上市與上櫃平行查詢，避免逐一等待造成一鍵更新卡住。
+  const results=await Promise.allSettled(channels.map(fetchChannel));
+  const found=results.find(x=>x.status==='fulfilled'&&x.value?.price>0);
+  if(found)return found.value;
+  throw new Error('TWSE / TPEx official MIS failed');
 }
 
-// Yahoo 僅做備援；只允許台灣市場 .TW / .TWO，不再嘗試裸代號。
 async function fetchYahooClose(sym){
   const candidates=[`${sym}.TW`,`${sym}.TWO`];
   for(const s of candidates){
@@ -4890,7 +4883,7 @@ $('#refreshAllBtn').onclick=async()=>{
 
   const btn=$('#refreshAllBtn');
   btn.disabled=true;
-  btn.textContent='抓取價格中…';
+  btn.textContent='證交所抓價中…';
 
   try{
     // 同一股票只抓一次，避免不同分析師持有同股時重複請求造成卡頓。
@@ -4922,7 +4915,7 @@ $('#refreshAllBtn').onclick=async()=>{
         };
       }finally{
         done++;
-        btn.textContent=`抓取價格中 ${done}/${unique.length}`;
+        btn.textContent=`證交所抓價中 ${done}/${unique.length}`;
       }
     });
 
@@ -4936,7 +4929,7 @@ $('#refreshAllBtn').onclick=async()=>{
     if(!confirmed)return;
 
     btn.disabled=true;
-    btn.textContent='寫入中…';
+    btn.textContent='寫入股價與時間中…';
 
     // 同代號只寫一次；syncSameStockCurrentPrice 會同步所有分析師的同股持倉。
     const confirmedBySymbol=new Map();

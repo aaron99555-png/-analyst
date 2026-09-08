@@ -2028,6 +2028,376 @@ body{
   .date-card-title .date-query-box{width:100%;}
 }
 
+
+/* v97：深色 / 淺色模式 */
+.theme-toggle-btn{white-space:nowrap;min-width:108px;}
+html[data-theme="light"]{
+  --bg:#f3f1eb;
+  --card:#ffffff;
+  --card2:#f8f6f0;
+  --text:#171717;
+  --muted:#66645f;
+  --line:#d9d4c8;
+  --gold:#9b7618;
+  --gold2:#b58a20;
+}
+html[data-theme="light"] body{
+  background:#f3f1eb !important;
+  color:#171717 !important;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .chart-box,
+html[data-theme="light"] .rank-group,
+html[data-theme="light"] .today-entry-item,
+html[data-theme="light"] .shared-open-item,
+html[data-theme="light"] .modal-card{
+  background:#fff !important;
+  color:#171717 !important;
+  border-color:#d9d4c8 !important;
+  box-shadow:0 7px 24px rgba(0,0,0,.07);
+}
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] b,
+html[data-theme="light"] .rank-name,
+html[data-theme="light"] .rank-value,
+html[data-theme="light"] .today-entry-stock,
+html[data-theme="light"] .visual-chart-title,
+html[data-theme="light"] .shared-open-stock{
+  color:#171717;
+}
+html[data-theme="light"] .sub,
+html[data-theme="light"] .status,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .k,
+html[data-theme="light"] .chart-scope-note,
+html[data-theme="light"] .rank-rule-note,
+html[data-theme="light"] .price-note,
+html[data-theme="light"] label{
+  color:#67635a !important;
+}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{
+  background:#fff !important;
+  color:#171717 !important;
+  border-color:#c9c3b6 !important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{color:#8b877e !important;}
+html[data-theme="light"] table{color:#171717;}
+html[data-theme="light"] th{
+  background:#eee9de !important;
+  color:#332d20 !important;
+  border-color:#d4cdbf !important;
+}
+html[data-theme="light"] td{
+  background:#fff !important;
+  color:#252525;
+  border-color:#e3ded4 !important;
+}
+html[data-theme="light"] tr:nth-child(even) td{background:#faf8f3 !important;}
+html[data-theme="light"] .stock-link,
+html[data-theme="light"] a{color:#795b10;}
+html[data-theme="light"] button.ghost,
+html[data-theme="light"] .mini.ghost{
+  background:#fff !important;
+  color:#3b3529 !important;
+  border-color:#bdb5a5 !important;
+}
+html[data-theme="light"] .visual-tabs,
+html[data-theme="light"] .rank-metric-switch{
+  background:#ebe6dc !important;
+  border-color:#cfc6b5 !important;
+}
+html[data-theme="light"] .visual-tabs button,
+html[data-theme="light"] .rank-metric-switch button{color:#5e594f;}
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active{
+  color:#111 !important;
+}
+html[data-theme="light"] .pill.open{color:#8b1c1c;}
+html[data-theme="light"] .pill.closed{color:#4b4b4b;}
+html[data-theme="light"] .pos{color:#c21f2f !important;}
+html[data-theme="light"] .neg{color:#168344 !important;}
+html[data-theme="light"] .topbar{
+  border-bottom-color:#d8d1c3 !important;
+}
+html[data-theme="light"] .rank-row,
+html[data-theme="light"] .shared-open-analyst{
+  border-color:#e0dbd0 !important;
+}
+@media(max-width:700px){
+  .theme-toggle-btn{min-width:0;}
+}
+
+
+/* v98：淺色模式全面可讀性修正 */
+html[data-theme="light"]{
+  color-scheme:light;
+}
+html[data-theme="light"] body,
+html[data-theme="light"] .wrap,
+html[data-theme="light"] .grid,
+html[data-theme="light"] section,
+html[data-theme="light"] div,
+html[data-theme="light"] p,
+html[data-theme="light"] span{
+  --text:#161616;
+  --muted:#5f5b52;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .card *,
+html[data-theme="light"] .today-entry-item *,
+html[data-theme="light"] .rank-row *,
+html[data-theme="light"] .shared-open-item *,
+html[data-theme="light"] .modal-card *{
+  text-shadow:none !important;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .card p,
+html[data-theme="light"] .card span:not(.pos):not(.neg):not(.pill):not(.status),
+html[data-theme="light"] .card div:not(.pos):not(.neg),
+html[data-theme="light"] .modal-card,
+html[data-theme="light"] .modal-card p,
+html[data-theme="light"] .modal-card div,
+html[data-theme="light"] .modal-card span:not(.pos):not(.neg):not(.pill){
+  color:#202020;
+}
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] .brand,
+html[data-theme="light"] .brand *,
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .section-title h2,
+html[data-theme="light"] .rank-name,
+html[data-theme="light"] .rank-group-title,
+html[data-theme="light"] .rank-value,
+html[data-theme="light"] .today-analyst,
+html[data-theme="light"] .today-price,
+html[data-theme="light"] .today-entry-stock,
+html[data-theme="light"] .visual-chart-title,
+html[data-theme="light"] .no-trade-msg{
+  color:#171717 !important;
+}
+html[data-theme="light"] .sub,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .k,
+html[data-theme="light"] .status,
+html[data-theme="light"] .chart-scope-note,
+html[data-theme="light"] .rank-rule-note,
+html[data-theme="light"] .rank-period,
+html[data-theme="light"] .price-note,
+html[data-theme="light"] .shared-open-empty,
+html[data-theme="light"] .today-empty-message,
+html[data-theme="light"] label{
+  color:#5b574f !important;
+}
+html[data-theme="light"] .baseline-title-note{
+  color:#735812 !important;
+}
+html[data-theme="light"] table,
+html[data-theme="light"] tbody,
+html[data-theme="light"] tr{
+  color:#1d1d1d !important;
+}
+html[data-theme="light"] td,
+html[data-theme="light"] td *,
+html[data-theme="light"] tbody button:not(.primary):not(.danger){
+  color:#252525;
+}
+html[data-theme="light"] th,
+html[data-theme="light"] th *{
+  color:#302b21 !important;
+}
+html[data-theme="light"] .pos,
+html[data-theme="light"] .pos *{
+  color:#b51226 !important;
+}
+html[data-theme="light"] .neg,
+html[data-theme="light"] .neg *{
+  color:#08763a !important;
+}
+html[data-theme="light"] .stock-link,
+html[data-theme="light"] .shared-open-stock,
+html[data-theme="light"] a.stock-link{
+  color:#6f5100 !important;
+  text-decoration-color:#a88932;
+}
+html[data-theme="light"] .pill.open{
+  background:#f9e7e8 !important;
+  color:#9e1725 !important;
+  border-color:#e9b9bd !important;
+}
+html[data-theme="light"] .pill.closed{
+  background:#ecebea !important;
+  color:#454545 !important;
+  border-color:#ccc8c1 !important;
+}
+html[data-theme="light"] .exit-kind.partial{
+  background:#fff2d6 !important;
+  color:#725000 !important;
+}
+html[data-theme="light"] .exit-kind.full{
+  background:#ecebea !important;
+  color:#404040 !important;
+}
+html[data-theme="light"] .shared-open-analyst{
+  background:#f1eee7 !important;
+  color:#39352e !important;
+}
+html[data-theme="light"] button:not(.primary):not(.danger):not(.active),
+html[data-theme="light"] .mini:not(.primary):not(.danger):not(.active){
+  color:#353129 !important;
+}
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active{
+  color:#111 !important;
+}
+html[data-theme="light"] button.danger{
+  color:#fff !important;
+}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] option{
+  color:#171717 !important;
+  background:#fff !important;
+  -webkit-text-fill-color:#171717 !important;
+}
+html[data-theme="light"] input:disabled,
+html[data-theme="light"] select:disabled{
+  color:#555 !important;
+  -webkit-text-fill-color:#555 !important;
+  opacity:1;
+}
+html[data-theme="light"] .visual-tabs button,
+html[data-theme="light"] .rank-metric-switch button{
+  color:#4e493f !important;
+}
+html[data-theme="light"] canvas{
+  filter:none !important;
+}
+
+
+/* v99：淺色模式按鈕全面修正，避免黑底黑字/深色按鈕看不清楚 */
+html[data-theme="light"] button,
+html[data-theme="light"] input[type="button"],
+html[data-theme="light"] input[type="submit"]{
+  background:#f7f4ec !important;
+  color:#25221c !important;
+  border:1px solid #bdb5a5 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  -webkit-text-fill-color:#25221c !important;
+}
+html[data-theme="light"] button:hover,
+html[data-theme="light"] input[type="button"]:hover,
+html[data-theme="light"] input[type="submit"]:hover{
+  background:#ece6d8 !important;
+  color:#111 !important;
+  border-color:#9f8c60 !important;
+}
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .primary{
+  background:#b78b22 !important;
+  color:#111 !important;
+  border-color:#9a7317 !important;
+  -webkit-text-fill-color:#111 !important;
+}
+html[data-theme="light"] button.danger,
+html[data-theme="light"] .danger{
+  background:#b4232f !important;
+  color:#fff !important;
+  border-color:#981d27 !important;
+  -webkit-text-fill-color:#fff !important;
+}
+html[data-theme="light"] button.active,
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active,
+html[data-theme="light"] .analyst-chip.active{
+  background:#d7b354 !important;
+  color:#17130a !important;
+  border-color:#a98324 !important;
+  -webkit-text-fill-color:#17130a !important;
+}
+html[data-theme="light"] .analyst-chip{
+  background:#fff !important;
+  color:#363128 !important;
+  border-color:#c8c0b0 !important;
+  -webkit-text-fill-color:#363128 !important;
+}
+html[data-theme="light"] .mini,
+html[data-theme="light"] .ghost,
+html[data-theme="light"] .mini.ghost,
+html[data-theme="light"] .theme-toggle-btn,
+html[data-theme="light"] .today-delete-btn:not(.danger){
+  background:#fff !important;
+  color:#302c24 !important;
+  border-color:#bbb2a1 !important;
+  -webkit-text-fill-color:#302c24 !important;
+}
+html[data-theme="light"] button:disabled{
+  background:#e8e5df !important;
+  color:#777 !important;
+  border-color:#d0ccc4 !important;
+  -webkit-text-fill-color:#777 !important;
+  opacity:1 !important;
+}
+html[data-theme="light"] .visual-tabs,
+html[data-theme="light"] .rank-metric-switch{
+  background:#eee9df !important;
+}
+
+
+/* v100：淺色模式－總績效排行區塊全面提亮 */
+html[data-theme="light"] .rank-group,
+html[data-theme="light"] .rank-card,
+html[data-theme="light"] .ranking-card,
+html[data-theme="light"] .podium,
+html[data-theme="light"] .podium-item,
+html[data-theme="light"] .rank-row{
+  background:#ffffff !important;
+  color:#1b1b1b !important;
+  border-color:#d8d1c3 !important;
+  box-shadow:0 5px 16px rgba(0,0,0,.06) !important;
+}
+html[data-theme="light"] .rank-group *,
+html[data-theme="light"] .rank-card *,
+html[data-theme="light"] .ranking-card *,
+html[data-theme="light"] .podium *,
+html[data-theme="light"] .podium-item *,
+html[data-theme="light"] .rank-row *{
+  text-shadow:none !important;
+}
+html[data-theme="light"] .rank-group-title,
+html[data-theme="light"] .rank-title,
+html[data-theme="light"] .rank-name,
+html[data-theme="light"] .rank-value,
+html[data-theme="light"] .rank-row{
+  color:#1b1b1b !important;
+}
+html[data-theme="light"] .rank-period,
+html[data-theme="light"] .rank-sub,
+html[data-theme="light"] .rank-meta{
+  color:#5f5a50 !important;
+}
+/* 保留台股慣例：獲利紅、虧損綠 */
+html[data-theme="light"] .rank-group .pos,
+html[data-theme="light"] .rank-row .pos,
+html[data-theme="light"] .podium .pos{
+  color:#b51226 !important;
+}
+html[data-theme="light"] .rank-group .neg,
+html[data-theme="light"] .rank-row .neg,
+html[data-theme="light"] .podium .neg{
+  color:#08763a !important;
+}
+
 </style>
 </head>
 <body>
@@ -2045,6 +2415,7 @@ body{
 
         <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
+      <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
       <button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>
@@ -2511,6 +2882,31 @@ document.addEventListener('click',e=>{
 });
 
 
+
+const THEME_KEY='analystPerformanceTheme';
+function applyTheme(theme){
+  const mode=theme==='light'?'light':'dark';
+  document.documentElement.dataset.theme=mode;
+  try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
+  const btn=$('#themeToggleBtn');
+  if(btn){
+    btn.textContent=mode==='dark'?'☀ 淺色模式':'☾ 深色模式';
+    btn.setAttribute('aria-label',mode==='dark'?'切換為淺色模式':'切換為深色模式');
+  }
+  // Chart.js canvas needs a redraw so labels/grid remain readable after theme change.
+  try{renderCharts();}catch(e){}
+  try{renderVisualAnalytics();}catch(e){}
+}
+function initTheme(){
+  let saved='light';
+  try{saved=localStorage.getItem(THEME_KEY)||'light';}catch(e){}
+  applyTheme(saved);
+}
+$('#themeToggleBtn')?.addEventListener('click',()=>{
+  applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+});
+initTheme();
+
 let visualMode='profitcompare';
 let visualAnalyticsChart=null;
 let visualSelectedAnalyst='';
@@ -2526,19 +2922,30 @@ function destroyVisualChart(){
   }
 }
 
+function visualThemeColors(){
+  const light=document.documentElement.dataset.theme==='light';
+  return {
+    text:light?'#34312b':'#f6f0df',
+    muted:light?'#5e594f':'#b9b4a8',
+    grid:light?'rgba(90,75,40,.14)':'rgba(217,178,76,.10)',
+    angle:light?'rgba(90,75,40,.18)':'rgba(217,178,76,.16)'
+  };
+}
+
 function visualBaseOptions(horizontal=false){
+  const tc=visualThemeColors();
   return {
     responsive:true,
     maintainAspectRatio:false,
     indexAxis:horizontal?'y':'x',
     interaction:{mode:'nearest',intersect:false},
     plugins:{
-      legend:{labels:{color:'#f6f0df',boxWidth:12,font:{size:10}}},
+      legend:{labels:{color:tc.text,boxWidth:12,font:{size:10}}},
       tooltip:{callbacks:{}}
     },
     scales:{
-      x:{ticks:{color:'#b9b4a8',font:{size:10}},grid:{color:'rgba(217,178,76,.08)'}},
-      y:{ticks:{color:'#b9b4a8',font:{size:10}},grid:{color:'rgba(217,178,76,.10)'}}
+      x:{ticks:{color:tc.muted,font:{size:10}},grid:{color:tc.grid}},
+      y:{ticks:{color:tc.muted,font:{size:10}},grid:{color:tc.grid}}
     }
   };
 }
@@ -2705,15 +3112,15 @@ function renderVisualAnalytics(){
       options:{
         responsive:true,
         maintainAspectRatio:false,
-        plugins:{legend:{labels:{color:'#f6f0df',font:{size:11}}}},
+        plugins:{legend:{labels:{color:visualThemeColors().text,font:{size:11}}}},
         scales:{r:{
           beginAtZero:true,
           min:0,
           max:100,
           ticks:{display:false,stepSize:20},
-          angleLines:{color:'rgba(217,178,76,.16)'},
-          grid:{color:'rgba(217,178,76,.18)'},
-          pointLabels:{color:'#f6f0df',font:{size:12,weight:'700'}}
+          angleLines:{color:visualThemeColors().angle},
+          grid:{color:visualThemeColors().grid},
+          pointLabels:{color:visualThemeColors().text,font:{size:12,weight:'700'}}
         }}
       }
     });
@@ -2759,7 +3166,7 @@ function renderVisualAnalytics(){
         maintainAspectRatio:false,
         cutout:'62%',
         plugins:{
-          legend:{position:'bottom',labels:{color:'#f6f0df',padding:16,font:{size:11}}},
+          legend:{position:'bottom',labels:{color:visualThemeColors().text,padding:16,font:{size:11}}},
           tooltip:{callbacks:{label:ctx=>`${ctx.label}：${ctx.raw} 筆`}}
         }
       }

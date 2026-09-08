@@ -2963,14 +2963,16 @@ const isAdmin2=()=>isAdmin&&adminRole==='admin2';
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 
 const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰'];
-const ADMIN2_ANALYSTS=['團團'];
+const ALL_ANALYSTS=[...PUBLIC_ANALYSTS,'團團'];
 
 function visibleAnalystNames(){
-  return isAdmin2()?ADMIN2_ANALYSTS:PUBLIC_ANALYSTS;
+  // 管理者2可查看全部分析師；一般使用者與主要管理者不顯示團團
+  return isAdmin2()?ALL_ANALYSTS:PUBLIC_ANALYSTS;
 }
 function canViewTrade(t){
   if(!t)return false;
-  return isAdmin2()?t.analyst==='團團':t.analyst!=='團團';
+  // 管理者2可查看全部資料，其餘角色排除團團
+  return isAdmin2()?true:t.analyst!=='團團';
 }
 function refreshAnalystVisibilityOptions(){
   const names=visibleAnalystNames();
@@ -4263,7 +4265,7 @@ function setAdmin(v,role=''){
     }
   }
   const formTitle=$('#formTitle');
-  if(formTitle)formTitle.textContent=isAdmin2()?'新增團團交易':'新增交易';
+  if(formTitle)formTitle.textContent=isAdmin2()?'新增團團交易（不可修改既有資料）':'新增交易';
   $$('.main-admin-form-only').forEach(x=>x.classList.toggle('hidden',isAdmin2()));
   refreshAnalystVisibilityOptions();
   render();

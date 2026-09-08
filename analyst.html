@@ -2801,7 +2801,7 @@ html[data-theme="dark"] .section-title{
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
 </div>
 
-        <div class="price-note"><b>更新價：自動抓 TWSE／TPEx 最新行情，失敗再用 Yahoo 備援</b>｜<b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
+        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
       <button id="adminBtn" class="primary">管理者登入</button>
@@ -3979,7 +3979,7 @@ function renderAnalystTradesModal(name){
     const tradeId=tradeIdFromObject(tr);
     const adminActions=isMainAdmin()&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新最新價</button>
+        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
     return `
@@ -3992,7 +3992,7 @@ function renderAnalystTradesModal(name){
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span>目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
-        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
+        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
       ${adminActions}
@@ -4929,7 +4929,7 @@ async function refreshOne(id){
   const tr=trades[id];
   if(!tr)return;
   const btn=document.querySelector(`[data-up="${id}"]`);
-  if(btn){btn.disabled=true;btn.textContent='抓網路最新價…'}
+  if(btn){btn.disabled=true;btn.textContent='抓價中…'}
   if($('#lastRefresh'))$('#lastRefresh').textContent=`正在更新 ${tr.symbol} 股價…`;
   try{
     let item;
@@ -4951,7 +4951,7 @@ async function refreshOne(id){
         stockName:tr.stockName,
         oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
         price:Number(tr.currentPrice||tr.entryPrice||0),
-        source:'TWSE／Yahoo 抓價失敗，可於確認視窗手動輸入',
+        source:'行情抓取失敗，可手動輸入',
         mode:'manual'
       };
     }
@@ -4964,20 +4964,7 @@ async function refreshOne(id){
     const newPrice=Number(finalItem.price||0);
     const result=await writeManualOrFetchedPrice(id,finalItem);
 
-    $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}｜${finalItem.source||'網路行情'}${result.count>1?`｜同股同步 ${result.count} 筆`:''}`;
-
-    // 排行榜彈窗若開啟，立刻反映新價格。
-    if(currentAnalystModalName){
-      renderAnalystTradesModal(currentAnalystModalName);
-    }
-
-    alert(
-      `✅ 已更新網路最新價格\n\n`+
-      `${tr.symbol} ${tr.stockName||''}\n`+
-      `${fmt(oldPrice)} → ${fmt(newPrice)}\n`+
-      `來源：${finalItem.source||'網路行情'}\n`+
-      `時間：${result.updatedAt}`
-    );
+    $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}${result.count>1?`｜同股同步 ${result.count} 筆`:''}`;
 
     if(oldPrice===newPrice){
       console.info(`${tr.symbol} 行情抓取成功，但價格與目前價相同：${newPrice}`);
@@ -5281,10 +5268,7 @@ document.addEventListener('click',async e=>{
   try{
     if(priceBtn){
       const id=priceBtn.dataset.modalPrice;
-      await refreshOne(id);
-      if(currentAnalystModalName){
-        renderAnalystTradesModal(currentAnalystModalName);
-      }
+      await manualCurrentPrice(id);
     }else if(settleBtn){
       const id=settleBtn.dataset.modalSettle;
       await settleTrade(id);
@@ -5499,7 +5483,7 @@ document.addEventListener('click', async (e)=>{
         alert('更新股價功能僅限管理員1使用');
         return;
       }
-      await refreshOne(upId);
+      await manualCurrentPrice(upId);
       return;
     }
     if(settleId){
@@ -5560,7 +5544,7 @@ document.addEventListener('click',async e=>{
 
   btn.dataset.priceClickRunning='1';
   try{
-    await refreshOne(id);
+    await manualCurrentPrice(id);
   }catch(err){
     console.error('單筆股價更新失敗',err);
     alert('更新股價失敗：'+(err?.message||'未知錯誤'));

@@ -2807,7 +2807,7 @@ html[data-theme="dark"] .section-title{
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
 </div>
 
-        <div class="price-note"><b>更新價：自動抓 TWSE／TPEx 最新行情，失敗再用 Yahoo 備援</b>｜<b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
+        <div class="price-note"><b>更新目前價：每次重新抓網路最新行情；全部來源失敗時改由手動輸入，不沿用舊價格</b>｜<b>盤中以最新成交價為主</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
       <button id="adminBtn" class="primary">管理者登入</button>
@@ -3845,7 +3845,7 @@ function render(){
     html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span>${fmt(t.currentPrice||t.entryPrice)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
-</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${isMainAdmin()&&c.open?`<button class="mini" data-up="${id}">更新價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
+</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${isMainAdmin()&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
@@ -4028,7 +4028,7 @@ function renderAnalystTradesModal(name){
     const tradeId=tradeIdFromObject(tr);
     const adminActions=isMainAdmin()&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新最新價</button>
+        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新目前價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
     return `
@@ -4933,8 +4933,7 @@ async function syncSameStockCurrentPrice(symbol,price,source){
   const sameStockIds=Object.entries(trades||{})
     .filter(([tid,tr])=>{
       if(!tr)return false;
-      return canViewTrade(tr)
-        && String(tr.symbol||'').trim().toUpperCase()===normalized
+      return String(tr.symbol||'').trim().toUpperCase()===normalized
         && calc(tr).open;
     })
     .map(([tid])=>tid);
@@ -5049,88 +5048,131 @@ async function manualCurrentPrice(id){
   }
 }
 
-async function refreshOne(id){
-  if(!isMainAdmin())return alert('更新股價功能僅限管理員1使用');
-  const tr=trades[id];
-  if(!tr)return alert('找不到交易資料');
 
+async function promptManualPriceAfterFetchFailure(id,fetchError){
+  const tr=trades[id];
+  if(!tr)throw new Error('找不到交易資料');
+
+  const symbol=String(tr.symbol||'').trim();
+  const stockName=String(tr.stockName||'').trim();
+  const reason=String(fetchError?.message||'網路行情抓取失敗');
+
+  const input=prompt(
+    `⚠️ ${symbol} ${stockName}\n網路最新價格抓取失敗。\n\n原因：${reason}\n\n請手動輸入目前價：`,
+    ''
+  );
+
+  // 使用者取消：不更新，絕不沿用舊價格。
+  if(input===null)return {updated:false,cancelled:true};
+
+  const price=Number(String(input).trim());
+  if(!Number.isFinite(price)||price<=0){
+    alert('價格格式不正確，本次不更新；原有價格保持不變。');
+    return {updated:false,invalid:true};
+  }
+
+  const result=await syncSameStockCurrentPrice(
+    symbol,
+    price,
+    '網路抓價失敗－管理員手動輸入'
+  );
+
+  clearTimeout(cloudRenderTimer);
+  render();
+  if(currentAnalystModalName)renderAnalystTradesModal(currentAnalystModalName);
+
+  if($('#lastRefresh')){
+    $('#lastRefresh').textContent=
+      `價格更新：${result.updatedAt}｜${symbol} → ${fmt(price)}｜手動輸入｜同步 ${result.count} 筆`;
+  }
+
+  alert(
+    `✅ 已改用手動價格更新\n\n`+
+    `${symbol} ${stockName}\n`+
+    `目前價：${fmt(price)}\n`+
+    `更新時間：${result.updatedAt}\n`+
+    `同代號同步：${result.count} 筆`
+  );
+
+  return {updated:true,manual:true,...result};
+}
+
+async function refreshOne(id){
+  if(!isMainAdmin()){
+    alert('更新目前價功能僅限管理員1使用');
+    return;
+  }
+
+  const tr=trades[id];
+  if(!tr){
+    alert('找不到交易資料');
+    return;
+  }
+
+  const symbol=String(tr.symbol||'').trim();
+  const stockName=String(tr.stockName||'').trim();
   const btn=document.querySelector(`[data-up="${id}"],[data-modal-price="${id}"]`);
-  const oldText=btn?.textContent||'更新價';
-  if(btn){btn.disabled=true;btn.textContent='抓最新價…';}
+  const oldText=btn?.textContent||'更新目前價';
+
+  if(btn){
+    btn.disabled=true;
+    btn.textContent='網路抓價中…';
+  }
+
+  if($('#lastRefresh')){
+    $('#lastRefresh').textContent=`正在重新抓取 ${symbol} 最新價格…`;
+  }
 
   try{
-    const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
-    const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
-    const newPrice=Number(q.price);
-    if(!(newPrice>0))throw new Error('抓到的價格格式異常');
+    // 每次點擊都重新走網路來源；各來源本身皆帶 no-store / timestamp 防快取。
+    const q=await getLatestPrice(symbol,{allowIntraday:true});
+    const newPrice=Number(q?.price);
 
-    const result=await writeManualOrFetchedPrice(id,{
-      id,
-      symbol:tr.symbol,
-      stockName:tr.stockName,
-      oldPrice,
-      price:newPrice,
-      source:q.source||'Google Finance',
-      mode:q.mode||'latest'
-    });
+    if(!Number.isFinite(newPrice)||newPrice<=0){
+      throw new Error('網路行情沒有回傳有效價格');
+    }
+
+    // 只有抓取成功才寫入；同代號所有「持有中」部位一起更新。
+    const result=await syncSameStockCurrentPrice(
+      symbol,
+      newPrice,
+      q.source||'網路最新行情'
+    );
 
     clearTimeout(cloudRenderTimer);
     render();
     if(currentAnalystModalName)renderAnalystTradesModal(currentAnalystModalName);
 
     if($('#lastRefresh')){
-      $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}｜${q.source||'Google Finance'}`;
+      $('#lastRefresh').textContent=
+        `價格更新：${result.updatedAt}｜${symbol} → ${fmt(newPrice)}｜${q.source||'網路最新行情'}｜同步 ${result.count} 筆`;
     }
 
-    alert(`✅ 最新價格已更新\n\n${tr.symbol} ${tr.stockName||''}\n${fmt(oldPrice)} → ${fmt(newPrice)}\n來源：${q.source||'Google Finance'}\n時間：${result.updatedAt}`);
-  }catch(e){
-    console.error('自動抓取最新價格失敗',tr.symbol,e);
-
-    // v121：自動抓價失敗時，立即提供手動輸入。
-    const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
-    const input=prompt(
-      `❌ ${tr.symbol} ${tr.stockName||''} 自動抓價失敗\n\n`+
-      `${e?.message||'行情來源暫時無法使用'}\n\n`+
-      `請直接手動輸入目前價格：`,
-      oldPrice||''
+    alert(
+      `✅ 已取得網路最新價格\n\n`+
+      `${symbol} ${stockName}\n`+
+      `目前價：${fmt(newPrice)}\n`+
+      `來源：${q.source||'網路最新行情'}\n`+
+      `更新時間：${result.updatedAt}\n`+
+      `同代號同步：${result.count} 筆`
     );
 
-    if(input!==null){
-      const manualPrice=Number(String(input).trim());
-      if(!Number.isFinite(manualPrice)||manualPrice<=0){
-        alert('⚠️ 手動更新取消：請輸入正確的價格。');
-      }else{
-        try{
-          const result=await syncSameStockCurrentPrice(
-            tr.symbol,
-            manualPrice,
-            '自動抓價失敗－手動輸入'
-          );
+  }catch(fetchError){
+    console.warn(`${symbol} 網路抓價失敗，改由手動輸入`,fetchError);
 
-          clearTimeout(cloudRenderTimer);
-          render();
-          if(currentAnalystModalName)renderAnalystTradesModal(currentAnalystModalName);
-
-          if($('#lastRefresh')){
-            $('#lastRefresh').textContent=
-              `價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(manualPrice)}｜手動輸入`;
-          }
-
-          alert(
-            `✅ 手動價格更新完成\n\n`+
-            `${tr.symbol} ${tr.stockName||''}\n`+
-            `${fmt(oldPrice)} → ${fmt(manualPrice)}\n`+
-            `更新時間：${result.updatedAt}`+
-            (result.count>1?`\n同股同步：${result.count} 筆`:'')
-          );
-        }catch(manualErr){
-          console.error('自動抓價失敗後手動寫入也失敗',manualErr);
-          alert(`❌ 手動價格寫入失敗\n\n${manualErr?.message||'未知錯誤'}`);
-        }
-      }
+    if($('#lastRefresh')){
+      $('#lastRefresh').textContent=
+        `${symbol} 網路抓價失敗，等待手動輸入目前價`;
     }
+
+    // 重要：抓價失敗時，不帶入舊價格，也不自動寫入任何價格。
+    await promptManualPriceAfterFetchFailure(id,fetchError);
+
   }finally{
-    if(btn){btn.disabled=false;btn.textContent=oldText;}
+    if(btn){
+      btn.disabled=false;
+      btn.textContent=oldText;
+    }
   }
 }
 async function runWithConcurrency(tasks,limit=4){
@@ -5549,7 +5591,6 @@ $('#quickPriceValue')?.addEventListener('keydown',e=>{
   }
 });
 $('#quickPriceUpdateBtn')?.addEventListener('click',quickUpdateCurrentPrice);
-if($('#quickPriceUpdateBtn'))$('#quickPriceUpdateBtn').onclick=quickUpdateCurrentPrice;
 
 let cloudRenderTimer=null;
 let cloudFirstLoad=true;

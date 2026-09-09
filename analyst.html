@@ -5084,7 +5084,51 @@ async function refreshOne(id){
 
     alert(`✅ 最新價格已更新\n\n${tr.symbol} ${tr.stockName||''}\n${fmt(oldPrice)} → ${fmt(newPrice)}\n來源：${q.source||'Google Finance'}\n時間：${result.updatedAt}`);
   }catch(e){
-    alert(`❌ ${tr.symbol} 抓不到最新價格\n\n${e?.message||'未知錯誤'}\n\n請確認「Google Finance 抓價設定」已填入 Apps Script Web App 網址。`);
+    console.error('自動抓取最新價格失敗',tr.symbol,e);
+
+    // v121：自動抓價失敗時，立即提供手動輸入。
+    const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
+    const input=prompt(
+      `❌ ${tr.symbol} ${tr.stockName||''} 自動抓價失敗\n\n`+
+      `${e?.message||'行情來源暫時無法使用'}\n\n`+
+      `請直接手動輸入目前價格：`,
+      oldPrice||''
+    );
+
+    if(input!==null){
+      const manualPrice=Number(String(input).trim());
+      if(!Number.isFinite(manualPrice)||manualPrice<=0){
+        alert('⚠️ 手動更新取消：請輸入正確的價格。');
+      }else{
+        try{
+          const result=await syncSameStockCurrentPrice(
+            tr.symbol,
+            manualPrice,
+            '自動抓價失敗－手動輸入'
+          );
+
+          clearTimeout(cloudRenderTimer);
+          render();
+          if(currentAnalystModalName)renderAnalystTradesModal(currentAnalystModalName);
+
+          if($('#lastRefresh')){
+            $('#lastRefresh').textContent=
+              `價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(manualPrice)}｜手動輸入`;
+          }
+
+          alert(
+            `✅ 手動價格更新完成\n\n`+
+            `${tr.symbol} ${tr.stockName||''}\n`+
+            `${fmt(oldPrice)} → ${fmt(manualPrice)}\n`+
+            `更新時間：${result.updatedAt}`+
+            (result.count>1?`\n同股同步：${result.count} 筆`:'')
+          );
+        }catch(manualErr){
+          console.error('自動抓價失敗後手動寫入也失敗',manualErr);
+          alert(`❌ 手動價格寫入失敗\n\n${manualErr?.message||'未知錯誤'}`);
+        }
+      }
+    }
   }finally{
     if(btn){btn.disabled=false;btn.textContent=oldText;}
   }

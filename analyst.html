@@ -2786,6 +2786,12 @@ html[data-theme="dark"] .section-title{
   cursor:pointer !important;
 }
 
+
+.gf-settings-row{display:grid;grid-template-columns:minmax(240px,1fr) auto auto;gap:8px;align-items:center;margin-top:10px}
+.gf-settings-row input{width:100%;min-width:0}
+#googleFinanceApiStatus{margin-top:8px;font-size:12px}
+@media(max-width:700px){.gf-settings-row{grid-template-columns:1fr}.gf-settings-row button{width:100%}}
+
 </style>
 </head>
 <body>
@@ -2801,7 +2807,7 @@ html[data-theme="dark"] .section-title{
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
 </div>
 
-        <div class="price-note"><b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
+        <div class="price-note"><b>更新價：自動抓 TWSE／TPEx 最新行情，失敗再用 Yahoo 備援</b>｜<b>正確價位一律以收盤為基準</b>｜一般使用者僅更新已完成收盤價</div>
       </div>
       <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
       <button id="adminBtn" class="primary">管理者登入</button>
@@ -2925,7 +2931,22 @@ html[data-theme="dark"] .section-title{
 
     
 
-    <section class="card span12 admin-only hidden quick-price-card" id="quickPriceCard">
+    
+<section class="card span12 admin-only" id="googleFinanceSettingsCard">
+  <div class="card-head">
+    <div>
+      <h3>Google Finance 抓價設定</h3>
+      <div class="muted">管理員1設定一次 Apps Script Web App 網址，之後按「更新價」即可自動抓最新價格。</div>
+    </div>
+  </div>
+  <div class="gf-settings-row">
+    <input id="googleFinanceApiUrl" type="url" placeholder="貼上 Google Apps Script Web App 網址">
+    <button id="saveGoogleFinanceApiBtn" type="button" class="primary">儲存網址</button>
+    <button id="testGoogleFinanceApiBtn" type="button" class="ghost">測試連線</button>
+  </div>
+  <div id="googleFinanceApiStatus" class="muted">尚未設定 Google Finance API</div>
+</section>
+<section class="card span12 admin-only hidden quick-price-card" id="quickPriceCard">
   <div class="section-title">
     <h2>快速更新股價</h2>
     <span class="status">管理員專用｜輸入股票代號與目前價即可同步更新持有中部位</span>
@@ -3736,10 +3757,17 @@ function buildEntryCopyText(){
   if(!rows.length){
     lines.push('今日無進場資料');
   }else{
-    rows.forEach(({t})=>{
-      lines.push(`${t.symbol||''} ${t.stockName||''}｜${t.analyst||''}｜進場價 ${fmt(t.entryPrice)}｜股數 ${fmt(t.shares)}`);
+    rows.forEach(({t},index)=>{
+      lines.push(`${t.symbol||''} ${t.stockName||''}｜${t.analyst||''}｜進場價 ${fmt(t.entryPrice)}`);
+      if(index<rows.length-1)lines.push('');
     });
   }
+
+  lines.push('');
+  lines.push('-------------------');
+  lines.push('⚠️ 停損是紀律，停利是藝術。');
+  lines.push('⚠️ 位階決定勝率，部位決定存活。');
+  lines.push('⚠️ 趨勢-族群-題材-位階-動能-風控');
   return lines.join('\n');
 }
 
@@ -3764,10 +3792,17 @@ function buildExitCopyText(){
   if(!rows.length){
     lines.push('今日無出場資料');
   }else{
-    rows.forEach(({t,c})=>{
+    rows.forEach(({t,c},index)=>{
       lines.push(`${t.symbol||''} ${t.stockName||''}｜${t.analyst||''}｜${exitStatusText(t)}｜出場價 ${fmt(t.exitPrice)}｜績效 ${pct(c.perf)}｜損益 ${fmtMoney(c.realized)}`);
+      if(index<rows.length-1)lines.push('');
     });
   }
+
+  lines.push('');
+  lines.push('-------------------');
+  lines.push('⚠️ 停損是紀律，停利是藝術。');
+  lines.push('⚠️ 位階決定勝率，部位決定存活。');
+  lines.push('⚠️ 趨勢-族群-題材-位階-動能-風控');
   return lines.join('\n');
 }
 
@@ -3853,6 +3888,7 @@ async function copyTextSmart(text){
 }
 
 function buildAnalystHoldingsCopyText(name){
+  const d=today();
   const rows=analystTradeListSource()
     .filter(tr=>tr && tr.analyst===name)
     .map(tr=>({tr,c:calc(tr)}));
@@ -3860,36 +3896,49 @@ function buildAnalystHoldingsCopyText(name){
   const openRows=rows
     .filter(x=>x.c.open)
     .sort((a,b)=>String(b.tr.entryDate||'').localeCompare(String(a.tr.entryDate||'')));
+
   const closedRows=rows
     .filter(x=>!x.c.open)
     .sort((a,b)=>String(b.tr.exitDate||'').localeCompare(String(a.tr.exitDate||'')));
 
-  const lines=[`【${name}｜持股清單】`];
+  const lines=[
+    `【${d} 分析師進場清單】`,
+    '',
+    `【${name}｜持股清單】`,
+    `持有中（${openRows.length}檔）`
+  ];
 
-  lines.push(`持有中（${openRows.length}檔）`);
   if(openRows.length){
-    openRows.forEach(({tr,c})=>{
+    openRows.forEach(({tr},index)=>{
       const status=tr.partialSettlement?'部分出場後持有':'持有中';
-      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${status}｜進場 ${tr.entryDate||'—'}｜進場價 ${fmt(tr.entryPrice)}｜目前價 ${fmt(tr.currentPrice||tr.entryPrice)}｜績效 ${pct(c.perf)}`);
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${status}｜進場 ${tr.entryDate||'—'}｜進場價 ${fmt(tr.entryPrice)}｜`);
+      if(index<openRows.length-1)lines.push('');
     });
   }else{
     lines.push('無');
   }
 
   lines.push('');
+  lines.push('');
   lines.push(`已結算（${closedRows.length}檔）`);
+
   if(closedRows.length){
-    closedRows.forEach(({tr,c})=>{
+    closedRows.forEach(({tr,c},index)=>{
       const exitStatus=(tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId))?'部分出場':'全部出場';
       lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${tr.entryDate||'—'} ${fmt(tr.entryPrice)}｜出場 ${tr.exitDate||'—'} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
+      if(index<closedRows.length-1)lines.push('');
     });
   }else{
     lines.push('無');
   }
 
+  lines.push('');
+  lines.push('-------------------');
+  lines.push('⚠️ 停損是紀律，停利是藝術。');
+  lines.push('⚠️ 位階決定勝率，部位決定存活。');
+
   return lines.join('\n');
 }
-
 function getSharedHoldingGroups(){
   const groups={};
   Object.values(trades||{}).forEach(tr=>{
@@ -3979,7 +4028,7 @@ function renderAnalystTradesModal(name){
     const tradeId=tradeIdFromObject(tr);
     const adminActions=isMainAdmin()&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新價</button>
+        <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新最新價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
     return `
@@ -3992,7 +4041,7 @@ function renderAnalystTradesModal(name){
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span>目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
-        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span>
+        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
       ${adminActions}
@@ -4725,15 +4774,91 @@ async function fetchYahooClose(sym){
   throw new Error('Yahoo close failed');
 }
 
+
+const GOOGLE_FINANCE_API_KEY='analystPerformanceGoogleFinanceApiUrl';
+
+function getGoogleFinanceApiUrl(){
+  return String(localStorage.getItem(GOOGLE_FINANCE_API_KEY)||'').trim();
+}
+
+function setGoogleFinanceApiStatus(msg,ok=false){
+  const el=$('#googleFinanceApiStatus');
+  if(!el)return;
+  el.textContent=msg;
+  el.classList.toggle('pos',!!ok);
+}
+
+async function fetchGoogleFinancePrice(symbol){
+  const api=getGoogleFinanceApiUrl();
+  if(!api)throw new Error('尚未設定 Google Finance API 網址');
+  const sym=String(symbol||'').trim();
+  const url=new URL(api);
+  url.searchParams.set('symbol',sym);
+  url.searchParams.set('_',Date.now());
+
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8000);
+  try{
+    const r=await fetch(url.toString(),{cache:'no-store',signal:controller.signal});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const j=await r.json();
+    if(!j?.ok)throw new Error(j?.error||'Google Finance API 回傳失敗');
+    const price=Number(j.price);
+    if(!(price>0))throw new Error('Google Finance 價格格式異常');
+    return {price,source:j.source||'Google Finance',mode:'latest'};
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function initGoogleFinanceSettings(){
+  const input=$('#googleFinanceApiUrl');
+  const api=getGoogleFinanceApiUrl();
+  if(input)input.value=api;
+  setGoogleFinanceApiStatus(api?'✅ 已設定 Google Finance API':'尚未設定 Google Finance API',!!api);
+}
+
+$('#saveGoogleFinanceApiBtn')?.addEventListener('click',()=>{
+  if(!isMainAdmin())return alert('此設定僅限管理員1使用');
+  const v=String($('#googleFinanceApiUrl')?.value||'').trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\//i.test(v)){
+    return alert('請貼上 Google Apps Script Web App 網址');
+  }
+  localStorage.setItem(GOOGLE_FINANCE_API_KEY,v);
+  setGoogleFinanceApiStatus('✅ Google Finance API 網址已儲存',true);
+  alert('Google Finance API 網址已儲存');
+});
+
+$('#testGoogleFinanceApiBtn')?.addEventListener('click',async()=>{
+  if(!isMainAdmin())return alert('此功能僅限管理員1使用');
+  const btn=$('#testGoogleFinanceApiBtn');
+  if(btn){btn.disabled=true;btn.textContent='測試中…';}
+  try{
+    const q=await fetchGoogleFinancePrice('2330');
+    setGoogleFinanceApiStatus(`✅ 測試成功｜2330：${fmt(q.price)}`,true);
+  }catch(e){
+    alert(`測試失敗：${e?.message||'未知錯誤'}`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='測試連線';}
+  }
+});
 async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
-  try{
-    return await fetchTWSEPrice(sym,{allowIntraday});
-  }catch(e0){
-    // 備援只回傳收盤資料，不提供盤中即時價，避免第三方錯價污染。
-    return await fetchYahooClose(sym);
+  const errors=[];
+
+  if(getGoogleFinanceApiUrl()){
+    try{return await fetchGoogleFinancePrice(sym);}
+    catch(e){errors.push(`Google Finance：${e?.message||'失敗'}`);}
   }
+
+  try{return await fetchTWSEPrice(sym,{allowIntraday});}
+  catch(e){errors.push(`TWSE/TPEx：${e?.message||'失敗'}`);}
+
+  try{return await fetchYahooClose(sym);}
+  catch(e){errors.push(`Yahoo：${e?.message||'失敗'}`);}
+
+  throw new Error(errors.join('｜')||'所有行情來源皆抓取失敗');
 }
 
 async function writeValidatedPrice(id,q){
@@ -4925,57 +5050,45 @@ async function manualCurrentPrice(id){
 }
 
 async function refreshOne(id){
-  if(!isMainAdmin())return;
+  if(!isMainAdmin())return alert('更新股價功能僅限管理員1使用');
   const tr=trades[id];
-  if(!tr)return;
-  const btn=document.querySelector(`[data-up="${id}"]`);
-  if(btn){btn.disabled=true;btn.textContent='抓價中…'}
-  if($('#lastRefresh'))$('#lastRefresh').textContent=`正在更新 ${tr.symbol} 股價…`;
+  if(!tr)return alert('找不到交易資料');
+
+  const btn=document.querySelector(`[data-up="${id}"],[data-modal-price="${id}"]`);
+  const oldText=btn?.textContent||'更新價';
+  if(btn){btn.disabled=true;btn.textContent='抓最新價…';}
+
   try{
-    let item;
-    try{
-      const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
-      item={
-        id,
-        symbol:tr.symbol,
-        stockName:tr.stockName,
-        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
-        price:q.price,
-        source:q.source,
-        mode:q.mode
-      };
-    }catch(e){
-      item={
-        id,
-        symbol:tr.symbol,
-        stockName:tr.stockName,
-        oldPrice:Number(tr.currentPrice||tr.entryPrice||0),
-        price:Number(tr.currentPrice||tr.entryPrice||0),
-        source:'行情抓取失敗，可手動輸入',
-        mode:'manual'
-      };
-    }
-
-    const confirmed=await openPriceConfirm([item]);
-    if(!confirmed)return;
-
-    const finalItem=confirmed[0];
+    const q=await getLatestPrice(tr.symbol,{allowIntraday:isAdmin});
     const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
-    const newPrice=Number(finalItem.price||0);
-    const result=await writeManualOrFetchedPrice(id,finalItem);
+    const newPrice=Number(q.price);
+    if(!(newPrice>0))throw new Error('抓到的價格格式異常');
 
-    $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}${result.count>1?`｜同股同步 ${result.count} 筆`:''}`;
+    const result=await writeManualOrFetchedPrice(id,{
+      id,
+      symbol:tr.symbol,
+      stockName:tr.stockName,
+      oldPrice,
+      price:newPrice,
+      source:q.source||'Google Finance',
+      mode:q.mode||'latest'
+    });
 
-    if(oldPrice===newPrice){
-      console.info(`${tr.symbol} 行情抓取成功，但價格與目前價相同：${newPrice}`);
+    clearTimeout(cloudRenderTimer);
+    render();
+    if(currentAnalystModalName)renderAnalystTradesModal(currentAnalystModalName);
+
+    if($('#lastRefresh')){
+      $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(newPrice)}｜${q.source||'Google Finance'}`;
     }
+
+    alert(`✅ 最新價格已更新\n\n${tr.symbol} ${tr.stockName||''}\n${fmt(oldPrice)} → ${fmt(newPrice)}\n來源：${q.source||'Google Finance'}\n時間：${result.updatedAt}`);
   }catch(e){
-    alert(`${tr.symbol} 更新失敗。\n${e?.message||'請確認輸入價格'}`);
+    alert(`❌ ${tr.symbol} 抓不到最新價格\n\n${e?.message||'未知錯誤'}\n\n請確認「Google Finance 抓價設定」已填入 Apps Script Web App 網址。`);
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='更新價'}
+    if(btn){btn.disabled=false;btn.textContent=oldText;}
   }
 }
-
 async function runWithConcurrency(tasks,limit=4){
   const results=new Array(tasks.length);
   let next=0;
@@ -5268,7 +5381,10 @@ document.addEventListener('click',async e=>{
   try{
     if(priceBtn){
       const id=priceBtn.dataset.modalPrice;
-      await manualCurrentPrice(id);
+      await refreshOne(id);
+      if(currentAnalystModalName){
+        renderAnalystTradesModal(currentAnalystModalName);
+      }
     }else if(settleBtn){
       const id=settleBtn.dataset.modalSettle;
       await settleTrade(id);
@@ -5483,7 +5599,7 @@ document.addEventListener('click', async (e)=>{
         alert('更新股價功能僅限管理員1使用');
         return;
       }
-      await manualCurrentPrice(upId);
+      await refreshOne(upId);
       return;
     }
     if(settleId){
@@ -5544,7 +5660,7 @@ document.addEventListener('click',async e=>{
 
   btn.dataset.priceClickRunning='1';
   try{
-    await manualCurrentPrice(id);
+    await refreshOne(id);
   }catch(err){
     console.error('單筆股價更新失敗',err);
     alert('更新股價失敗：'+(err?.message||'未知錯誤'));
@@ -5553,6 +5669,8 @@ document.addEventListener('click',async e=>{
   }
 },false);
 
+
+setTimeout(initGoogleFinanceSettings,0);
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>

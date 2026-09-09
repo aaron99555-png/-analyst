@@ -2792,6 +2792,13 @@ html[data-theme="dark"] .section-title{
 #googleFinanceApiStatus{margin-top:8px;font-size:12px}
 @media(max-width:700px){.gf-settings-row{grid-template-columns:1fr}.gf-settings-row button{width:100%}}
 
+
+
+/* v123：管理者1－團團顯示切換 */
+#toggleTuanBtn{
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
@@ -2800,8 +2807,9 @@ html[data-theme="dark"] .section-title{
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">12 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新目前價</button>
+        <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
+  <button id="toggleTuanBtn" class="ghost" type="button">顯示團團</button>
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
@@ -3035,19 +3043,37 @@ const ADMIN_PASSWORD='51685168';
 const ADMIN2_PASSWORD='16888';
 const isMainAdmin=()=>isAdmin&&adminRole==='main';
 const isAdmin2=()=>isAdmin&&adminRole==='admin2';
+const canUpdatePrice=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 
 const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰','GD何基鼎'];
 const ALL_ANALYSTS=[...PUBLIC_ANALYSTS,'團團'];
 
+const MAIN_ADMIN_TUAN_KEY='mainAdminShowTuan';
+let mainAdminShowTuan=localStorage.getItem(MAIN_ADMIN_TUAN_KEY)==='1';
+
+function mainAdminCanSeeTuan(){
+  return isMainAdmin() && mainAdminShowTuan;
+}
+
 function visibleAnalystNames(){
-  // 管理者2可查看全部分析師；一般使用者與主要管理者不顯示團團
-  return isAdmin2()?ALL_ANALYSTS:PUBLIC_ANALYSTS;
+  // 管理者2固定可見團團；管理者1可自行切換；一般使用者不顯示團團。
+  if(isAdmin2())return ALL_ANALYSTS;
+  if(mainAdminCanSeeTuan())return ALL_ANALYSTS;
+  return PUBLIC_ANALYSTS;
 }
 function canViewTrade(t){
   if(!t)return false;
-  // 管理者2可查看全部資料，其餘角色排除團團
-  return isAdmin2()?true:t.analyst!=='團團';
+  if(t.analyst!=='團團')return true;
+  return isAdmin2() || mainAdminCanSeeTuan();
+}
+
+function updateTuanToggleUI(){
+  const btn=$('#toggleTuanBtn');
+  if(!btn)return;
+  btn.classList.toggle('hidden',!isMainAdmin());
+  btn.textContent=mainAdminShowTuan?'隱藏團團':'顯示團團';
+  btn.title=mainAdminShowTuan?'目前管理者1可看到並操作團團資料':'目前團團資料隱藏';
 }
 function refreshAnalystVisibilityOptions(){
   const names=visibleAnalystNames();
@@ -3887,7 +3913,7 @@ function render(){
     html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span>${fmt(t.currentPrice||t.entryPrice)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
-</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${isMainAdmin()&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
+</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${canUpdatePrice(t)&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
@@ -4492,6 +4518,7 @@ function setAdmin(v,role=''){
   const formTitle=$('#formTitle');
   if(formTitle)formTitle.textContent=isAdmin2()?'新增團團交易（不可修改既有資料）':'新增交易';
   $$('.main-admin-form-only').forEach(x=>x.classList.toggle('hidden',isAdmin2()));
+  updateTuanToggleUI();
   refreshAnalystVisibilityOptions();
   render();
   updatePriceModeUI();
@@ -4501,16 +4528,17 @@ function updatePriceModeUI(){
   const btn=$('#refreshAllBtn');
   const note=document.querySelector('.price-note');
   if(btn){
-    btn.textContent=isMainAdmin()?'⟳ 一鍵更新證交所股價':'⟳ 一鍵更新證交所股價';
+    btn.textContent='⟳ 一鍵更新目前價';
   }
   if(note){
-    note.innerHTML=isMainAdmin()
-      ? '<strong>管理者盤中可寫入即時價</strong>｜<b>正確價位一律以收盤為基準</b>'
-      : '<b>正確價位一律以收盤為基準</b>';
+    note.innerHTML=isAdmin
+      ? '<strong>單筆與一鍵更新都會重新抓最新價</strong>｜抓不到改手動輸入｜管理者2僅更新團團'
+      : '<b>價格由管理者更新</b>';
   }
 }
 if(localStorage.getItem('analystAdmin')==='1')setAdmin(true,localStorage.getItem('analystAdminRole')||'main');
 else{
+  updateTuanToggleUI();
   refreshAnalystVisibilityOptions();
   updatePriceModeUI();
 }
@@ -4529,6 +4557,28 @@ $('#doLogin').onclick=()=>{
   $('#adminPwd').value='';
 };
 $('#logoutBtn').onclick=()=>setAdmin(false,'');
+
+$('#toggleTuanBtn')?.addEventListener('click',()=>{
+  if(!isMainAdmin())return;
+
+  mainAdminShowTuan=!mainAdminShowTuan;
+  localStorage.setItem(MAIN_ADMIN_TUAN_KEY,mainAdminShowTuan?'1':'0');
+
+  // 若正在篩選團團後切成隱藏，恢復「全部」避免空白畫面。
+  if(!mainAdminShowTuan && $('#fAnalyst')?.value==='團團'){
+    $('#fAnalyst').value='';
+  }
+
+  // 若正在編輯團團資料後切成隱藏，取消編輯。
+  if(!mainAdminShowTuan && editingId && trades[editingId]?.analyst==='團團'){
+    clearForm();
+  }
+
+  updateTuanToggleUI();
+  refreshAnalystVisibilityOptions();
+  renderAnalystQuickFilter();
+  render();
+});
 
 $('#saveBtn').onclick=async()=>{
   if(!isAdmin)return;
@@ -4963,7 +5013,7 @@ function openPriceConfirm(items){
   });
 }
 
-async function syncSameStockCurrentPrice(symbol,price,source){
+async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}){
   const normalized=String(symbol||'').trim().toUpperCase();
   const numericPrice=Number(price);
   if(!normalized)throw new Error('股票代號不存在');
@@ -4976,7 +5026,8 @@ async function syncSameStockCurrentPrice(symbol,price,source){
     .filter(([tid,tr])=>{
       if(!tr)return false;
       return String(tr.symbol||'').trim().toUpperCase()===normalized
-        && calc(tr).open;
+        && calc(tr).open
+        && (!onlyTuan || tr.analyst==='團團');
     })
     .map(([tid])=>tid);
 
@@ -5016,18 +5067,20 @@ async function writeManualOrFetchedPrice(id,item){
   return await syncSameStockCurrentPrice(
     tr.symbol,
     item.price,
-    item.source||'手動確認'
+    item.source||'手動確認',
+    {onlyTuan:isAdmin2()}
   );
 }
 
 
 async function manualCurrentPrice(id){
-  if(!isMainAdmin()){
-    alert('更新股價功能僅限管理員1使用');
+  const tr=trades[id];
+  if(!canUpdatePrice(tr)){
+    alert('你沒有這筆資料的更新股價權限');
     return false;
   }
 
-  const tr=trades[id];
+
   if(!tr){
     alert('找不到這筆交易資料，請重新整理頁面後再試');
     return false;
@@ -5057,7 +5110,8 @@ async function manualCurrentPrice(id){
     const result=await syncSameStockCurrentPrice(
       tr.symbol,
       price,
-      '管理員1手動更新'
+      isAdmin2()?'管理員2手動更新':'管理員1手動更新',
+      {onlyTuan:isAdmin2()}
     );
 
     // syncSameStockCurrentPrice 已更新 Firebase + 本機資料，
@@ -5116,7 +5170,8 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
   const result=await syncSameStockCurrentPrice(
     symbol,
     price,
-    '網路抓價失敗－管理員手動輸入'
+    '網路抓價失敗－管理員手動輸入',
+    {onlyTuan:isAdmin2()}
   );
 
   clearTimeout(cloudRenderTimer);
@@ -5140,12 +5195,13 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
 }
 
 async function refreshOne(id){
-  if(!isMainAdmin()){
-    alert('更新目前價功能僅限管理員1使用');
+  const tr=trades[id];
+  if(!canUpdatePrice(tr)){
+    alert('你沒有這筆資料的更新目前價權限');
     return;
   }
 
-  const tr=trades[id];
+
   if(!tr){
     alert('找不到交易資料');
     return;
@@ -5178,7 +5234,8 @@ async function refreshOne(id){
     const result=await syncSameStockCurrentPrice(
       symbol,
       newPrice,
-      q.source||'網路最新行情'
+      q.source||'網路最新行情',
+      {onlyTuan:isAdmin2()}
     );
 
     clearTimeout(cloudRenderTimer);
@@ -5236,13 +5293,18 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
   e.preventDefault();
   e.stopPropagation();
 
-  if(!isMainAdmin()){
-    alert('一鍵更新目前價僅限主管理員使用');
+  if(!isAdmin){
+    alert('一鍵更新目前價僅限管理者使用');
     return;
   }
 
   const openEntries=Object.entries(trades||{})
-    .filter(([id,tr])=>tr && calc(tr).open);
+    .filter(([id,tr])=>{
+      if(!tr || !calc(tr).open)return false;
+      // 管理者2只更新團團；管理者1更新目前可見範圍。
+      if(isAdmin2())return tr.analyst==='團團';
+      return canViewTrade(tr);
+    });
 
   if(!openEntries.length){
     alert('目前沒有持有中的股票可更新');
@@ -5312,7 +5374,8 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
         await syncSameStockCurrentPrice(
           item.symbol,
           item.price,
-          item.source||'網路最新行情'
+          item.source||'網路最新行情',
+          {onlyTuan:isAdmin2()}
         );
         success++;
       }catch(err){
@@ -5545,14 +5608,14 @@ document.addEventListener('click',async e=>{
   e.preventDefault();
   e.stopPropagation();
 
-  if(!isMainAdmin()){
-    alert('此功能僅限管理員1使用');
-    return;
-  }
-
   try{
     if(priceBtn){
       const id=priceBtn.dataset.modalPrice;
+      const tr=trades[id];
+      if(!canUpdatePrice(tr)){
+        alert('你沒有這筆資料的更新目前價權限');
+        return;
+      }
       await refreshOne(id);
       if(currentAnalystModalName){
         renderAnalystTradesModal(currentAnalystModalName);

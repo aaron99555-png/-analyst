@@ -2940,7 +2940,7 @@ html[data-theme="dark"] .section-title{
     
 
     
-<section class="card span12 admin-only" id="googleFinanceSettingsCard">
+<section class="card span12 admin-only hidden" id="googleFinanceSettingsCard">
   <div class="card-head">
     <div>
       <h3>Google Finance 抓價設定</h3>
@@ -3007,7 +3007,17 @@ html[data-theme="dark"] .section-title{
 
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
+/*
+v126 股價來源規則：
+- 上市：TWSE 官方 STOCK_DAY 月盤後資料
+- 上櫃：Yahoo Finance .TWO
+- GitHub / proxy 僅作為傳輸 relay，不視為主要行情資料庫
+- 所有主要來源皆失敗時，由現有流程跳出空白手動輸入
+- 絕不沿用舊 currentPrice 當作本次更新成功
+*/
+
+</script>
 
 <div class="modal hidden" id="priceConfirmModal">
   <div class="modal-card" style="max-width:760px">
@@ -4532,9 +4542,9 @@ function updatePriceModeUI(){
   }
   if(note){
     note.innerHTML=isMainAdmin()
-      ? '<strong>管理者1：可單筆與一鍵更新最新價</strong>｜抓不到改手動輸入'
+      ? '<strong>上市：TWSE 官方盤後｜上櫃：Yahoo Finance .TWO</strong>｜抓不到改手動輸入'
       : isAdmin2()
-        ? '<strong>管理者2：僅可更新團團持股目前價</strong>｜抓不到改手動輸入'
+        ? '<strong>管理者2：團團持股更新｜上市 TWSE／上櫃 Yahoo .TWO</strong>｜抓不到改手動輸入'
         : '<b>價格由管理者更新</b>';
   }
 }
@@ -4936,25 +4946,142 @@ $('#testGoogleFinanceApiBtn')?.addEventListener('click',async()=>{
     if(btn){btn.disabled=false;btn.textContent='測試連線';}
   }
 });
+
+function twseMonthYYYYMM(){
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit'
+  }).formatToParts(new Date());
+  const y=parts.find(x=>x.type==='year')?.value;
+  const m=parts.find(x=>x.type==='month')?.value;
+  return `${y}${m}01`;
+}
+
+// 上市：TWSE 官方 STOCK_DAY 月盤後資料。
+async function fetchTWSEOfficialAfterHours(sym){
+  const stockNo=String(sym||'').trim();
+  const date=twseMonthYYYYMM();
+  const url=`https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${encodeURIComponent(date)}&stockNo=${encodeURIComponent(stockNo)}&_=${Date.now()}`;
+
+  let j=null;
+  try{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+    try{
+      const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+      if(r.ok)j=await r.json();
+    }finally{
+      clearTimeout(timer);
+    }
+  }catch(_){}
+
+  // relay/proxy 只做傳輸輔助；行情內容仍取自 TWSE 官方。
+  if(!j){
+    try{j=await fetchJsonViaProxy(url);}catch(_){}
+  }
+
+  const rows=Array.isArray(j?.data)?j.data:[];
+  if(!rows.length)throw new Error('TWSE 查無此上市股票盤後資料');
+
+  const valid=rows.map(row=>{
+    const closeText=String(row?.[6]??'').replace(/,/g,'').trim();
+    const price=Number(closeText);
+    return {date:String(row?.[0]??'').trim(),price};
+  }).filter(x=>Number.isFinite(x.price)&&x.price>0);
+
+  if(!valid.length)throw new Error('TWSE 官方盤後資料沒有有效收盤價');
+
+  const latest=valid[valid.length-1];
+  return {
+    price:latest.price,
+    source:'TWSE 官方盤後資料',
+    mode:'closed',
+    market:'TWSE',
+    tradeDate:latest.date
+  };
+}
+
+// 上櫃：Yahoo Finance .TWO 為主。
+async function fetchYahooTWOAfterHours(sym){
+  const ticker=`${String(sym||'').trim()}.TWO`;
+  let lastError=null;
+
+  for(const host of ['query1.finance.yahoo.com','query2.finance.yahoo.com']){
+    try{
+      const url=`https://${host}/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1mo&_=${Date.now()}`;
+      let j=null;
+
+      try{
+        const controller=new AbortController();
+        const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+        try{
+          const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+          if(r.ok)j=await r.json();
+        }finally{
+          clearTimeout(timer);
+        }
+      }catch(_){}
+
+      if(!j){
+        try{j=await fetchJsonViaProxy(url);}catch(_){}
+      }
+
+      const result=j?.chart?.result?.[0];
+      const meta=result?.meta;
+      if(!result || !meta)throw new Error('Yahoo .TWO 無行情資料');
+      if(meta.currency && meta.currency!=='TWD')throw new Error('Yahoo .TWO 幣別不是 TWD');
+
+      const closes=result?.indicators?.quote?.[0]?.close||[];
+      const timestamps=result?.timestamp||[];
+      const valid=[];
+
+      closes.forEach((v,i)=>{
+        const price=Number(v);
+        const ts=Number(timestamps[i]);
+        if(Number.isFinite(price)&&price>0&&Number.isFinite(ts)&&ts>0){
+          valid.push({price,ts});
+        }
+      });
+
+      if(!valid.length)throw new Error('Yahoo .TWO 沒有有效收盤價');
+
+      const latest=valid[valid.length-1];
+      const tradeDate=new Date(latest.ts*1000).toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'});
+
+      return {
+        price:latest.price,
+        source:`Yahoo Finance ${ticker}`,
+        mode:'closed',
+        market:'TPEx',
+        tradeDate
+      };
+    }catch(e){
+      lastError=e;
+    }
+  }
+
+  throw new Error(lastError?.message||'Yahoo Finance .TWO 抓取失敗');
+}
+
 async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
-  const errors=[];
 
-  if(getGoogleFinanceApiUrl()){
-    try{return await fetchGoogleFinancePrice(sym);}
-    catch(e){errors.push(`Google Finance：${e?.message||'失敗'}`);}
+  let twseError=null;
+  try{
+    return await fetchTWSEOfficialAfterHours(sym);
+  }catch(e){
+    twseError=e;
   }
 
-  try{return await fetchTWSEPrice(sym,{allowIntraday});}
-  catch(e){errors.push(`TWSE/TPEx：${e?.message||'失敗'}`);}
-
-  try{return await fetchYahooClose(sym);}
-  catch(e){errors.push(`Yahoo：${e?.message||'失敗'}`);}
-
-  throw new Error(errors.join('｜')||'所有行情來源皆抓取失敗');
+  try{
+    return await fetchYahooTWOAfterHours(sym);
+  }catch(yahooError){
+    throw new Error(
+      `上市 TWSE：${twseError?.message||'查無資料'}｜`+
+      `上櫃 Yahoo .TWO：${yahooError?.message||'抓取失敗'}`
+    );
+  }
 }
-
 async function writeValidatedPrice(id,q){
   const tr=trades[id];
   if(!tr)throw new Error('找不到交易資料');
@@ -5172,7 +5299,7 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
   const result=await syncSameStockCurrentPrice(
     symbol,
     price,
-    '網路抓價失敗－管理員手動輸入',
+    '盤後行情抓取失敗－管理員手動輸入',
     {onlyTuan:isAdmin2()}
   );
 
@@ -5253,17 +5380,17 @@ async function refreshOne(id){
       `✅ 已取得網路最新價格\n\n`+
       `${symbol} ${stockName}\n`+
       `目前價：${fmt(newPrice)}\n`+
-      `來源：${q.source||'網路最新行情'}\n`+
+      `來源：${q.source||'網路最新行情'}${q.tradeDate?`｜資料日 ${q.tradeDate}`:''}\n`+
       `更新時間：${result.updatedAt}\n`+
       `同代號同步：${result.count} 筆`
     );
 
   }catch(fetchError){
-    console.warn(`${symbol} 網路抓價失敗，改由手動輸入`,fetchError);
+    console.warn(`${symbol} 盤後行情抓取失敗，改由手動輸入`,fetchError);
 
     if($('#lastRefresh')){
       $('#lastRefresh').textContent=
-        `${symbol} 網路抓價失敗，等待手動輸入目前價`;
+        `${symbol} 盤後行情抓取失敗，等待手動輸入目前價`;
     }
 
     // 重要：抓價失敗時，不帶入舊價格，也不自動寫入任何價格。
@@ -5414,7 +5541,7 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
 
     alert(
       `✅ 一鍵更新完成\n\n`+
-      `網路自動更新：${success} 檔\n`+
+      `盤後自動更新：${success} 檔\n`+
       `手動更新：${manualSuccess} 檔\n`+
       `本次共更新：${updatedTotal} 檔`+
       (skipped?`\n取消／略過：${skipped} 檔`:'')+

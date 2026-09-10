@@ -3808,6 +3808,9 @@ body.quiz-locked{overflow:hidden!important}
 }
 .analyst-external-link:hover{filter:brightness(1.08)}
 
+
+
+/* v149：團團出場時間改為系統自動記錄，無手動輸入欄位 */
 </style>
 </head>
 <body>
@@ -4105,6 +4108,38 @@ const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+function isTuanTrade(trOrName){
+  const name=typeof trOrName==='string' ? trOrName : trOrName?.analyst;
+  return String(name||'').trim()==='團團';
+}
+
+function normalizeHHMM(v){
+  const s=String(v||'').trim();
+  const m=s.match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return '';
+  const hh=String(Math.min(23,Math.max(0,Number(m[1])))).padStart(2,'0');
+  const mm=String(Math.min(59,Math.max(0,Number(m[2])))).padStart(2,'0');
+  return `${hh}:${mm}`;
+}
+
+function currentTaipeiHHMM(){
+  return new Date().toLocaleTimeString('en-GB',{
+    timeZone:'Asia/Taipei',
+    hour:'2-digit',
+    minute:'2-digit',
+    hour12:false
+  });
+}
+
+
+function formatExitDateTime(tr){
+  const d=String(tr?.exitDate||'').trim();
+  const tm=isTuanTrade(tr)?normalizeHHMM(tr?.exitTime):'';
+  if(!d)return tm||'—';
+  return tm?`${d} ${tm}`:d;
+}
+
 
 let pendingBulkFailedPrices=[];
 let bulkFailedPriceResolver=null;
@@ -5316,7 +5351,7 @@ function buildAnalystHoldingsCopyText(name){
   if(closedRows.length){
     closedRows.forEach(({tr,c},index)=>{
       const exitStatus=(tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId))?'部分出場':'全部出場';
-      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${tr.entryDate||'—'} ${fmt(tr.entryPrice)}｜出場 ${tr.exitDate||'—'} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${tr.entryDate||'—'} ${fmt(tr.entryPrice)}｜出場 ${formatExitDateTime(tr)} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
       if(index<closedRows.length-1)lines.push('');
     });
   }else{
@@ -5454,7 +5489,7 @@ function renderAnalystTradesModal(name){
       <div class="analyst-trade-grid">
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
-        <span>出場日 <b>${esc(tr.exitDate||'—')}</b></span>
+        <span>出場日 <b>${esc(formatExitDateTime(tr))}</b></span>
         <span>出場價 <b>${fmt(tr.exitPrice)}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
         <span>已實現 <b class="${c.realized>=0?'pos':'neg'}">${fmtMoney(c.realized)}</b></span>
@@ -5983,6 +6018,9 @@ $('#saveBtn').onclick=async()=>{
     stopLoss:+$('#stopLoss').value||0,
     takeProfit:+$('#takeProfit').value||0,
     exitDate:isAdmin2()?'':$('#exitDate').value,
+    exitTime:(isTuanTrade($('#analyst')?.value)&&$('#exitDate')?.value)
+      ? (editingId&&trades?.[editingId]?.exitTime ? normalizeHHMM(trades[editingId].exitTime) : currentTaipeiHHMM())
+      : '',
     exitPrice:isAdmin2()?0:(+$('#exitPrice').value||0),
     note:$('#note').value.trim(),
     updatedAt:nowText()
@@ -6009,6 +6047,7 @@ function clearForm(){
     $('#analyst').value=isAdmin2()?'團團':'';
     $('#analyst').disabled=true;
   }
+
 }
 $('#cancelEditBtn').onclick=clearForm;
 async function deleteTrade(id){

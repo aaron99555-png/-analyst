@@ -4346,6 +4346,9 @@ $('#quizPassBtn')?.addEventListener('click',()=>{
 });
 
 $('#quizAdminLoginBtn')?.addEventListener('click',()=>{
+  // 管理者免考：進入管理者登入流程時，不顯示考題。
+  $('#quizGate')?.classList.add('hidden');
+  document.body.classList.remove('quiz-locked');
   $('#loginModal')?.classList.add('show');
   setTimeout(()=>$('#adminPwd')?.focus(),0);
 });
@@ -5853,8 +5856,13 @@ function bindRows(){
 function setAdmin(v,role=''){
   isAdmin=v;
   adminRole=v?(role||'main'):'';
-  localStorage.setItem('analystAdmin',v?'1':'0');
-  localStorage.setItem('analystAdminRole',adminRole);
+  if(v){
+    localStorage.setItem('analystAdmin','1');
+    localStorage.setItem('analystAdminRole',adminRole);
+  }else{
+    localStorage.removeItem('analystAdmin');
+    localStorage.removeItem('analystAdminRole');
+  }
 
   $$('.admin-only').forEach(x=>x.classList.toggle('hidden',!v));
   $$('.main-admin-only').forEach(x=>x.classList.toggle('hidden',!isMainAdmin()));
@@ -5903,15 +5911,28 @@ function updatePriceModeUI(){
   }
 }
 if(localStorage.getItem('analystAdmin')==='1'){
+  // 已登入管理者：直接進入，完全不顯示考題。
+  closeQuizGate();
   setAdmin(true,localStorage.getItem('analystAdminRole')||'main');
 }else{
+  // 一般使用者：每次開啟 / 重新整理隨機抽一題。
   updateTuanToggleUI();
   refreshAnalystVisibilityOptions();
   updatePriceModeUI();
   setTimeout(openQuizGate,0);
 }
 
-$('#adminBtn').onclick=()=>{$('#loginModal').classList.add('show');$('#adminPwd').focus()}; $('#closeLogin').onclick=()=>$('#loginModal').classList.remove('show');
+$('#adminBtn').onclick=()=>{
+  $('#quizGate')?.classList.add('hidden');
+  document.body.classList.remove('quiz-locked');
+  $('#loginModal').classList.add('show');
+  $('#adminPwd').focus();
+};
+$('#closeLogin').onclick=()=>{
+  $('#loginModal').classList.remove('show');
+  // 尚未登入管理者時，取消登入才回到一般使用者考題。
+  if(!isAdmin)setTimeout(openQuizGate,0);
+};
 $('#doLogin').onclick=()=>{
   const pwd=$('#adminPwd').value;
   if(pwd===ADMIN_PASSWORD){

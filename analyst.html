@@ -3550,14 +3550,14 @@ function refreshAnalystVisibilityOptions(){
   const form=$('#analyst');
   if(form){
     const old=form.value;
-    form.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
+    form.innerHTML='<option value="">請選擇分析師</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
     if(isAdmin2()){
       form.value='團團';
       form.disabled=true;
     }else{
       form.disabled=false;
-      if(names.includes(old))form.value=old;
-      else if(names.length)form.value=names[0];
+      if(editingId && names.includes(old))form.value=old;
+      else form.value='';
     }
   }
 }
@@ -5088,7 +5088,7 @@ function clearForm(){
   $('#shares').value=1000;
   $('#entryDate').value=today();
   if(isAdmin2()){
-    $('#analyst').value='團團';
+    $('#analyst').value=isAdmin2()?'團團':'';
     $('#analyst').disabled=true;
   }
 }

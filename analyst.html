@@ -3371,6 +3371,144 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v142：修正手機版分析師持股視窗右上按鈕溢出 */
+@media(max-width:700px){
+
+  /* 整個視窗不可橫向溢出 */
+  #analystTradesModal,
+  #analystTradesModal .modal-card,
+  #analystTradesModal .section-title,
+  #analystTradesModal .analyst-trades-head{
+    overflow-x:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  /* 標題與按鈕完全分開，不互相擠壓 */
+  #analystTradesModal .analyst-trades-head,
+  #analystTradesModal .section-title{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    gap:10px !important;
+    width:100% !important;
+  }
+
+  /* 文字區固定在上面 */
+  #analystTradesModal .analyst-trades-head > :not(.analyst-trades-head-actions),
+  #analystTradesModal .section-title > :not(.analyst-trades-head-actions){
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+  }
+
+  #analystTradesModal h2,
+  #analystTradesModal h3,
+  #analystTradesModal .analyst-trades-title{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    font-size:21px !important;
+    line-height:1.35 !important;
+    word-break:break-word !important;
+    white-space:normal !important;
+  }
+
+  #analystTradesModal .status,
+  #analystTradesModal .analyst-trades-range,
+  #analystTradesModal [id*="Range"]{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    font-size:12px !important;
+    line-height:1.45 !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+  }
+
+  /* 按鈕區改成完整獨立區塊 */
+  #analystTradesModal .analyst-trades-head-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  #analystTradesModal #addTradeFromAnalystModalBtn{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+  }
+
+  #analystTradesModal #copyAnalystHoldingsBtn,
+  #analystTradesModal #closeAnalystTrades{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+  }
+
+  #analystTradesModal .analyst-trades-head-actions button,
+  #analystTradesModal .analyst-trades-head-actions .primary,
+  #analystTradesModal .analyst-trades-head-actions .ghost{
+    display:block !important;
+    box-sizing:border-box !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    padding:10px 12px !important;
+    font-size:13px !important;
+    line-height:1.2 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+
+  /* 內容容器也避免把寬度撐出去 */
+  #analystTradesModal .analyst-trades-body,
+  #analystTradesModal .modal-body,
+  #analystTradesModal [class*="analyst-trades"],
+  #analystTradesModal [class*="trade-list"]{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+  }
+
+  /* 卡片內的欄位避免長字把容器撐出去 */
+  #analystTradesModal .analyst-trade-card,
+  #analystTradesModal .holding-card,
+  #analystTradesModal .analyst-trades-item,
+  #analystTradesModal .trade-meta,
+  #analystTradesModal .holding-meta,
+  #analystTradesModal .trade-grid{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+  }
+
+  #analystTradesModal .trade-meta > *,
+  #analystTradesModal .holding-meta > *,
+  #analystTradesModal .trade-grid > *{
+    min-width:0 !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+  }
+}
+
 </style>
 </head>
 <body>

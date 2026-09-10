@@ -3136,6 +3136,28 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v138：分析師持股視窗可直接新增進場股票 */
+#addTradeFromAnalystModalBtn{
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .analyst-trades-head-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    width:100%;
+  }
+  #addTradeFromAnalystModalBtn{
+    grid-column:1 / -1;
+    width:100%;
+  }
+  .analyst-trades-head-actions button{
+    width:100%;
+    min-width:0;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3334,6 +3356,7 @@ body.quiz-locked{overflow:hidden!important}
         <div id="analystTradesRange" class="analyst-trades-range">—</div>
       </div>
       <div class="analyst-trades-head-actions">
+        <button id="addTradeFromAnalystModalBtn" class="primary hidden" type="button">＋ 新增進場股票</button>
         <button id="copyAnalystHoldingsBtn" class="ghost" type="button">複製持股清單</button>
         <button id="closeAnalystTrades" class="ghost analyst-trades-close" type="button">關閉</button>
       </div>
@@ -4606,6 +4629,12 @@ function renderAnalystTradesModal(name){
   if(title)title.textContent=`${name}｜目前持股狀況`;
   if(range)range.textContent=$('#rankRangeStatus')?.textContent||'統計區間：全部期間';
 
+  const modalAddBtn=$('#addTradeFromAnalystModalBtn');
+  if(modalAddBtn){
+    modalAddBtn.classList.toggle('hidden',!isMainAdmin());
+    modalAddBtn.dataset.analyst=name||'';
+  }
+
   const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
   const openHtml=openRows.length?openRows.map(({tr,c})=>{
     const tradeId=tradeIdFromObject(tr);
@@ -4665,6 +4694,30 @@ function renderAnalystTradesModal(name){
 function closeAnalystTradesModal(){
   $('#analystTradesModal')?.classList.remove('show');
 }
+
+$('#addTradeFromAnalystModalBtn')?.addEventListener('click',()=>{
+  if(!isMainAdmin())return;
+
+  const name=String(currentAnalystModalName||$('#addTradeFromAnalystModalBtn')?.dataset.analyst||'').trim();
+  if(!name)return;
+
+  clearForm();
+
+  const analystEl=$('#analyst');
+  if(analystEl){
+    analystEl.disabled=false;
+    analystEl.value=name;
+  }
+
+  const card=$('#entryCard');
+  card?.classList.remove('hidden');
+  closeAnalystTradesModal();
+
+  requestAnimationFrame(()=>{
+    card?.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>$('#symbol')?.focus(),320);
+  });
+});
 
 
 $('#copyAnalystHoldingsBtn')?.addEventListener('click',async()=>{

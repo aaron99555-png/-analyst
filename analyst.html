@@ -3082,6 +3082,60 @@ body.quiz-locked{overflow:hidden!important}
   .quiz-actions{grid-template-columns:1fr}
 }
 
+
+/* v137：手機版績效排行榜壓縮
+   績效％ + 金額同一行，減少垂直空間 */
+@media(max-width:700px){
+  #rankingList .rank-card,
+  #rankingList .ranking-card,
+  .rank-list .rank-card,
+  .performance-ranking .rank-card{
+    padding-top:10px !important;
+    padding-bottom:10px !important;
+  }
+
+  #rankingList .rank-metrics,
+  #rankingList .rank-stats,
+  #rankingList .ranking-metrics,
+  .rank-list .rank-metrics,
+  .performance-ranking .rank-metrics{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    flex-wrap:nowrap !important;
+  }
+
+  #rankingList .rank-metrics > *,
+  #rankingList .rank-stats > *,
+  #rankingList .ranking-metrics > *,
+  .rank-list .rank-metrics > *,
+  .performance-ranking .rank-metrics > *{
+    margin:0 !important;
+    min-width:0 !important;
+    white-space:nowrap !important;
+  }
+
+  #rankingList .rank-perf,
+  #rankingList .performance,
+  #rankingList .perf,
+  .rank-list .rank-perf,
+  .performance-ranking .rank-perf{
+    flex:0 0 auto !important;
+  }
+
+  #rankingList .rank-amount,
+  #rankingList .amount,
+  #rankingList .pnl,
+  .rank-list .rank-amount,
+  .performance-ranking .rank-amount{
+    flex:0 0 auto !important;
+    margin-left:auto !important;
+    text-align:right !important;
+  }
+}
+
 </style>
 </head>
 <body>

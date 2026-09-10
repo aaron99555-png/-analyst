@@ -3509,12 +3509,287 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v143：整併修正手機版分析師持股視窗
+   1. 標題不再直排
+   2. 右上按鈕不再溢出
+   3. 內容區與卡片同步防跑版 */
+@media (max-width:700px){
+
+  /* Modal 外框 */
+  #analystTradesModal{
+    padding:10px !important;
+    align-items:flex-end !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+  }
+
+  /* Modal 卡片 */
+  #analystTradesModal .analyst-trades-modal-card,
+  #analystTradesModal .modal-card{
+    width:calc(100vw - 20px) !important;
+    max-width:calc(100vw - 20px) !important;
+    min-width:0 !important;
+    max-height:90vh !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:16px !important;
+    border-radius:22px 22px 0 0 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+
+  /* 標題列：改成上下排列 */
+  #analystTradesModal .analyst-trades-modal-head{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    gap:10px !important;
+    width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+    position:sticky !important;
+    top:0 !important;
+    z-index:2 !important;
+    background:inherit !important;
+    padding-bottom:10px !important;
+    overflow:hidden !important;
+  }
+
+  /* 標題文字區 */
+  #analystTradesModal .analyst-trades-modal-head > div:first-child{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+  }
+
+  #analystTradesTitle,
+  #analystTradesModal h3{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    font-size:20px !important;
+    line-height:1.35 !important;
+    font-weight:900 !important;
+    writing-mode:horizontal-tb !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+    overflow-wrap:anywhere !important;
+    text-align:left !important;
+  }
+
+  #analystTradesRange,
+  #analystTradesModal .analyst-trades-range{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:2px 0 0 0 !important;
+    font-size:12px !important;
+    line-height:1.45 !important;
+    writing-mode:horizontal-tb !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+    color:var(--muted) !important;
+    text-align:left !important;
+  }
+
+  /* 按鈕列：新增獨立一行，下面兩顆並排 */
+  #analystTradesModal .analyst-trades-head-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    flex:none !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+
+  #analystTradesModal #addTradeFromAnalystModalBtn{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+  }
+
+  #analystTradesModal #copyAnalystHoldingsBtn,
+  #analystTradesModal #closeAnalystTrades{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+  }
+
+  #analystTradesModal .analyst-trades-head-actions button{
+    display:block !important;
+    box-sizing:border-box !important;
+    min-height:42px !important;
+    padding:10px 12px !important;
+    font-size:13px !important;
+    line-height:1.2 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    border-radius:12px !important;
+  }
+
+  /* 內容區 */
+  #analystTradesBody,
+  #analystTradesModal .analyst-trades-body{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    max-height:calc(90vh - 150px) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    box-sizing:border-box !important;
+    padding-top:6px !important;
+  }
+
+  /* 區塊標題 */
+  #analystTradesModal .analyst-trade-section{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+  }
+
+  #analystTradesModal .analyst-trade-section-title{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:10px !important;
+    width:100% !important;
+    min-width:0 !important;
+    font-size:18px !important;
+    line-height:1.3 !important;
+    margin:12px 0 8px !important;
+    white-space:normal !important;
+  }
+
+  #analystTradesModal .analyst-trade-section-title span{
+    flex:0 0 auto !important;
+    font-size:13px !important;
+    color:var(--muted) !important;
+  }
+
+  /* 持股卡片 */
+  #analystTradesModal .analyst-trade-item{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    padding:14px !important;
+    margin-bottom:12px !important;
+    border-radius:16px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+
+  /* 股票名稱列 */
+  #analystTradesModal .analyst-trade-top{
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  #analystTradesModal .analyst-trade-stock{
+    min-width:0 !important;
+    max-width:calc(100% - 88px) !important;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  #analystTradesModal .analyst-trade-status{
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+    font-size:12px !important;
+  }
+
+  /* 資訊欄位改兩欄 */
+  #analystTradesModal .analyst-trade-grid{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px 14px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin-top:10px !important;
+    box-sizing:border-box !important;
+  }
+
+  #analystTradesModal .analyst-trade-grid > span{
+    min-width:0 !important;
+    font-size:12px !important;
+    line-height:1.45 !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  /* 來源等長文字整行顯示 */
+  #analystTradesModal .analyst-trade-grid > span:nth-last-child(2),
+  #analystTradesModal .analyst-trade-grid > span:nth-last-child(1){
+    grid-column:auto !important;
+  }
+
+  /* 若有很長的來源文字，讓它自動換行 */
+  #analystTradesModal .analyst-trade-grid .source,
+  #analystTradesModal .analyst-trade-grid .trade-source{
+    grid-column:1 / -1 !important;
+  }
+
+  /* 卡片底部操作按鈕 */
+  #analystTradesModal .analyst-trade-admin-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin-top:12px !important;
+    box-sizing:border-box !important;
+  }
+
+  #analystTradesModal .analyst-trade-admin-actions button{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-height:42px !important;
+    padding:10px 12px !important;
+    font-size:13px !important;
+    border-radius:12px !important;
+    box-sizing:border-box !important;
+  }
+
+  /* 空狀態文字 */
+  #analystTradesModal .analyst-trade-empty{
+    padding:18px 10px !important;
+    font-size:14px !important;
+    text-align:center !important;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">12 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
+    <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">13 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新目前價</button>
@@ -3548,7 +3823,7 @@ body.quiz-locked{overflow:hidden!important}
 <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>團團</option><option>運達黃培碩</option><option>蔡總蔡明彰</option></select></div>
+        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>莊佳螢</option><option>團團</option><option>運達黃培碩</option><option>蔡總蔡明彰</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -3722,7 +3997,7 @@ body.quiz-locked{overflow:hidden!important}
 /*
 v126 股價來源規則：
 - 上市：TWSE 官方 STOCK_DAY 月盤後資料
-- 上櫃：TPEx 櫃買中心官方 OpenAPI 優先，Yahoo Finance .TWO 備援
+- 上櫃：TPEx 櫃買中心官方 OpenAPI 優先，Yahoo Finance .TWO 備援；再加 Investing.com 備援
 - GitHub / proxy 僅作為傳輸 relay，不視為主要行情資料庫
 - 所有主要來源皆失敗時，由現有流程跳出空白手動輸入
 - 絕不沿用舊 currentPrice 當作本次更新成功
@@ -3826,6 +4101,7 @@ function openBulkFailedPriceModal(items=[]){
         <div class="bulk-failed-price-stock">
           <strong>${esc(symbol)}${stockName?`　${esc(stockName)}`:''}</strong>
           <small>${esc(reason)}</small>
+          <small><a href="${investingSearchUrl(symbol)}" target="_blank" rel="noopener noreferrer">Investing.com 查詢</a></small>
         </div>
         <input
           type="number"
@@ -4066,7 +4342,7 @@ const isAdmin2=()=>isAdmin&&adminRole==='admin2';
 const canUpdatePrice=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 
-const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰','GD何基鼎'];
+const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰','GD何基鼎','莊佳螢'];
 const ALL_ANALYSTS=[...PUBLIC_ANALYSTS,'團團'];
 
 const MAIN_ADMIN_TUAN_KEY='mainAdminShowTuan';
@@ -5588,9 +5864,9 @@ function updatePriceModeUI(){
   }
   if(note){
     note.innerHTML=isMainAdmin()
-      ? '<strong>上市：TWSE 官方｜上櫃：TPEx 官方 → Yahoo .TWO</strong>｜抓不到改手動輸入'
+      ? '<strong>TWSE 官方 → TPEx 官方 → Yahoo .TWO → Investing.com</strong>｜抓不到改手動輸入'
       : isAdmin2()
-        ? '<strong>管理者2：團團持股更新｜上市 TWSE／上櫃 TPEx → Yahoo .TWO</strong>｜抓不到改手動輸入'
+        ? '<strong>管理者2：團團持股更新｜TWSE → TPEx → Yahoo .TWO → Investing.com</strong>｜抓不到改手動輸入'
         : '<b>價格由管理者更新</b>';
   }
 }
@@ -6202,14 +6478,149 @@ async function fetchYahooTWOAfterHours(sym){
   throw new Error(lastError?.message||'Yahoo Finance .TWO 抓取失敗');
 }
 
+
+function investingRandomToken(){
+  try{
+    const a=new Uint8Array(16);
+    crypto.getRandomValues(a);
+    return [...a].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }catch(_){
+    return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
+  }
+}
+
+function investingTvcUrl(endpoint,params={}){
+  const token=investingRandomToken();
+  const qs=new URLSearchParams(params);
+  return `https://tvc6.investing.com/${token}/0/0/0/0/${endpoint}?${qs.toString()}`;
+}
+
+async function fetchInvestingJson(url){
+  try{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+    try{
+      const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+      if(r.ok)return await r.json();
+    }finally{
+      clearTimeout(timer);
+    }
+  }catch(_){}
+
+  try{
+    const j=await fetchJsonViaProxy(url);
+    if(j)return j;
+  }catch(_){}
+
+  throw new Error('Investing.com 連線遭阻擋或無回應');
+}
+
+function investingSearchScore(item,sym){
+  const symbol=String(
+    item?.symbol ?? item?.pair_symbol ?? item?.displaySymbol ?? item?.code ?? ''
+  ).trim().toUpperCase();
+  const country=String(
+    item?.country ?? item?.countryName ?? item?.country_name ?? item?.flag ?? ''
+  ).toLowerCase();
+  const exchange=String(item?.exchange??item?.exchangeName??'').toLowerCase();
+  const type=String(item?.type??item?.instrumentType??'').toLowerCase();
+
+  let score=0;
+  if(symbol===String(sym).toUpperCase())score+=100;
+  if(country.includes('taiwan')||country.includes('台灣')||country.includes('台湾'))score+=40;
+  if(exchange.includes('taiwan')||exchange.includes('tpe')||exchange.includes('twse')||exchange.includes('tpex'))score+=25;
+  if(type.includes('stock')||type.includes('equity'))score+=10;
+  return score;
+}
+
+async function fetchInvestingTaiwanPrice(sym){
+  const stockNo=String(sym||'').trim();
+  let searchData=null;
+  let searchError=null;
+
+  const searchUrls=[
+    investingTvcUrl('search',{query:stockNo,limit:'10',type:'Stock',exchange:''}),
+    `https://api.investing.com/api/search/v2/search?q=${encodeURIComponent(stockNo)}`
+  ];
+
+  for(const url of searchUrls){
+    try{
+      searchData=await fetchInvestingJson(url);
+      if(searchData)break;
+    }catch(e){
+      searchError=e;
+    }
+  }
+
+  const items=Array.isArray(searchData)
+    ? searchData
+    : Array.isArray(searchData?.quotes)
+      ? searchData.quotes
+      : Array.isArray(searchData?.data)
+        ? searchData.data
+        : [];
+
+  if(!items.length)throw new Error(searchError?.message||'Investing.com 搜尋不到此股票');
+
+  const ranked=items
+    .map(item=>({item,score:investingSearchScore(item,stockNo)}))
+    .sort((a,b)=>b.score-a.score);
+
+  const best=ranked[0];
+  if(!best || best.score<100)throw new Error('Investing.com 找不到相符的台股代號');
+
+  const pairId=String(
+    best.item?.ticker ?? best.item?.pair_ID ?? best.item?.pairId ?? best.item?.pair_id ?? best.item?.id ?? ''
+  ).trim();
+
+  if(!pairId)throw new Error('Investing.com 找不到行情識別碼');
+
+  const now=Math.floor(Date.now()/1000);
+  const historyUrl=investingTvcUrl('history',{
+    symbol:pairId,
+    resolution:'D',
+    from:String(now-14*24*60*60),
+    to:String(now+86400)
+  });
+
+  const h=await fetchInvestingJson(historyUrl);
+  if(h?.s && h.s!=='ok')throw new Error(`Investing.com 行情狀態：${h.s}`);
+
+  const closes=Array.isArray(h?.c)?h.c:[];
+  const times=Array.isArray(h?.t)?h.t:[];
+  const valid=[];
+  closes.forEach((v,i)=>{
+    const price=Number(v);
+    const ts=Number(times[i]);
+    if(Number.isFinite(price)&&price>0){
+      valid.push({price,ts:Number.isFinite(ts)?ts:0});
+    }
+  });
+
+  if(!valid.length)throw new Error('Investing.com 沒有有效收盤價');
+
+  const latest=valid[valid.length-1];
+  const tradeDate=latest.ts
+    ? new Date(latest.ts*1000).toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'})
+    : '';
+
+  return {
+    price:latest.price,
+    source:'Investing.com 備援行情',
+    mode:'closed',
+    market:'Taiwan',
+    tradeDate
+  };
+}
+
+function investingSearchUrl(symbol){
+  return `https://cn.investing.com/search/?q=${encodeURIComponent(String(symbol||'').trim())}`;
+}
+
 async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
 
-  // 1. 上市：TWSE 官方盤後
-  // 2. 上櫃：TPEx 櫃買中心官方 OpenAPI
-  // 3. 上櫃備援：Yahoo Finance .TWO
-  // 4. 全部失敗才交由既有手動／批次輸入流程
   let twseError=null;
   try{
     return await fetchTWSEOfficialAfterHours(sym);
@@ -6224,13 +6635,21 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
     tpexError=e;
   }
 
+  let yahooError=null;
   try{
     return await fetchYahooTWOAfterHours(sym);
-  }catch(yahooError){
+  }catch(e){
+    yahooError=e;
+  }
+
+  try{
+    return await fetchInvestingTaiwanPrice(sym);
+  }catch(investingError){
     throw new Error(
-      `上市 TWSE：${twseError?.message||'查無資料'}｜`+
-      `上櫃 TPEx：${tpexError?.message||'抓取失敗'}｜`+
-      `Yahoo .TWO：${yahooError?.message||'抓取失敗'}`
+      `TWSE：${twseError?.message||'失敗'}｜`+
+      `TPEx：${tpexError?.message||'失敗'}｜`+
+      `Yahoo .TWO：${yahooError?.message||'失敗'}｜`+
+      `Investing.com：${investingError?.message||'失敗'}`
     );
   }
 }

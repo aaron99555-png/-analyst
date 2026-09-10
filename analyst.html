@@ -3416,7 +3416,7 @@ body.quiz-locked{overflow:hidden!important}
 /*
 v126 股價來源規則：
 - 上市：TWSE 官方 STOCK_DAY 月盤後資料
-- 上櫃：Yahoo Finance .TWO
+- 上櫃：TPEx 櫃買中心官方 OpenAPI 優先，Yahoo Finance .TWO 備援
 - GitHub / proxy 僅作為傳輸 relay，不視為主要行情資料庫
 - 所有主要來源皆失敗時，由現有流程跳出空白手動輸入
 - 絕不沿用舊 currentPrice 當作本次更新成功
@@ -5282,9 +5282,9 @@ function updatePriceModeUI(){
   }
   if(note){
     note.innerHTML=isMainAdmin()
-      ? '<strong>上市：TWSE 官方盤後｜上櫃：Yahoo Finance .TWO</strong>｜抓不到改手動輸入'
+      ? '<strong>上市：TWSE 官方｜上櫃：TPEx 官方 → Yahoo .TWO</strong>｜抓不到改手動輸入'
       : isAdmin2()
-        ? '<strong>管理者2：團團持股更新｜上市 TWSE／上櫃 Yahoo .TWO</strong>｜抓不到改手動輸入'
+        ? '<strong>管理者2：團團持股更新｜上市 TWSE／上櫃 TPEx → Yahoo .TWO</strong>｜抓不到改手動輸入'
         : '<b>價格由管理者更新</b>';
   }
 }
@@ -5743,6 +5743,98 @@ async function fetchTWSEOfficialAfterHours(sym){
 }
 
 // 上櫃：Yahoo Finance .TWO 為主。
+
+function rocDateToISO(v){
+  const s=String(v||'').replace(/\D/g,'').trim();
+  if(s.length<7)return String(v||'').trim();
+  const y=Number(s.slice(0,s.length-4));
+  const md=s.slice(-4);
+  if(!Number.isFinite(y))return String(v||'').trim();
+  return `${y+1911}-${md.slice(0,2)}-${md.slice(2,4)}`;
+}
+
+// 上櫃：TPEx 官方 OpenAPI 最新收盤行情。
+// 官方端點會回傳最新交易日全市場資料，依股票代號比對後取 Close。
+async function fetchTPExOfficialAfterHours(sym){
+  const stockNo=String(sym||'').trim();
+  const endpoints=[
+    'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes',
+    'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes'
+  ];
+
+  const errors=[];
+
+  for(const url0 of endpoints){
+    const url=`${url0}?_=${Date.now()}`;
+    try{
+      let j=null;
+
+      try{
+        const controller=new AbortController();
+        const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+        try{
+          const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+          if(r.ok)j=await r.json();
+        }finally{
+          clearTimeout(timer);
+        }
+      }catch(_){}
+
+      // 若瀏覽器遇到 CORS，沿用既有 relay/proxy；
+      // relay 只做傳輸，行情內容仍來自 TPEx 官方。
+      if(!j){
+        try{j=await fetchJsonViaProxy(url0);}catch(_){}
+      }
+
+      const rows=Array.isArray(j)?j:(Array.isArray(j?.data)?j.data:[]);
+      if(!rows.length)throw new Error('TPEx 官方回傳空資料');
+
+      const row=rows.find(x=>{
+        const code=String(
+          x?.SecuritiesCompanyCode ??
+          x?.Code ??
+          x?.StockNo ??
+          x?.stockNo ??
+          ''
+        ).trim();
+        return code===stockNo;
+      });
+
+      if(!row)throw new Error('TPEx 官方查無此上櫃股票');
+
+      const rawClose=
+        row?.Close ??
+        row?.ClosingPrice ??
+        row?.close ??
+        row?.["收盤價"] ??
+        row?.["收盤"];
+
+      const price=Number(String(rawClose??'').replace(/,/g,'').trim());
+      if(!Number.isFinite(price)||price<=0){
+        throw new Error('TPEx 官方沒有有效收盤價');
+      }
+
+      const rawDate=
+        row?.Date ??
+        row?.TradeDate ??
+        row?.date ??
+        '';
+
+      return {
+        price,
+        source:'TPEx 櫃買中心官方收盤行情',
+        mode:'closed',
+        market:'TPEx',
+        tradeDate:rocDateToISO(rawDate)
+      };
+    }catch(e){
+      errors.push(e?.message||'TPEx 抓取失敗');
+    }
+  }
+
+  throw new Error(errors.join('｜')||'TPEx 官方抓取失敗');
+}
+
 async function fetchYahooTWOAfterHours(sym){
   const ticker=`${String(sym||'').trim()}.TWO`;
   let lastError=null;
@@ -5808,6 +5900,10 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
 
+  // 1. 上市：TWSE 官方盤後
+  // 2. 上櫃：TPEx 櫃買中心官方 OpenAPI
+  // 3. 上櫃備援：Yahoo Finance .TWO
+  // 4. 全部失敗才交由既有手動／批次輸入流程
   let twseError=null;
   try{
     return await fetchTWSEOfficialAfterHours(sym);
@@ -5815,15 +5911,24 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
     twseError=e;
   }
 
+  let tpexError=null;
+  try{
+    return await fetchTPExOfficialAfterHours(sym);
+  }catch(e){
+    tpexError=e;
+  }
+
   try{
     return await fetchYahooTWOAfterHours(sym);
   }catch(yahooError){
     throw new Error(
       `上市 TWSE：${twseError?.message||'查無資料'}｜`+
-      `上櫃 Yahoo .TWO：${yahooError?.message||'抓取失敗'}`
+      `上櫃 TPEx：${tpexError?.message||'抓取失敗'}｜`+
+      `Yahoo .TWO：${yahooError?.message||'抓取失敗'}`
     );
   }
 }
+
 async function writeValidatedPrice(id,q){
   const tr=trades[id];
   if(!tr)throw new Error('找不到交易資料');

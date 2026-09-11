@@ -5212,7 +5212,16 @@ async function copySharedStockAnalysts(symbol,stockName=''){
 
   const names=[...group.analysts];
   const label=`${group.symbol}${group.stockName?' '+group.stockName:(stockName?' '+stockName:'')}`;
-  const text=`${label}｜持有分析師：${names.join('、')}`;
+  const dateText=String($('#entryQueryDate')?.value||today()).replaceAll('-','/');
+  const text=
+`| ${dateText} 同時持有分析師   |
+
+${label}｜持有分析師：${names.join('、')}
+
+-------------------
+⚠️ 停損是紀律，停利是藝術。
+⚠️ 位階決定勝率，部位決定存活。
+⚠️ 趨勢-族群-題材-位階-動能-風控`;
 
   try{
     await navigator.clipboard.writeText(text);

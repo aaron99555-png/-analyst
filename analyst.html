@@ -4065,6 +4065,12 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v158：今日進場／出場卡片顯示目前價 */
+.today-entry-meta .current-price{
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
@@ -5231,6 +5237,7 @@ function renderTodayExits(){
         <span class="today-time">出場時間 <b>${esc(tradeExitDateTime(tr))}</b></span>
         <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
+        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b></span>
         <span class="${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
         <button class="mini ghost copy-perf-btn" type="button" data-copy-exit-perf="${id}">複製績效</button>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
@@ -5354,6 +5361,7 @@ function renderTodayEntries(){
         <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
         <span class="today-time">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></span>
         <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
+        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>

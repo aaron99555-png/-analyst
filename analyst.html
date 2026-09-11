@@ -4317,6 +4317,15 @@ body.dark .today-price{
   }
 }
 
+
+/* v163：損益比較可切換金額／百分比 */
+#visualProfitCompareControls{
+  margin-bottom:10px;
+}
+#visualProfitCompareControls select{
+  min-width:120px;
+}
+
 </style>
 </head>
 <body>
@@ -4451,6 +4460,13 @@ body.dark .today-price{
         <button type="button" data-visual-mode="radar">績效雷達</button>
         <button type="button" data-visual-mode="status">持股狀態</button>
         <button type="button" data-visual-mode="contribution">損益貢獻</button>
+      </div>
+      <div id="visualProfitCompareControls" class="visual-radar-controls">
+        <label for="visualProfitCompareMetric">比較方式</label>
+        <select id="visualProfitCompareMetric" aria-label="選擇損益比較方式">
+          <option value="money">損益金額</option>
+          <option value="percent">績效 %</option>
+        </select>
       </div>
       <div id="visualTrendControls" class="visual-radar-controls hidden">
         <label for="visualTrendMetric">績效類型</label>
@@ -5353,6 +5369,7 @@ let visualMode='profitcompare';
 let visualAnalyticsChart=null;
 let visualSelectedAnalyst='';
 let visualTrendMetric='total';
+let visualProfitCompareMetric='money';
 
 function visualAllTrades(){
   return Object.values(trades||{}).filter(t=>t&&canViewTrade(t));
@@ -5440,6 +5457,7 @@ function renderVisualAnalytics(){
   const note=$('#visualChartNote');
   const analystControls=$('#visualAnalystControls');
   const trendControls=$('#visualTrendControls');
+  const profitCompareControls=$('#visualProfitCompareControls');
 
   empty?.classList.add('hidden');
   if(wrap)wrap.style.display='block';
@@ -5447,6 +5465,7 @@ function renderVisualAnalytics(){
   const needsAnalyst=visualMode==='radar'||visualMode==='status';
   analystControls?.classList.toggle('hidden',!needsAnalyst);
   trendControls?.classList.toggle('hidden',visualMode!=='trend');
+  profitCompareControls?.classList.toggle('hidden',visualMode!=='profitcompare');
   if(needsAnalyst)ensureVisualAnalystOptions();
 
   const fail=(msg)=>{
@@ -5527,23 +5546,46 @@ function renderVisualAnalytics(){
   }
 
   if(visualMode==='profitcompare'){
-    title.textContent='分析師損益比較｜全部期間';
-    note.textContent='比較未實現損益、已實現損益與總損益；固定顯示全部交易資料';
+    const usePercent=visualProfitCompareMetric==='percent';
+    title.textContent=usePercent?'分析師績效 % 比較｜全部期間':'分析師損益比較｜全部期間';
+    note.textContent=usePercent
+      ?'以百分比比較未實現績效、已實現績效與總績效，可避免不同投入金額造成比較失真'
+      :'比較未實現損益、已實現損益與總損益；固定顯示全部交易資料';
+
     const rows=analystSummaryAll().filter(r=>r.tradesCount>0);
     if(!rows.length)return fail('目前沒有可比較的分析師交易資料');
+
     const opt=visualBaseOptions(false);
-    visualAnalyticsChart=new Chart(canvas,{
-      type:'bar',
-      data:{
-        labels:rows.map(r=>r.name),
-        datasets:[
-          {label:'未實現損益',data:rows.map(r=>Math.round(r.unrealized))},
-          {label:'已實現損益',data:rows.map(r=>Math.round(r.realized))},
-          {label:'總損益',data:rows.map(r=>Math.round(r.total))}
-        ]
-      },
-      options:opt
-    });
+
+    if(usePercent){
+      opt.scales.y.ticks.callback=v=>v+'%';
+      opt.plugins.tooltip.callbacks.label=ctx=>`${ctx.dataset.label}：${Number(ctx.raw||0).toFixed(2)}%`;
+      visualAnalyticsChart=new Chart(canvas,{
+        type:'bar',
+        data:{
+          labels:rows.map(r=>r.name),
+          datasets:[
+            {label:'未實現績效 %',data:rows.map(r=>Number((r.unrealizedPerf||0).toFixed(2)))},
+            {label:'已實現績效 %',data:rows.map(r=>Number((r.realizedPerf||0).toFixed(2)))},
+            {label:'總績效 %',data:rows.map(r=>Number((r.totalPerf||0).toFixed(2)))}
+          ]
+        },
+        options:opt
+      });
+    }else{
+      visualAnalyticsChart=new Chart(canvas,{
+        type:'bar',
+        data:{
+          labels:rows.map(r=>r.name),
+          datasets:[
+            {label:'未實現損益',data:rows.map(r=>Math.round(r.unrealized))},
+            {label:'已實現損益',data:rows.map(r=>Math.round(r.realized))},
+            {label:'總損益',data:rows.map(r=>Math.round(r.total))}
+          ]
+        },
+        options:opt
+      });
+    }
     return;
   }
 
@@ -5700,6 +5742,11 @@ $('#visualAnalystSelect')?.addEventListener('change',e=>{
 $('#visualTrendMetric')?.addEventListener('change',e=>{
   visualTrendMetric=e.target.value||'total';
   if(visualMode==='trend')renderVisualAnalytics();
+});
+
+$('#visualProfitCompareMetric')?.addEventListener('change',e=>{
+  visualProfitCompareMetric=e.target.value||'money';
+  if(visualMode==='profitcompare')renderVisualAnalytics();
 });
 
 

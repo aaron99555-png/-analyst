@@ -3976,345 +3976,222 @@ body.quiz-locked{overflow:hidden!important}
 }
 
 
-/* v162：整體 UI 精修版 */
+/* ===== v162 整體 UI 精修 ===== */
 :root{
-  --milk-bg:#f5f0e8;
-  --milk-card:#fffdf8;
-  --milk-card-2:#faf6ef;
-  --milk-line:#e7ded0;
-  --milk-text:#2b2926;
-  --milk-muted:#756f67;
-  --milk-gold:#b58a3b;
-  --milk-gold-soft:#efe2c4;
-  --milk-danger:#c85b5b;
-  --milk-positive:#b74343;
-  --milk-negative:#2f7a55;
+  --milk-bg:#f5f0e7;
+  --milk-card:#fffaf2;
+  --milk-card-2:#fbf4e9;
+  --milk-line:#e5dbc9;
+  --milk-gold:#b38b4b;
 }
-
-body:not(.dark){
+body:not(.dark),
+body[data-theme="light"]{
   background:
-    radial-gradient(circle at 10% 0%,rgba(181,138,59,.08),transparent 26%),
-    linear-gradient(180deg,#f8f4ed 0%,#f3eee6 100%) !important;
-  color:var(--milk-text);
+    radial-gradient(circle at 12% 0%,rgba(221,197,153,.18),transparent 30%),
+    linear-gradient(180deg,#faf6ef 0%,#f2ede4 100%)!important;
 }
-
 body:not(.dark) .card,
-body:not(.dark) .modal-card,
-body:not(.dark) .quiz-card{
-  background:var(--milk-card)!important;
+body[data-theme="light"] .card{
+  background:rgba(255,250,242,.96)!important;
   border-color:var(--milk-line)!important;
-  box-shadow:0 10px 28px rgba(72,56,35,.06)!important;
+  box-shadow:0 8px 24px rgba(87,66,34,.055);
 }
-
-body:not(.dark) .today-entry-item,
-body:not(.dark) .shared-open-item,
-body:not(.dark) .rank-row,
-body:not(.dark) .analyst-trade-item,
-body:not(.dark) .notification-help,
-body:not(.dark) .bulk-failed-price-row{
-  background:var(--milk-card-2)!important;
-  border-color:var(--milk-line)!important;
-}
-
-body:not(.dark) input,
-body:not(.dark) select,
-body:not(.dark) textarea{
-  background:#fffdfa!important;
-  border-color:var(--milk-line)!important;
-  color:var(--milk-text)!important;
-}
-
-body:not(.dark) .ghost{
-  background:#fffaf2!important;
-  border-color:var(--milk-line)!important;
-  color:var(--milk-text)!important;
-}
-body:not(.dark) .primary{
-  background:#c99f52!important;
-  border-color:#c99f52!important;
-  color:#211b12!important;
-}
-body:not(.dark) .danger{
-  background:#f7e5e5!important;
-  border-color:#e9c6c6!important;
-  color:#8c3f3f!important;
+body:not(.dark) .topbar,
+body[data-theme="light"] .topbar{
+  background:rgba(255,250,242,.9)!important;
+  border:1px solid var(--milk-line);
+  box-shadow:0 8px 24px rgba(87,66,34,.05);
+  backdrop-filter:blur(12px);
 }
 
 .topbar{
-  align-items:flex-start!important;
-  gap:14px!important;
+  border-radius:18px;
+  padding:14px 16px!important;
   margin-bottom:14px!important;
 }
-.brand{
-  min-width:0!important;
-}
-.brand h1{
-  letter-spacing:-.02em;
-}
-.brand .sub{
-  margin-top:4px;
-  line-height:1.45;
-}
-.actions{
-  display:flex!important;
-  align-items:flex-start!important;
-  justify-content:flex-end!important;
-  gap:8px!important;
-  flex-wrap:wrap!important;
-}
-.role-badge{
+.brand h1{letter-spacing:-.02em}
+.brand .sub{margin-top:3px;line-height:1.4}
+.actions{gap:8px!important;align-items:center!important}
+.admin-role-badge{
   display:inline-flex;
   align-items:center;
-  min-height:34px;
-  padding:6px 10px;
+  min-height:30px;
+  padding:5px 9px;
   border-radius:999px;
-  font-size:11px;
-  font-weight:900;
   border:1px solid var(--line);
   background:var(--card2);
-  white-space:nowrap;
-}
-
-.card{
-  border-radius:18px!important;
-  padding:16px!important;
-}
-.section-title{
-  margin-bottom:12px!important;
-}
-.section-title h2{
-  letter-spacing:-.01em;
-}
-.status{
-  opacity:.78;
-}
-
-.entry-card-head{
-  padding-bottom:4px;
-}
-#entryCard.entry-card-collapsed{
-  padding:12px 16px!important;
-}
-#entryCard.entry-card-collapsed .entry-card-title-wrap .status{
-  display:none;
-}
-#entryCard.entry-card-pinned{
-  backdrop-filter:blur(12px);
-}
-.formgrid{
-  gap:10px!important;
-}
-.formgrid label{
-  margin-bottom:4px;
   font-size:11px;
-  font-weight:800;
-  opacity:.78;
-}
-.formgrid input,
-.formgrid select,
-.formgrid textarea{
-  border-radius:10px!important;
-}
-
-.today-entry-item{
-  padding:12px 13px!important;
-  border-radius:14px!important;
-}
-.today-entry-stock{
-  justify-content:space-between;
-  gap:10px!important;
-}
-.today-entry-stock b{
-  font-size:16px!important;
-}
-.today-entry-stock span{
-  font-size:14px!important;
-}
-.today-entry-meta{
-  margin-top:7px;
-  display:flex!important;
-  align-items:center;
-  gap:7px 10px!important;
-  flex-wrap:wrap!important;
-}
-.today-entry-meta .today-analyst{
-  flex-basis:100%;
-  font-size:13px!important;
-}
-.today-time{
-  flex-basis:100%!important;
-  font-size:11px!important;
-  opacity:.72;
-}
-.today-price{
-  display:inline-flex;
-  align-items:baseline;
-  gap:4px;
-  padding:3px 7px;
-  border-radius:999px;
-  background:rgba(127,127,127,.08);
-  font-size:11px!important;
-}
-.today-price b{
-  font-size:13px!important;
-}
-.exit-kind{
-  border-radius:999px!important;
-  padding:3px 7px!important;
-}
-
-.shared-open-item{
-  border-radius:14px!important;
-  padding:12px 13px!important;
-}
-.shared-open-head{
-  align-items:center!important;
-}
-.shared-open-stock{
-  font-size:15px!important;
-  font-weight:900!important;
-}
-.shared-open-count{
-  font-size:10px!important;
-  border-radius:999px;
-  padding:3px 7px;
-  background:rgba(181,138,59,.10);
-}
-.shared-open-analysts{
-  margin-top:8px!important;
-  gap:6px!important;
-}
-.shared-open-analyst-btn{
-  background:rgba(127,127,127,.06)!important;
-}
-
-.rank-list{
-  display:grid;
-  gap:7px;
-}
-.rank-row{
-  border-radius:14px!important;
-  padding:10px 11px!important;
-}
-.rank-name{
-  font-weight:900!important;
-}
-.rank-metrics,
-.rank-stats{
-  gap:8px!important;
-}
-.rank-perf,
-.rank-amount{
-  font-weight:900!important;
+  font-weight:900;
+  white-space:nowrap;
 }
 
 button{
   border-radius:10px!important;
-  font-weight:800;
+  transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease;
 }
-.mini{
-  min-height:30px!important;
-}
+button:hover:not(:disabled){transform:translateY(-1px)}
+button.primary{box-shadow:0 4px 12px rgba(179,139,75,.14)}
+button.danger{box-shadow:none!important}
 
-.visual-tabs button{
-  border-radius:999px!important;
+/* 新增交易 */
+#entryCard{
+  border-width:1px!important;
+  overflow:visible;
 }
-.visual-chart-wrap{
-  border-radius:14px;
-  overflow:hidden;
+#entryCard.entry-card-pinned{
+  backdrop-filter:blur(14px);
 }
+.entry-card-title-wrap h2{font-size:18px!important}
+.entry-card-title-wrap .status{
+  padding:4px 7px;
+  border-radius:999px;
+  background:var(--card2);
+}
+.entry-card-head-actions button{min-height:32px}
+#entryCard.entry-card-collapsed{
+  padding-top:10px!important;
+  padding-bottom:10px!important;
+}
+#entryCard.entry-card-collapsed .entry-card-title-wrap .status{display:none}
 
-.table-wrap{
-  border-radius:14px;
+/* 今日進出場 */
+.today-entry-list{gap:10px!important}
+.today-entry-item{
+  position:relative;
+  padding:11px 12px!important;
+  border-radius:13px!important;
+  border:1px solid var(--line)!important;
+  background:linear-gradient(180deg,var(--card2),rgba(255,255,255,.02));
 }
-table{
-  border-collapse:separate!important;
-  border-spacing:0!important;
+.today-entry-stock{margin-bottom:8px!important}
+.today-entry-stock b{font-size:16px!important}
+.today-entry-stock span{font-size:14px!important}
+.today-entry-meta{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:5px 10px!important;
+  align-items:center;
 }
-th{
+.today-entry-meta .today-analyst{
+  grid-column:1/-1;
+  width:max-content;
+}
+.today-time{
+  grid-column:1/-1;
   font-size:11px!important;
-  letter-spacing:.01em;
+  opacity:.8;
 }
-td{
-  vertical-align:middle!important;
+.today-price,.today-price b{font-size:13px!important}
+.today-delta{
+  display:inline-flex;
+  align-items:center;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+  background:rgba(127,127,127,.08);
 }
+.today-delta.pos{color:#c73a3a}
+.today-delta.neg{color:#25845a}
 
-.analyst-trades-modal-card{
-  border-radius:20px!important;
+/* 同時持有 */
+.shared-open-item{
+  padding:12px 13px!important;
+  border-radius:13px!important;
 }
-.analyst-trade-item{
-  border-radius:14px!important;
+.shared-open-stock-wrap{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  flex-wrap:wrap;
 }
+.shared-open-stock{font-size:15px!important}
+.shared-consensus-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+  border:1px solid var(--line);
+  background:var(--card2);
+}
+.shared-consensus-badge.mid{background:rgba(179,139,75,.10)}
+.shared-consensus-badge.high{background:rgba(198,64,64,.09)}
+.shared-open-analysts{margin-top:8px!important}
+.shared-open-analyst-btn{background:rgba(255,255,255,.22)!important}
 
-body.dark .card,
-body.dark .modal-card{
-  box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
+/* 排行榜 */
+.rank-list{gap:8px!important}
+.rank-row{
+  border:1px solid var(--line)!important;
+  border-radius:13px!important;
+  background:linear-gradient(180deg,var(--card2),rgba(255,255,255,.02));
 }
-body.dark .today-price{
-  background:rgba(255,255,255,.06);
+.rank-row:hover{box-shadow:0 6px 18px rgba(0,0,0,.05)}
+.rank-no{font-weight:950!important}
+.rank-name-btn{font-weight:900!important}
+.rank-metrics,.rank-stats{gap:7px!important}
+
+/* 標題、表格 */
+.section-title{margin-bottom:10px!important}
+.section-title h2{letter-spacing:-.01em}
+table{border-collapse:separate!important;border-spacing:0!important}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  backdrop-filter:blur(8px);
 }
+tbody tr{transition:background .12s ease}
+tbody tr:hover{background:rgba(179,139,75,.045)}
 
 @media(max-width:700px){
-  .wrap{
-    padding:10px!important;
-  }
-  .topbar{
-    flex-direction:column!important;
-    align-items:stretch!important;
-  }
+  .wrap{padding:10px!important}
+  .topbar{padding:12px!important;border-radius:15px!important}
+  .brand{align-items:flex-start!important}
+  .brand h1{font-size:21px!important}
+  .brand .sub{font-size:11px!important}
+
   .actions{
-    justify-content:flex-start!important;
-    width:100%!important;
-  }
-  .actions > *{
-    max-width:100%;
-  }
-  .price-update-wrap{
     width:100%;
+    display:grid!important;
+    grid-template-columns:1fr 1fr;
   }
-  .price-note{
-    font-size:10px!important;
-    line-height:1.4!important;
-  }
-  .card{
-    padding:13px!important;
-    border-radius:16px!important;
-  }
-  .section-title{
-    align-items:flex-start!important;
-    gap:8px!important;
-  }
-  .section-title h2{
-    font-size:16px!important;
-  }
-  .today-entry-meta{
-    gap:6px!important;
-  }
-  .today-price{
-    flex:0 0 auto;
-  }
-  .shared-open-head{
-    flex-direction:column;
-    align-items:flex-start!important;
-  }
+  .price-update-wrap{grid-column:1/-1}
+  #refreshAllBtn{width:100%}
+  .admin-role-badge{grid-column:1/-1;width:max-content}
+
+  .card{border-radius:15px!important;padding:12px!important}
+
+  .entry-card-head{flex-direction:column;gap:8px!important}
+  .entry-card-head-actions{width:100%;display:grid!important;grid-template-columns:1fr 1fr}
+  .entry-card-head-actions button{width:100%}
+
+  .today-entry-meta{grid-template-columns:1fr 1fr!important}
+  .today-price,.today-price b{font-size:13px!important}
+
+  .shared-open-head{flex-direction:column;align-items:stretch!important}
   .shared-open-head-actions{
-    align-items:flex-start!important;
     flex-direction:row!important;
-    flex-wrap:wrap;
-  }
-  .rank-row{
-    padding:10px!important;
-  }
-  .rank-name-wrap{
-    min-width:0;
-  }
-  .entry-card-head-actions{
+    justify-content:space-between;
+    align-items:center!important;
     width:100%;
-    grid-template-columns:1fr 1fr!important;
   }
-  #entryCard.entry-card-pinned{
-    top:2px!important;
+
+  .rank-row{padding:10px!important}
+  .visual-tabs{gap:6px!important}
+  .visual-tabs button{
+    border-radius:999px!important;
+    padding:7px 10px!important;
   }
+}
+
+body.dark .today-entry-item,
+body.dark .rank-row{
+  background:rgba(255,255,255,.025)!important;
 }
 
 </style>
@@ -4324,7 +4201,7 @@ body.dark .today-price{
   <div class="topbar">
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">13 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
-      <div id="roleBadge" class="role-badge hidden">管理者</div>
+      <span id="adminRoleBadge" class="admin-role-badge hidden">一般模式</span>
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
@@ -4619,6 +4496,51 @@ const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+function normalizeHHMM(v){
+  const s=String(v||'').trim();
+  const m=s.match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return '';
+  const hh=String(Math.min(23,Math.max(0,Number(m[1])))).padStart(2,'0');
+  const mm=String(Math.min(59,Math.max(0,Number(m[2])))).padStart(2,'0');
+  return `${hh}:${mm}`;
+}
+function currentTaipeiHHMM(){
+  return new Date().toLocaleTimeString('en-GB',{
+    timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit',hour12:false
+  });
+}
+function formatDateWithTime(dateValue,timeValue){
+  const d=String(dateValue||'').trim();
+  const tm=normalizeHHMM(timeValue);
+  if(!d)return tm||'—';
+  return tm?`${d} ${tm}`:d;
+}
+function tradeEntryDateTime(tr){
+  return formatDateWithTime(tr?.entryDate,tr?.entryTime);
+}
+function tradeExitDateTime(tr){
+  return formatDateWithTime(tr?.exitDate,tr?.exitTime);
+}
+function formatExitDateTime(tr){
+  return formatDateWithTime(tr?.exitDate,tr?.exitTime);
+}
+function todayPriceDelta(tr,basePrice){
+  const current=Number(tr?.currentPrice);
+  const base=Number(basePrice);
+  if(!(current>0)||!(base>0))return '';
+  const pctValue=(current-base)/base*100;
+  const cls=pctValue>0?'pos':pctValue<0?'neg':'';
+  const arrow=pctValue>0?'▲':pctValue<0?'▼':'•';
+  return `<span class="today-delta ${cls}">${arrow} ${pctValue>0?'+':''}${pctValue.toFixed(2)}%</span>`;
+}
+function sharedConsensusInfo(count){
+  const n=Number(count)||0;
+  if(n>=4)return {label:'🔥 高共識',cls:'high'};
+  if(n===3)return {label:'✨ 中高共識',cls:'mid'};
+  return {label:'共同持有',cls:'base'};
+}
+
 
 const ENTRY_CARD_PIN_KEY='entryCardPinned';
 const ENTRY_CARD_COLLAPSE_KEY='entryCardCollapsed';
@@ -5152,7 +5074,7 @@ function renderTodayExits(){
         <span class="today-time">出場時間 <b>${esc(tradeExitDateTime(tr))}</b></span>
         <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
-        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b></span>
+        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b> ${todayPriceDelta(tr,tr.entryPrice)}</span>
         <span class="${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
         <button class="mini ghost copy-perf-btn" type="button" data-copy-exit-perf="${id}">複製績效</button>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
@@ -5217,7 +5139,10 @@ function renderSharedOpenPositions(){
     const label=`${g.symbol}${g.stockName?' '+g.stockName:''}`;
     return `<div class="shared-open-item">
       <div class="shared-open-head">
-        <a class="shared-open-stock" href="${yahooStockUrl(g.symbol)}" target="_blank" rel="noopener">${label}</a>
+        <div class="shared-open-stock-wrap">
+          <a class="shared-open-stock" href="${yahooStockUrl(g.symbol)}" target="_blank" rel="noopener">${label}</a>
+          <span class="shared-consensus-badge ${sharedConsensusInfo(names.length).cls}">${sharedConsensusInfo(names.length).label}</span>
+        </div>
         <div class="shared-open-head-actions">
           <span class="shared-open-count">${names.length} 位持有</span>
           <button class="mini ghost shared-copy-analysts-btn" type="button"
@@ -5276,10 +5201,7 @@ function renderTodayEntries(){
         <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
         <span class="today-time">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></span>
         <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
-        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
-        <span class="${((Number(tr.currentPrice||tr.entryPrice)-Number(tr.entryPrice||0))>=0)?'pos':'neg'} today-price">
-          ${Number(tr.entryPrice)>0?pct((Number(tr.currentPrice||tr.entryPrice)-Number(tr.entryPrice))/Number(tr.entryPrice)*100):'—'}
-        </span>
+        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b> ${todayPriceDelta(tr,tr.entryPrice)}</span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>
@@ -6449,18 +6371,6 @@ function bindRows(){
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
-
-function updateRoleBadge(){
-  const el=$('#roleBadge');
-  if(!el)return;
-  if(!isAdmin){
-    el.classList.add('hidden');
-    return;
-  }
-  el.classList.remove('hidden');
-  el.textContent=isAdmin2()?'管理者2｜團團':'管理者1';
-}
-
 function setAdmin(v,role=''){
   isAdmin=v;
   adminRole=v?(role||'main'):'';
@@ -6500,7 +6410,6 @@ function setAdmin(v,role=''){
   if(v){
     closeQuizGate();
   }else{
-    closeNotificationSettings();
     setTimeout(openQuizGate,0);
   }
 
@@ -6509,7 +6418,11 @@ function setAdmin(v,role=''){
     bulkBtn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
   }
 
-  updateRoleBadge();
+  const roleBadge=$('#adminRoleBadge');
+  if(roleBadge){
+    roleBadge.classList.toggle('hidden',!v);
+    roleBadge.textContent=v?(isAdmin2()?'管理者2｜團團':'管理者1'):'一般模式';
+  }
 }
 
 function updatePriceModeUI(){

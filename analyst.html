@@ -4042,6 +4042,29 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v157：進場／出場日期左右快速切換 */
+.date-query-box{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.date-arrow-btn{
+  min-width:34px;
+  padding:5px 8px;
+  font-size:16px;
+  font-weight:900;
+  line-height:1;
+}
+@media(max-width:700px){
+  .date-query-box{
+    flex-wrap:wrap;
+  }
+  .date-arrow-btn{
+    min-width:36px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4116,7 +4139,9 @@ body.quiz-locked{overflow:hidden!important}
           <button id="copyEntryBtn" class="mini ghost" type="button">複製</button>
         </div>
         <div class="date-query-box">
+          <button id="entryPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">←</button>
           <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
+          <button id="entryNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">→</button>
           <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>
@@ -4130,7 +4155,9 @@ body.quiz-locked{overflow:hidden!important}
           <button id="copyExitBtn" class="mini ghost" type="button">複製</button>
         </div>
         <div class="date-query-box">
+          <button id="exitPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">←</button>
           <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
+          <button id="exitNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">→</button>
           <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>
@@ -5159,6 +5186,21 @@ function yahooStockUrl(symbol){
 }
 function shortMD(d){
   return d ? String(d).slice(0,10) : '';
+}
+
+
+function shiftDateInput(inputId,days){
+  const input=$('#'+inputId);
+  if(!input)return;
+  const base=input.value||today();
+  const d=new Date(`${base}T00:00:00`);
+  if(Number.isNaN(d.getTime()))return;
+  d.setDate(d.getDate()+days);
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  input.value=`${y}-${m}-${day}`;
+  input.dispatchEvent(new Event('change',{bubbles:true}));
 }
 
 function renderTodayExits(){
@@ -7998,7 +8040,12 @@ function initDateQueryPickers(){
   entry?.addEventListener('change',renderTodayEntries);
   exit?.addEventListener('change',renderTodayExits);
 
-  $('#entryTodayBtn')?.addEventListener('click',()=>{
+  
+$('#entryPrevDayBtn')?.addEventListener('click',()=>shiftDateInput('entryQueryDate',-1));
+$('#entryNextDayBtn')?.addEventListener('click',()=>shiftDateInput('entryQueryDate',1));
+$('#exitPrevDayBtn')?.addEventListener('click',()=>shiftDateInput('exitQueryDate',-1));
+$('#exitNextDayBtn')?.addEventListener('click',()=>shiftDateInput('exitQueryDate',1));
+$('#entryTodayBtn')?.addEventListener('click',()=>{
     if(entry)entry.value=today();
     renderTodayEntries();
   });

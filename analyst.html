@@ -2787,11 +2787,6 @@ html[data-theme="dark"] .section-title{
 }
 
 
-.gf-settings-row{display:grid;grid-template-columns:minmax(240px,1fr) auto auto;gap:8px;align-items:center;margin-top:10px}
-.gf-settings-row input{width:100%;min-width:0}
-#googleFinanceApiStatus{margin-top:8px;font-size:12px}
-@media(max-width:700px){.gf-settings-row{grid-template-columns:1fr}.gf-settings-row button{width:100%}}
-
 
 
 /* v123：管理者1－團團顯示切換 */
@@ -3812,142 +3807,6 @@ body.quiz-locked{overflow:hidden!important}
 
 /* v149：團團出場時間改為系統自動記錄，無手動輸入欄位 */
 
-/* v150：進出場通知中心 */
-.notification-settings-card{
-  width:min(94vw,860px)!important;
-  max-height:88vh;
-  overflow:auto;
-}
-.notification-settings-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px;
-}
-.notification-settings-head h3{margin:0 0 4px;font-size:20px}
-.notification-settings-sub{font-size:12px;color:var(--muted);line-height:1.5}
-.notification-help{
-  padding:10px 12px;
-  margin-bottom:14px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--card2);
-  font-size:12px;
-  line-height:1.6;
-  color:var(--muted);
-}
-.notification-form-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-}
-.notification-form-grid>div{min-width:0}
-.notification-check{
-  display:flex!important;
-  align-items:center;
-  gap:8px;
-  min-height:40px;
-  padding:0 10px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--card2);
-}
-.notification-check input{width:auto!important}
-.notification-form-actions{
-  display:flex;
-  justify-content:flex-end;
-  margin-top:12px;
-}
-.notification-list-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin:18px 0 8px;
-}
-.notification-list-head span{font-size:12px;color:var(--muted)}
-.notification-recipient-list{
-  display:grid;
-  gap:8px;
-}
-.notification-recipient-item{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:12px;
-  align-items:center;
-  padding:11px 12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--card2);
-}
-.notification-recipient-main{min-width:0}
-.notification-recipient-title{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  flex-wrap:wrap;
-  font-weight:900;
-}
-.notification-recipient-meta{
-  margin-top:4px;
-  font-size:11px;
-  color:var(--muted);
-  line-height:1.5;
-  overflow-wrap:anywhere;
-}
-.notification-recipient-actions{
-  display:flex;
-  gap:6px;
-}
-.notification-badge{
-  display:inline-flex;
-  align-items:center;
-  padding:2px 7px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  font-size:10px;
-  font-weight:850;
-}
-.notification-badge.off{opacity:.55}
-.notification-empty{
-  padding:18px;
-  text-align:center;
-  color:var(--muted);
-  border:1px dashed var(--line);
-  border-radius:12px;
-  font-size:12px;
-}
-.notification-queue-note{
-  margin-top:14px;
-  padding-top:12px;
-  border-top:1px solid var(--line);
-  font-size:11px;
-  line-height:1.55;
-  color:var(--muted);
-}
-@media(max-width:700px){
-  .notification-settings-card{
-    width:calc(100vw - 20px)!important;
-    max-width:calc(100vw - 20px)!important;
-    max-height:92vh!important;
-    padding:14px!important;
-  }
-  .notification-settings-head{
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .notification-settings-head button{width:100%}
-  .notification-form-grid{grid-template-columns:1fr}
-  .notification-form-actions button{width:100%}
-  .notification-recipient-item{grid-template-columns:1fr}
-  .notification-recipient-actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-  }
-  .notification-recipient-actions button{width:100%}
-}
-
-
 /* v151：今日進場／出場顯示系統輸入時間 */
 .today-time{
   flex-basis:100%;
@@ -4088,6 +3947,376 @@ body.quiz-locked{overflow:hidden!important}
   opacity:.82;
 }
 
+
+/* v161：新增交易置頂＋釘選＋展開收合 */
+#entryCard{grid-column:1/-1!important;width:100%!important}
+#entryCard.entry-card-pinned{
+  position:sticky!important;
+  top:8px;
+  z-index:500;
+  box-shadow:0 12px 34px rgba(0,0,0,.18);
+}
+.entry-card-head{
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.entry-card-title-wrap{display:flex;align-items:center;gap:10px;min-width:0}
+.entry-card-head-actions{display:flex;gap:6px;flex:0 0 auto}
+.entry-card-body{display:block}
+#entryCard.entry-card-collapsed .entry-card-body{display:none!important}
+#entryCard.entry-card-collapsed .entry-card-head{margin-bottom:0}
+#pinEntryCardBtn.is-active{font-weight:900}
+@media(max-width:700px){
+  #entryCard.entry-card-pinned{top:4px}
+  .entry-card-head{align-items:flex-start}
+  .entry-card-title-wrap{flex-direction:column;align-items:flex-start;gap:2px}
+}
+
+
+/* v162：整體 UI 精修版 */
+:root{
+  --milk-bg:#f5f0e8;
+  --milk-card:#fffdf8;
+  --milk-card-2:#faf6ef;
+  --milk-line:#e7ded0;
+  --milk-text:#2b2926;
+  --milk-muted:#756f67;
+  --milk-gold:#b58a3b;
+  --milk-gold-soft:#efe2c4;
+  --milk-danger:#c85b5b;
+  --milk-positive:#b74343;
+  --milk-negative:#2f7a55;
+}
+
+body:not(.dark){
+  background:
+    radial-gradient(circle at 10% 0%,rgba(181,138,59,.08),transparent 26%),
+    linear-gradient(180deg,#f8f4ed 0%,#f3eee6 100%) !important;
+  color:var(--milk-text);
+}
+
+body:not(.dark) .card,
+body:not(.dark) .modal-card,
+body:not(.dark) .quiz-card{
+  background:var(--milk-card)!important;
+  border-color:var(--milk-line)!important;
+  box-shadow:0 10px 28px rgba(72,56,35,.06)!important;
+}
+
+body:not(.dark) .today-entry-item,
+body:not(.dark) .shared-open-item,
+body:not(.dark) .rank-row,
+body:not(.dark) .analyst-trade-item,
+body:not(.dark) .notification-help,
+body:not(.dark) .bulk-failed-price-row{
+  background:var(--milk-card-2)!important;
+  border-color:var(--milk-line)!important;
+}
+
+body:not(.dark) input,
+body:not(.dark) select,
+body:not(.dark) textarea{
+  background:#fffdfa!important;
+  border-color:var(--milk-line)!important;
+  color:var(--milk-text)!important;
+}
+
+body:not(.dark) .ghost{
+  background:#fffaf2!important;
+  border-color:var(--milk-line)!important;
+  color:var(--milk-text)!important;
+}
+body:not(.dark) .primary{
+  background:#c99f52!important;
+  border-color:#c99f52!important;
+  color:#211b12!important;
+}
+body:not(.dark) .danger{
+  background:#f7e5e5!important;
+  border-color:#e9c6c6!important;
+  color:#8c3f3f!important;
+}
+
+.topbar{
+  align-items:flex-start!important;
+  gap:14px!important;
+  margin-bottom:14px!important;
+}
+.brand{
+  min-width:0!important;
+}
+.brand h1{
+  letter-spacing:-.02em;
+}
+.brand .sub{
+  margin-top:4px;
+  line-height:1.45;
+}
+.actions{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  flex-wrap:wrap!important;
+}
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:34px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:900;
+  border:1px solid var(--line);
+  background:var(--card2);
+  white-space:nowrap;
+}
+
+.card{
+  border-radius:18px!important;
+  padding:16px!important;
+}
+.section-title{
+  margin-bottom:12px!important;
+}
+.section-title h2{
+  letter-spacing:-.01em;
+}
+.status{
+  opacity:.78;
+}
+
+.entry-card-head{
+  padding-bottom:4px;
+}
+#entryCard.entry-card-collapsed{
+  padding:12px 16px!important;
+}
+#entryCard.entry-card-collapsed .entry-card-title-wrap .status{
+  display:none;
+}
+#entryCard.entry-card-pinned{
+  backdrop-filter:blur(12px);
+}
+.formgrid{
+  gap:10px!important;
+}
+.formgrid label{
+  margin-bottom:4px;
+  font-size:11px;
+  font-weight:800;
+  opacity:.78;
+}
+.formgrid input,
+.formgrid select,
+.formgrid textarea{
+  border-radius:10px!important;
+}
+
+.today-entry-item{
+  padding:12px 13px!important;
+  border-radius:14px!important;
+}
+.today-entry-stock{
+  justify-content:space-between;
+  gap:10px!important;
+}
+.today-entry-stock b{
+  font-size:16px!important;
+}
+.today-entry-stock span{
+  font-size:14px!important;
+}
+.today-entry-meta{
+  margin-top:7px;
+  display:flex!important;
+  align-items:center;
+  gap:7px 10px!important;
+  flex-wrap:wrap!important;
+}
+.today-entry-meta .today-analyst{
+  flex-basis:100%;
+  font-size:13px!important;
+}
+.today-time{
+  flex-basis:100%!important;
+  font-size:11px!important;
+  opacity:.72;
+}
+.today-price{
+  display:inline-flex;
+  align-items:baseline;
+  gap:4px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:rgba(127,127,127,.08);
+  font-size:11px!important;
+}
+.today-price b{
+  font-size:13px!important;
+}
+.exit-kind{
+  border-radius:999px!important;
+  padding:3px 7px!important;
+}
+
+.shared-open-item{
+  border-radius:14px!important;
+  padding:12px 13px!important;
+}
+.shared-open-head{
+  align-items:center!important;
+}
+.shared-open-stock{
+  font-size:15px!important;
+  font-weight:900!important;
+}
+.shared-open-count{
+  font-size:10px!important;
+  border-radius:999px;
+  padding:3px 7px;
+  background:rgba(181,138,59,.10);
+}
+.shared-open-analysts{
+  margin-top:8px!important;
+  gap:6px!important;
+}
+.shared-open-analyst-btn{
+  background:rgba(127,127,127,.06)!important;
+}
+
+.rank-list{
+  display:grid;
+  gap:7px;
+}
+.rank-row{
+  border-radius:14px!important;
+  padding:10px 11px!important;
+}
+.rank-name{
+  font-weight:900!important;
+}
+.rank-metrics,
+.rank-stats{
+  gap:8px!important;
+}
+.rank-perf,
+.rank-amount{
+  font-weight:900!important;
+}
+
+button{
+  border-radius:10px!important;
+  font-weight:800;
+}
+.mini{
+  min-height:30px!important;
+}
+
+.visual-tabs button{
+  border-radius:999px!important;
+}
+.visual-chart-wrap{
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.table-wrap{
+  border-radius:14px;
+}
+table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+}
+th{
+  font-size:11px!important;
+  letter-spacing:.01em;
+}
+td{
+  vertical-align:middle!important;
+}
+
+.analyst-trades-modal-card{
+  border-radius:20px!important;
+}
+.analyst-trade-item{
+  border-radius:14px!important;
+}
+
+body.dark .card,
+body.dark .modal-card{
+  box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
+}
+body.dark .today-price{
+  background:rgba(255,255,255,.06);
+}
+
+@media(max-width:700px){
+  .wrap{
+    padding:10px!important;
+  }
+  .topbar{
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+  .actions{
+    justify-content:flex-start!important;
+    width:100%!important;
+  }
+  .actions > *{
+    max-width:100%;
+  }
+  .price-update-wrap{
+    width:100%;
+  }
+  .price-note{
+    font-size:10px!important;
+    line-height:1.4!important;
+  }
+  .card{
+    padding:13px!important;
+    border-radius:16px!important;
+  }
+  .section-title{
+    align-items:flex-start!important;
+    gap:8px!important;
+  }
+  .section-title h2{
+    font-size:16px!important;
+  }
+  .today-entry-meta{
+    gap:6px!important;
+  }
+  .today-price{
+    flex:0 0 auto;
+  }
+  .shared-open-head{
+    flex-direction:column;
+    align-items:flex-start!important;
+  }
+  .shared-open-head-actions{
+    align-items:flex-start!important;
+    flex-direction:row!important;
+    flex-wrap:wrap;
+  }
+  .rank-row{
+    padding:10px!important;
+  }
+  .rank-name-wrap{
+    min-width:0;
+  }
+  .entry-card-head-actions{
+    width:100%;
+    grid-template-columns:1fr 1fr!important;
+  }
+  #entryCard.entry-card-pinned{
+    top:2px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4095,11 +4324,11 @@ body.quiz-locked{overflow:hidden!important}
   <div class="topbar">
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">13 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
+      <div id="roleBadge" class="role-badge hidden">管理者</div>
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="toggleTuanBtn" class="ghost" type="button">顯示團團</button>
-  <button id="notificationSettingsBtn" class="ghost" type="button">🔔 通知設定</button>
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
@@ -4114,19 +4343,18 @@ body.quiz-locked{overflow:hidden!important}
   </div>
 
   <div class="grid">
-<section class="card span12 shared-open-card">
-      <div class="section-title shared-open-title-row">
-        <h2>同時持有中股票</h2>
-        <div class="shared-open-title-actions">
-          <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
-          <button id="copySharedHoldingsBtn" class="mini ghost" type="button">複製共同持股</button>
-        </div>
-      </div>
-      <div id="sharedOpenPositions" class="shared-open-list"></div>
-    </section>
-
 <section class="card span12 admin-only hidden" id="entryCard">
-      <div class="section-title"><h2 id="formTitle">新增交易</h2><span class="status">僅管理者可操作</span></div>
+      <div class="section-title entry-card-head">
+  <div class="entry-card-title-wrap">
+    <h2 id="formTitle">新增交易</h2>
+    <span class="status">僅管理者可操作</span>
+  </div>
+  <div class="entry-card-head-actions">
+    <button id="pinEntryCardBtn" class="mini ghost" type="button">📌 釘選</button>
+    <button id="toggleEntryCardBtn" class="mini ghost" type="button" aria-expanded="true">收合 ▲</button>
+  </div>
+</div>
+<div id="entryCardBody" class="entry-card-body">
       <div class="formgrid">
         <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>股市期皇后-莊佳螢</option><option>團團</option><option>運達黃培碩</option><option>蔡總蔡明彰</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
@@ -4141,7 +4369,20 @@ body.quiz-locked{overflow:hidden!important}
         <div style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
+    </div>
+</section>
+<section class="card span12 shared-open-card">
+      <div class="section-title shared-open-title-row">
+        <h2>同時持有中股票</h2>
+        <div class="shared-open-title-actions">
+          <span class="status">同一檔股票由 2 位以上分析師同時持有</span>
+          <button id="copySharedHoldingsBtn" class="mini ghost" type="button">複製共同持股</button>
+        </div>
+      </div>
+      <div id="sharedOpenPositions" class="shared-open-list"></div>
     </section>
+
+
 <section class="card span3 filter-card">
       <div class="section-title"><h2>查詢與篩選</h2><span class="status" id="lastRefresh">收盤價更新：—</span></div>
       <div class="filters">
@@ -4234,20 +4475,7 @@ body.quiz-locked{overflow:hidden!important}
     
 
     
-<section class="card span12 admin-only hidden" id="googleFinanceSettingsCard">
-  <div class="card-head">
-    <div>
-      <h3>Google Finance 抓價設定</h3>
-      <div class="muted">管理員1設定一次 Apps Script Web App 網址，之後按「更新價」即可自動抓最新價格。</div>
-    </div>
-  </div>
-  <div class="gf-settings-row">
-    <input id="googleFinanceApiUrl" type="url" placeholder="貼上 Google Apps Script Web App 網址">
-    <button id="saveGoogleFinanceApiBtn" type="button" class="primary">儲存網址</button>
-    <button id="testGoogleFinanceApiBtn" type="button" class="ghost">測試連線</button>
-  </div>
-  <div id="googleFinanceApiStatus" class="muted">尚未設定 Google Finance API</div>
-</section>
+
 <section class="card span12 admin-only hidden quick-price-card" id="quickPriceCard">
   <div class="section-title">
     <h2>快速更新股價</h2>
@@ -4380,73 +4608,6 @@ v126 股價來源規則：
   </div>
 </div>
 
-<div id="notificationSettingsModal" class="modal">
-  <div class="modal-card notification-settings-card">
-    <div class="notification-settings-head">
-      <div>
-        <h3>🔔 進出場通知設定</h3>
-        <div class="notification-settings-sub">僅管理者1可維護通知對象；交易完成後會寫入 Firebase 通知佇列。</div>
-      </div>
-      <button id="closeNotificationSettings" class="ghost" type="button">關閉</button>
-    </div>
-
-    <div class="notification-help">
-      LINE 請填 <b>userId / groupId</b>；群組需先將 LINE Official Account Bot 加入群組並由 webhook 取得 groupId。
-      Email 則填收件信箱。LINE Token / Email API Key 不會儲存在此網頁。
-    </div>
-
-    <div class="notification-form-grid">
-      <div>
-        <label>顯示名稱</label>
-        <input id="notifyRecipientName" placeholder="例如：萊恩／飆股群">
-      </div>
-      <div>
-        <label>通知方式</label>
-        <select id="notifyChannel">
-          <option value="line_user">LINE 使用者</option>
-          <option value="line_group">LINE 群組</option>
-          <option value="email">Email</option>
-        </select>
-      </div>
-      <div class="notification-target-field">
-        <label id="notifyTargetLabel">LINE userId</label>
-        <input id="notifyTarget" placeholder="Uxxxxxxxxxxxxxxxx">
-      </div>
-      <div>
-        <label>通知事件</label>
-        <select id="notifyEvent">
-          <option value="all">進場＋出場</option>
-          <option value="entry">只通知進場</option>
-          <option value="exit">只通知出場</option>
-        </select>
-      </div>
-      <div>
-        <label>指定分析師</label>
-        <select id="notifyAnalyst">
-          <option value="all">全部分析師</option>
-        </select>
-      </div>
-      <div class="notification-enable-field">
-        <label>狀態</label>
-        <label class="notification-check"><input id="notifyEnabled" type="checkbox" checked> 啟用通知</label>
-      </div>
-    </div>
-
-    <div class="notification-form-actions">
-      <button id="addNotificationRecipientBtn" class="primary" type="button">＋ 新增通知對象</button>
-    </div>
-
-    <div class="notification-list-head">
-      <strong>已設定通知對象</strong>
-      <span id="notificationRecipientCount">0 位</span>
-    </div>
-    <div id="notificationRecipientList" class="notification-recipient-list"></div>
-
-    <div class="notification-queue-note">
-      <b>發送流程：</b>網頁新增/結算交易 → Firebase notificationQueue → Firebase Functions → LINE Messaging API / Email。
-    </div>
-  </div>
-</div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
@@ -4456,381 +4617,41 @@ const firebaseConfig={ databaseURL:FIREBASE_DB_URL };
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
-const notificationRecipientsRef=ref(db,'analystPerformance/notificationRecipients');
-const notificationQueueRef=ref(db,'analystPerformance/notificationQueue');
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
-let notificationRecipients={};
+const ENTRY_CARD_PIN_KEY='entryCardPinned';
+const ENTRY_CARD_COLLAPSE_KEY='entryCardCollapsed';
 
-function notificationChannelLabel(v){
-  return v==='line_user'?'LINE 使用者':v==='line_group'?'LINE 群組':v==='email'?'Email':v;
-}
-function notificationEventLabel(v){
-  return v==='entry'?'進場':v==='exit'?'出場':'進場＋出場';
-}
-function notificationAnalystLabel(v){
-  return !v||v==='all'?'全部分析師':v;
-}
-function notificationRecipientMatches(rec,eventType,analyst){
-  if(!rec||rec.enabled===false)return false;
-  if(rec.eventType!=='all' && rec.eventType!==eventType)return false;
-  if(rec.analyst && rec.analyst!=='all' && rec.analyst!==analyst)return false;
-  return true;
-}
-function buildTradeNotificationMessage(eventType,tr,extra={}){
-  const isEntry=eventType==='entry';
-  const title=isEntry?'【進場通知】':'【出場通知】';
-  const lines=[
-    title,
-    `分析師：${tr.analyst||'—'}`,
-    `股票：${tr.symbol||''} ${tr.stockName||''}`.trim()
-  ];
-  if(isEntry){
-    lines.push(`進場價：${fmt(tr.entryPrice)}`);
-    lines.push(`進場時間：${formatDateWithTime(tr.entryDate||today(),tr.entryTime)}`);
-    lines.push(`股數：${fmt(tr.shares)}`);
-  }else{
-    lines.push(`出場價：${fmt(extra.exitPrice??tr.exitPrice)}`);
-    lines.push(`出場日期：${extra.exitDate??tr.exitDate??today()}${extra.exitTime?` ${extra.exitTime}`:(tr.exitTime?` ${tr.exitTime}`:'')}`);
-    if(extra.sellShares!=null)lines.push(`賣出股數：${fmt(extra.sellShares)}`);
-    const entry=Number(tr.entryPrice)||0;
-    const exit=Number(extra.exitPrice??tr.exitPrice)||0;
-    if(entry>0&&exit>0)lines.push(`績效：${pct((exit-entry)/entry*100)}`);
+function applyEntryCardState(){
+  const card=$('#entryCard');
+  const pinBtn=$('#pinEntryCardBtn');
+  const toggleBtn=$('#toggleEntryCardBtn');
+  if(!card)return;
+  const pinned=localStorage.getItem(ENTRY_CARD_PIN_KEY)==='1';
+  const collapsed=localStorage.getItem(ENTRY_CARD_COLLAPSE_KEY)==='1';
+  card.classList.toggle('entry-card-pinned',pinned);
+  card.classList.toggle('entry-card-collapsed',collapsed);
+  if(pinBtn){
+    pinBtn.classList.toggle('is-active',pinned);
+    pinBtn.textContent=pinned?'📌 已釘選':'📌 釘選';
   }
-  lines.push(`建立時間：${nowText()}`);
-  return lines.join('\n');
-}
-async function enqueueTradeNotification(eventType,tr,{tradeId='',...extra}={}){
-  try{
-    if(!tr||!tr.analyst)return;
-    const matched=Object.entries(notificationRecipients||{})
-      .filter(([id,rec])=>notificationRecipientMatches(rec,eventType,tr.analyst))
-      .map(([id,rec])=>({
-        recipientId:id,
-        name:String(rec.name||''),
-        channel:String(rec.channel||''),
-        target:String(rec.target||'')
-      }))
-      .filter(x=>x.target);
-
-    if(!matched.length)return;
-
-    const q=push(notificationQueueRef);
-    await set(q,{
-      status:'pending',
-      eventType,
-      tradeId:String(tradeId||''),
-      analyst:String(tr.analyst||''),
-      symbol:String(tr.symbol||''),
-      stockName:String(tr.stockName||''),
-      entryDate:String(tr.entryDate||''),
-      entryTime:String(tr.entryTime||''),
-      entryPrice:Number(tr.entryPrice)||0,
-      exitDate:String(extra.exitDate??tr.exitDate??''),
-      exitTime:String(extra.exitTime??tr.exitTime??''),
-      exitPrice:Number(extra.exitPrice??tr.exitPrice)||0,
-      sellShares:Number(extra.sellShares??0)||0,
-      message:buildTradeNotificationMessage(eventType,tr,extra),
-      recipients:matched,
-      createdAt:nowText(),
-      createdBy:adminRole||'admin'
-    });
-  }catch(err){
-    console.error('建立通知佇列失敗',err);
+  if(toggleBtn){
+    toggleBtn.textContent=collapsed?'展開 ▼':'收合 ▲';
+    toggleBtn.setAttribute('aria-expanded',collapsed?'false':'true');
   }
 }
-
-function refreshNotificationAnalystOptions(){
-  const sel=$('#notifyAnalyst');
-  if(!sel)return;
-  const current=sel.value||'all';
-  const names=(typeof ALL_ANALYSTS!=='undefined'?ALL_ANALYSTS:[]);
-  sel.innerHTML='<option value="all">全部分析師</option>'+
-    names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  sel.value=[...sel.options].some(o=>o.value===current)?current:'all';
-}
-function updateNotifyTargetUI(){
-  const channel=$('#notifyChannel')?.value||'line_user';
-  const label=$('#notifyTargetLabel');
-  const input=$('#notifyTarget');
-  if(!label||!input)return;
-  if(channel==='email'){
-    label.textContent='Email 信箱';
-    input.placeholder='name@example.com';
-    input.type='email';
-  }else if(channel==='line_group'){
-    label.textContent='LINE groupId';
-    input.placeholder='Cxxxxxxxxxxxxxxxx';
-    input.type='text';
-  }else{
-    label.textContent='LINE userId';
-    input.placeholder='Uxxxxxxxxxxxxxxxx';
-    input.type='text';
-  }
-}
-function renderNotificationRecipients(){
-  const list=$('#notificationRecipientList');
-  const count=$('#notificationRecipientCount');
-  if(!list)return;
-  const entries=Object.entries(notificationRecipients||{})
-    .sort((a,b)=>String(a[1]?.name||'').localeCompare(String(b[1]?.name||''),'zh-Hant'));
-  if(count)count.textContent=`${entries.length} 位`;
-  if(!entries.length){
-    list.innerHTML='<div class="notification-empty">尚未設定通知對象</div>';
-    return;
-  }
-  list.innerHTML=entries.map(([id,r])=>`
-    <div class="notification-recipient-item">
-      <div class="notification-recipient-main">
-        <div class="notification-recipient-title">
-          <span>${esc(r.name||'未命名')}</span>
-          <span class="notification-badge ${r.enabled===false?'off':''}">${r.enabled===false?'停用':'啟用'}</span>
-          <span class="notification-badge">${esc(notificationChannelLabel(r.channel))}</span>
-        </div>
-        <div class="notification-recipient-meta">
-          ${esc(r.target||'—')}<br>
-          ${esc(notificationEventLabel(r.eventType))}｜${esc(notificationAnalystLabel(r.analyst))}
-        </div>
-      </div>
-      <div class="notification-recipient-actions">
-        <button class="ghost" type="button" data-notify-toggle="${esc(id)}">${r.enabled===false?'啟用':'停用'}</button>
-        <button class="danger" type="button" data-notify-delete="${esc(id)}">刪除</button>
-      </div>
-    </div>
-  `).join('');
-
-  $$('[data-notify-toggle]').forEach(btn=>btn.onclick=async()=>{
-    if(!isMainAdmin())return;
-    const id=btn.dataset.notifyToggle;
-    const current=notificationRecipients[id];
-    if(!current)return;
-    await update(ref(db,`analystPerformance/notificationRecipients/${id}`),{
-      enabled:current.enabled===false,
-      updatedAt:nowText()
-    });
-  });
-  $$('[data-notify-delete]').forEach(btn=>btn.onclick=async()=>{
-    if(!isMainAdmin())return;
-    const id=btn.dataset.notifyDelete;
-    const r=notificationRecipients[id];
-    if(!r)return;
-    if(confirm(`確定刪除通知對象「${r.name||''}」？`)){
-      await remove(ref(db,`analystPerformance/notificationRecipients/${id}`));
-    }
-  });
-}
-function openNotificationSettings(){
-  if(!isMainAdmin())return;
-  refreshNotificationAnalystOptions();
-  updateNotifyTargetUI();
-  renderNotificationRecipients();
-  $('#notificationSettingsModal')?.classList.add('show');
-}
-function closeNotificationSettings(){
-  $('#notificationSettingsModal')?.classList.remove('show');
-}
-
-onValue(notificationRecipientsRef,snap=>{
-  notificationRecipients=snap.val()||{};
-  renderNotificationRecipients();
+$('#pinEntryCardBtn')?.addEventListener('click',()=>{
+  const next=localStorage.getItem(ENTRY_CARD_PIN_KEY)!=='1';
+  localStorage.setItem(ENTRY_CARD_PIN_KEY,next?'1':'0');
+  applyEntryCardState();
+});
+$('#toggleEntryCardBtn')?.addEventListener('click',()=>{
+  const next=localStorage.getItem(ENTRY_CARD_COLLAPSE_KEY)!=='1';
+  localStorage.setItem(ENTRY_CARD_COLLAPSE_KEY,next?'1':'0');
+  applyEntryCardState();
 });
 
-$('#notificationSettingsBtn')?.addEventListener('click',openNotificationSettings);
-$('#closeNotificationSettings')?.addEventListener('click',closeNotificationSettings);
-$('#notifyChannel')?.addEventListener('change',updateNotifyTargetUI);
-$('#addNotificationRecipientBtn')?.addEventListener('click',async()=>{
-  if(!isMainAdmin())return;
-  const name=String($('#notifyRecipientName')?.value||'').trim();
-  const channel=String($('#notifyChannel')?.value||'line_user');
-  const target=String($('#notifyTarget')?.value||'').trim();
-  const eventType=String($('#notifyEvent')?.value||'all');
-  const analyst=String($('#notifyAnalyst')?.value||'all');
-  const enabled=!!$('#notifyEnabled')?.checked;
-
-  if(!name)return alert('請輸入通知對象顯示名稱');
-  if(!target)return alert('請輸入 LINE userId / groupId 或 Email 信箱');
-  if(channel==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)){
-    return alert('Email 格式不正確');
-  }
-
-  const r=push(notificationRecipientsRef);
-  await set(r,{name,channel,target,eventType,analyst,enabled,createdAt:nowText(),updatedAt:nowText()});
-
-  $('#notifyRecipientName').value='';
-  $('#notifyTarget').value='';
-  $('#notifyEnabled').checked=true;
-});
-
-function isTuanTrade(trOrName){
-  const name=typeof trOrName==='string' ? trOrName : trOrName?.analyst;
-  return String(name||'').trim()==='團團';
-}
-
-function normalizeHHMM(v){
-  const s=String(v||'').trim();
-  const m=s.match(/^(\d{1,2}):(\d{2})/);
-  if(!m)return '';
-  const hh=String(Math.min(23,Math.max(0,Number(m[1])))).padStart(2,'0');
-  const mm=String(Math.min(59,Math.max(0,Number(m[2])))).padStart(2,'0');
-  return `${hh}:${mm}`;
-}
-
-function currentTaipeiHHMM(){
-  return new Date().toLocaleTimeString('en-GB',{
-    timeZone:'Asia/Taipei',
-    hour:'2-digit',
-    minute:'2-digit',
-    hour12:false
-  });
-}
-
-function formatDateWithTime(dateValue,timeValue){
-  const d=String(dateValue||'').trim();
-  const tm=normalizeHHMM(timeValue);
-  if(!d)return tm||'—';
-  return tm?`${d} ${tm}`:d;
-}
-
-function tradeEntryDateTime(tr){
-  return formatDateWithTime(tr?.entryDate,tr?.entryTime);
-}
-
-function tradeExitDateTime(tr){
-  return formatDateWithTime(tr?.exitDate,tr?.exitTime);
-}
-
-
-
-function formatExitDateTime(tr){
-  return formatDateWithTime(tr?.exitDate,tr?.exitTime);
-}
-
-
-let pendingBulkFailedPrices=[];
-let bulkFailedPriceResolver=null;
-
-function openBulkFailedPriceModal(items=[]){
-  pendingBulkFailedPrices=(items||[]).filter(Boolean);
-  const modal=$('#bulkFailedPriceModal');
-  const list=$('#bulkFailedPriceList');
-  if(!modal||!list)return Promise.resolve({manualSuccess:0,skipped:pendingBulkFailedPrices.length,failed:0});
-
-  list.innerHTML=pendingBulkFailedPrices.map((item,idx)=>{
-    const tr=trades[item.id]||{};
-    const symbol=String(tr.symbol||item.symbol||'').trim();
-    const stockName=String(tr.stockName||item.stockName||'').trim();
-    const reason=String(item.error?.message||item.error||'抓取失敗');
-    return `
-      <div class="bulk-failed-price-row">
-        <div class="bulk-failed-price-stock">
-          <a class="bulk-failed-yahoo-link"
-             href="${yahooStockUrl(symbol)}"
-             target="_blank"
-             rel="noopener noreferrer"
-             title="開啟 Yahoo 股市個股資訊">
-            <strong>${esc(symbol)}${stockName?`　${esc(stockName)}`:''}</strong>
-          </a>
-          <small>${esc(reason)}</small>
-          <small>
-            <a href="${yahooStockUrl(symbol)}" target="_blank" rel="noopener noreferrer">Yahoo 個股資訊</a>
-            ｜<a href="${investingSearchUrl(symbol)}" target="_blank" rel="noopener noreferrer">Investing.com 查詢</a>
-          </small>
-        </div>
-        <input
-          type="number"
-          inputmode="decimal"
-          step="0.01"
-          min="0"
-          data-bulk-failed-price-index="${idx}"
-          placeholder="輸入目前價"
-        >
-      </div>
-    `;
-  }).join('');
-
-  modal.classList.remove('hidden');
-  modal.classList.add('show');
-  setTimeout(()=>list.querySelector('input')?.focus(),0);
-
-  return new Promise(resolve=>{
-    bulkFailedPriceResolver=resolve;
-  });
-}
-
-function finishBulkFailedPriceModal(result){
-  $('#bulkFailedPriceModal')?.classList.remove('show');
-  $('#bulkFailedPriceModal')?.classList.add('hidden');
-  pendingBulkFailedPrices=[];
-  const resolve=bulkFailedPriceResolver;
-  bulkFailedPriceResolver=null;
-  resolve?.(result);
-}
-
-async function saveBulkFailedPrices(){
-  if(!isMainAdmin()){
-    finishBulkFailedPriceModal({manualSuccess:0,skipped:pendingBulkFailedPrices.length,failed:0});
-    return;
-  }
-
-  const inputs=[...document.querySelectorAll('[data-bulk-failed-price-index]')];
-  const jobs=[];
-  let skipped=0;
-
-  for(const input of inputs){
-    const idx=Number(input.dataset.bulkFailedPriceIndex);
-    const item=pendingBulkFailedPrices[idx];
-    const tr=item?trades[item.id]:null;
-    const raw=String(input.value||'').trim();
-
-    if(!raw){
-      skipped++;
-      continue;
-    }
-
-    const price=Number(raw);
-    if(!Number.isFinite(price)||price<=0){
-      alert('請輸入大於 0 的有效價格');
-      input.focus();
-      return;
-    }
-    if(!tr){
-      skipped++;
-      continue;
-    }
-    jobs.push({tr,price});
-  }
-
-  let manualSuccess=0;
-  let failed=0;
-
-  for(const job of jobs){
-    try{
-      await syncSameStockCurrentPrice(
-        job.tr.symbol,
-        job.price,
-        '網路抓價失敗－管理員批次手動輸入',
-        {onlyTuan:isAdmin2()}
-      );
-      manualSuccess++;
-    }catch(err){
-      failed++;
-      console.error('批次手動更新失敗',job.tr.symbol,err);
-    }
-  }
-
-  finishBulkFailedPriceModal({manualSuccess,skipped,failed});
-}
-
-$('#bulkFailedPriceCancel')?.addEventListener('click',()=>{
-  finishBulkFailedPriceModal({
-    manualSuccess:0,
-    skipped:pendingBulkFailedPrices.length,
-    failed:0
-  });
-});
-
-$('#bulkFailedPriceSave')?.addEventListener('click',saveBulkFailedPrices);
 
 const QUIZ_QUESTIONS=[
   {q:'湯湯在玉山遺失了什麼？',options:['手機','身分證','錢包','悠遊卡'],answer:1},
@@ -5456,6 +5277,9 @@ function renderTodayEntries(){
         <span class="today-time">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></span>
         <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
+        <span class="${((Number(tr.currentPrice||tr.entryPrice)-Number(tr.entryPrice||0))>=0)?'pos':'neg'} today-price">
+          ${Number(tr.entryPrice)>0?pct((Number(tr.currentPrice||tr.entryPrice)-Number(tr.entryPrice))/Number(tr.entryPrice)*100):'—'}
+        </span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>
@@ -6625,6 +6449,18 @@ function bindRows(){
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
+
+function updateRoleBadge(){
+  const el=$('#roleBadge');
+  if(!el)return;
+  if(!isAdmin){
+    el.classList.add('hidden');
+    return;
+  }
+  el.classList.remove('hidden');
+  el.textContent=isAdmin2()?'管理者2｜團團':'管理者1';
+}
+
 function setAdmin(v,role=''){
   isAdmin=v;
   adminRole=v?(role||'main'):'';
@@ -6672,6 +6508,8 @@ function setAdmin(v,role=''){
   if(bulkBtn){
     bulkBtn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
   }
+
+  updateRoleBadge();
 }
 
 function updatePriceModeUI(){
@@ -6774,16 +6612,7 @@ $('#saveBtn').onclick=async()=>{
     const before=trades[editingId]||{};
     await update(ref(db,`analystPerformance/trades/${editingId}`),data);
 
-    // 只有原本尚未出場、這次新增出場資料時才建立出場通知，避免一般編輯重複通知。
-    if(!before.exitDate && data.exitDate && data.exitPrice>0){
-      await enqueueTradeNotification('exit',{...before,...data},{
-        tradeId:editingId,
-        exitDate:data.exitDate,
-        exitTime:data.exitTime,
-        exitPrice:data.exitPrice,
-        sellShares:data.shares
-      });
-    }
+
   }else{
     const r=push(tradesRef);
     const savedTrade={
@@ -6793,19 +6622,10 @@ $('#saveBtn').onclick=async()=>{
       priceUpdatedAt:'尚未更新'
     };
     await set(r,savedTrade);
-    await enqueueTradeNotification('entry',savedTrade,{tradeId:r.key||''});
 
-    // 若管理者1直接新增一筆已包含出場資料的歷史交易，同時建立出場通知。
     if(savedTrade.exitDate && savedTrade.exitPrice>0){
       savedTrade.exitTime=currentTaipeiHHMM();
       await update(ref(db,`analystPerformance/trades/${r.key}`),{exitTime:savedTrade.exitTime});
-      await enqueueTradeNotification('exit',savedTrade,{
-        tradeId:r.key||'',
-        exitDate:savedTrade.exitDate,
-        exitTime:savedTrade.exitTime,
-        exitPrice:savedTrade.exitPrice,
-        sellShares:savedTrade.shares
-      });
     }
   }
   clearForm();
@@ -6895,13 +6715,7 @@ async function settleTrade(id){
       exitType:'full',
       updatedAt:stamp
     });
-    await enqueueTradeNotification('exit',{...t,exitDate:dateText,exitTime,exitPrice},{
-      tradeId:id,
-      exitDate:dateText,
-      exitTime,
-      exitPrice,
-      sellShares
-    });
+
     return;
   }
 
@@ -6935,13 +6749,7 @@ async function settleTrade(id){
     update(ref(db,`analystPerformance/trades/${id}`),remainingUpdate)
   ]);
 
-  await enqueueTradeNotification('exit',closedTrade,{
-    tradeId:closedRef.key||'',
-    exitDate:dateText,
-    exitTime:closedTrade.exitTime||'',
-    exitPrice,
-    sellShares
-  });
+
 }
 
 
@@ -8497,6 +8305,8 @@ document.addEventListener('click',async e=>{
 
 
 setTimeout(initGoogleFinanceSettings,0);
+
+applyEntryCardState();
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>

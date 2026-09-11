@@ -4013,6 +4013,35 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v155：同時持有中股票－單檔複製持有分析師 */
+.shared-open-head-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.shared-copy-analysts-btn{
+  white-space:nowrap;
+  min-height:28px;
+  font-size:10px;
+  padding:4px 7px;
+}
+@media(max-width:700px){
+  .shared-open-head{
+    align-items:flex-start;
+    gap:8px;
+  }
+  .shared-open-head-actions{
+    flex-direction:column;
+    align-items:flex-end;
+    gap:4px;
+  }
+  .shared-copy-analysts-btn{
+    min-height:28px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5171,6 +5200,34 @@ function renderTodayExits(){
 }
 
 
+
+async function copySharedStockAnalysts(symbol,stockName=''){
+  const key=String(symbol||'').trim().toUpperCase();
+  if(!key)return;
+
+  const group=getSharedHoldingGroups().find(g=>
+    String(g.symbol||'').trim().toUpperCase()===key
+  );
+  if(!group)return alert('找不到此股票的持有分析師資料');
+
+  const names=[...group.analysts];
+  const label=`${group.symbol}${group.stockName?' '+group.stockName:(stockName?' '+stockName:'')}`;
+  const text=`${label}｜持有分析師：${names.join('、')}`;
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert(`已複製：\n${text}`);
+  }catch(_){
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    alert(`已複製：\n${text}`);
+  }
+}
+
 function renderSharedOpenPositions(){
   const box=$('#sharedOpenPositions');
   if(!box)return;
@@ -5188,7 +5245,12 @@ function renderSharedOpenPositions(){
     return `<div class="shared-open-item">
       <div class="shared-open-head">
         <a class="shared-open-stock" href="${yahooStockUrl(g.symbol)}" target="_blank" rel="noopener">${label}</a>
-        <span class="shared-open-count">${names.length} 位持有</span>
+        <div class="shared-open-head-actions">
+          <span class="shared-open-count">${names.length} 位持有</span>
+          <button class="mini ghost shared-copy-analysts-btn" type="button"
+            data-shared-copy-symbol="${esc(g.symbol)}"
+            data-shared-copy-name="${esc(g.stockName||'')}">複製持有分析師</button>
+        </div>
       </div>
       <div class="shared-open-analysts">
         ${names.map(n=>`<button class="shared-open-analyst shared-open-analyst-btn" type="button" data-shared-analyst="${esc(n)}">${esc(n)}</button>`).join('')}
@@ -5201,6 +5263,15 @@ function renderSharedOpenPositions(){
       const name=String(btn.dataset.sharedAnalyst||'').trim();
       if(!name)return;
       renderAnalystTradesModal(name);
+    };
+  });
+
+  $$('[data-shared-copy-symbol]').forEach(btn=>{
+    btn.onclick=()=>{
+      copySharedStockAnalysts(
+        btn.dataset.sharedCopySymbol,
+        btn.dataset.sharedCopyName||''
+      );
     };
   });
 }

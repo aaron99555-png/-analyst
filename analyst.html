@@ -3965,6 +3965,27 @@ body.quiz-locked{overflow:hidden!important}
   }
 }
 
+
+/* v152：今日進場／出場卡片分析師名稱可點擊 */
+.today-analyst-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  padding:0;
+  margin:0;
+  color:inherit;
+  font:inherit;
+  font-weight:900;
+  text-align:left;
+  cursor:pointer;
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:3px;
+}
+.today-analyst-btn:hover{
+  opacity:.82;
+}
+
 </style>
 </head>
 <body>
@@ -5107,7 +5128,7 @@ function renderTodayExits(){
         <span>${esc(tr.stockName||'')}</span>
       </div>
       <div class="today-entry-meta">
-        <span class="today-analyst">${esc(tr.analyst||'—')}</span>
+        <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
         <span class="today-time">出場時間 <b>${esc(tradeExitDateTime(tr))}</b></span>
         <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
         <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
@@ -5117,6 +5138,8 @@ function renderTodayExits(){
       </div>
     </div>
   `).join('');
+
+  bindTodayAnalystButtons();
 }
 
 
@@ -5170,13 +5193,26 @@ function renderTodayEntries(){
         <span>${esc(tr.stockName||'')}</span>
       </div>
       <div class="today-entry-meta">
-        <span class="today-analyst">${esc(tr.analyst||'—')}</span>
+        <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
         <span class="today-time">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></span>
         <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>
   `).join('');
+
+  bindTodayAnalystButtons();
+}
+
+
+function bindTodayAnalystButtons(){
+  $$('[data-today-analyst]').forEach(btn=>{
+    btn.onclick=()=>{
+      const name=String(btn.dataset.todayAnalyst||'').trim();
+      if(!name)return;
+      renderAnalystTradesModal(name);
+    };
+  });
 }
 
 function renderAnalystQuickFilter(){

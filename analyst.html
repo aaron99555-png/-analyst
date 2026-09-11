@@ -4218,6 +4218,265 @@ body.dark .rank-row{
   }
 }
 
+
+/* v164：手機版查詢與篩選、今日進出場資訊重新排版 */
+.filter-card .section-title{
+  align-items:flex-start!important;
+}
+.filter-card .status{
+  margin-top:2px;
+}
+.filter-card .filters{
+  align-items:stretch!important;
+}
+.filter-card .filters > div{
+  min-width:0;
+}
+.filter-card .filters > div:not(.form-actions){
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.filter-card .filters label{
+  display:flex;
+  align-items:flex-end;
+  min-height:22px;
+  line-height:1.2;
+  font-weight:800;
+}
+.filter-card .filters input,
+.filter-card .filters select,
+.filter-card .filters button{
+  width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  height:52px!important;
+  min-height:52px!important;
+}
+.filter-card .form-actions{
+  display:flex;
+  align-items:flex-end;
+}
+.filter-card .form-actions button{
+  width:100%;
+  height:52px!important;
+}
+
+/* 今日進場/出場 header */
+.date-card-title{
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:10px!important;
+}
+.date-card-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.date-query-box{
+  display:grid!important;
+  grid-template-columns:56px minmax(0,1fr) 56px auto;
+  gap:10px!important;
+  align-items:center!important;
+}
+.date-picker-box{
+  width:100%!important;
+  min-width:0!important;
+  height:56px!important;
+}
+.date-arrow-btn{
+  height:56px!important;
+}
+.date-today-btn{
+  height:56px!important;
+  white-space:nowrap;
+}
+
+/* 今日進出場個股卡片 */
+.today-entry-list{
+  grid-template-columns:1fr!important;
+  gap:12px!important;
+}
+.today-entry-item.compact{
+  padding:14px!important;
+  border-radius:18px!important;
+  display:grid!important;
+  gap:12px!important;
+}
+.today-entry-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.today-entry-stock-wrap{
+  min-width:0;
+  flex:1 1 auto;
+}
+.today-entry-stock{
+  display:flex!important;
+  align-items:baseline!important;
+  gap:8px!important;
+  margin-bottom:6px!important;
+  flex-wrap:wrap;
+}
+.today-entry-stock b{
+  font-size:18px!important;
+  line-height:1.1;
+}
+.today-entry-stock span{
+  font-size:14px!important;
+  line-height:1.25;
+}
+.today-entry-time-row{
+  display:block;
+  font-size:13px!important;
+  color:var(--muted)!important;
+}
+.today-entry-subrow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.today-entry-price-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px!important;
+}
+.today-info-box{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.4);
+  min-width:0;
+}
+.today-info-box label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:4px;
+  font-weight:800;
+}
+.today-info-box b{
+  font-size:20px;
+  line-height:1.1;
+  color:var(--text);
+}
+.today-info-box .today-delta{
+  margin-left:0!important;
+  margin-top:6px;
+  width:max-content;
+}
+.today-entry-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.today-delete-btn{
+  min-width:84px;
+}
+.today-perf{
+  margin-right:auto;
+  font-size:13px;
+  font-weight:900;
+}
+.today-empty-message{
+  border:1px dashed var(--line);
+  border-radius:14px;
+  padding:16px 12px;
+  text-align:center;
+  color:var(--muted);
+  background:rgba(255,255,255,.28);
+}
+
+@media(max-width:700px){
+  .filter-card .filters{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+    grid-auto-rows:auto;
+  }
+  .filter-card .filters > div:not(.form-actions){
+    min-height:86px;
+  }
+  .filter-card .filters label{
+    min-height:30px;
+    font-size:12px!important;
+  }
+  .filter-card .filters input,
+  .filter-card .filters select{
+    font-size:13px!important;
+    padding:0 12px!important;
+  }
+  .filter-card .form-actions{
+    grid-column:1/-1!important;
+  }
+
+  .date-card-heading{
+    align-items:flex-start;
+  }
+  .date-card-heading h2{
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .date-query-box{
+    grid-template-columns:48px minmax(0,1fr) 48px auto!important;
+    gap:8px!important;
+  }
+  .date-picker-box,
+  .date-arrow-btn,
+  .date-today-btn{
+    height:50px!important;
+    min-height:50px!important;
+  }
+
+  .today-entry-item.compact{
+    padding:12px!important;
+    gap:10px!important;
+  }
+  .today-entry-top{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .today-entry-stock b{
+    font-size:17px!important;
+  }
+  .today-entry-stock span{
+    font-size:13px!important;
+  }
+  .today-entry-price-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .today-info-box{
+    padding:10px 10px;
+  }
+  .today-info-box b{
+    font-size:17px;
+  }
+  .today-entry-actions{
+    justify-content:flex-end;
+  }
+}
+
+@media(max-width:460px){
+  .date-query-box{
+    grid-template-columns:44px minmax(0,1fr) 44px auto!important;
+  }
+  .today-entry-price-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .today-perf{
+    width:100%;
+    margin-right:0;
+    order:0;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5092,18 +5351,33 @@ function renderTodayExits(){
   }
 
   list.innerHTML=rows.map(([id,tr])=>`
-    <div class="today-entry-item">
-      <div class="today-entry-stock">
-        <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
-        <span>${esc(tr.stockName||'')}</span>
-      </div>
-      <div class="today-entry-meta">
+    <div class="today-entry-item compact exit">
+      <div class="today-entry-top">
+        <div class="today-entry-stock-wrap">
+          <div class="today-entry-stock">
+            <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
+            <span>${esc(tr.stockName||'')}</span>
+          </div>
+          <div class="today-entry-subrow">
+            <span class="today-entry-time-row">出場時間 <b>${esc(tradeExitDateTime(tr))}</b></span>
+            <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
+          </div>
+        </div>
         <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
-        <span class="today-time">出場時間 <b>${esc(tradeExitDateTime(tr))}</b></span>
-        <span class="exit-kind ${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'partial':'full'}">${tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId)?'部分出場':'全部出場'}</span>
-        <span class="today-price">出場價 <b>${fmt(tr.exitPrice)}</b></span>
-        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b> ${todayPriceDelta(tr,tr.entryPrice)}</span>
-        <span class="${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
+      </div>
+      <div class="today-entry-price-grid exit-grid">
+        <div class="today-info-box">
+          <label>出場價</label>
+          <b>${fmt(tr.exitPrice)}</b>
+        </div>
+        <div class="today-info-box current">
+          <label>目前價</label>
+          <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b>
+          ${todayPriceDelta(tr,tr.entryPrice)}
+        </div>
+      </div>
+      <div class="today-entry-actions">
+        <span class="today-perf ${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
         <button class="mini ghost copy-perf-btn" type="button" data-copy-exit-perf="${id}">複製績效</button>
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
@@ -5220,16 +5494,29 @@ function renderTodayEntries(){
   }
 
   el.innerHTML=rows.map(([id,tr])=>`
-    <div class="today-entry-item">
-      <div class="today-entry-stock">
-        <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
-        <span>${esc(tr.stockName||'')}</span>
-      </div>
-      <div class="today-entry-meta">
+    <div class="today-entry-item compact">
+      <div class="today-entry-top">
+        <div class="today-entry-stock-wrap">
+          <div class="today-entry-stock">
+            <a class="stock-link" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer"><b>${esc(tr.symbol||'')}</b></a>
+            <span>${esc(tr.stockName||'')}</span>
+          </div>
+          <div class="today-entry-time-row">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></div>
+        </div>
         <button class="today-analyst today-analyst-btn" type="button" data-today-analyst="${esc(tr.analyst||'')}">${esc(tr.analyst||'—')}</button>
-        <span class="today-time">進場時間 <b>${esc(tradeEntryDateTime(tr))}</b></span>
-        <span class="today-price">進場價 <b>${fmt(tr.entryPrice)}</b></span>
-        <span class="today-price current-price">目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b> ${todayPriceDelta(tr,tr.entryPrice)}</span>
+      </div>
+      <div class="today-entry-price-grid">
+        <div class="today-info-box">
+          <label>進場價</label>
+          <b>${fmt(tr.entryPrice)}</b>
+        </div>
+        <div class="today-info-box current">
+          <label>目前價</label>
+          <b>${fmt(tr.currentPrice||tr.entryPrice)}</b>
+          ${todayPriceDelta(tr,tr.entryPrice)}
+        </div>
+      </div>
+      <div class="today-entry-actions">
         ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
       </div>
     </div>

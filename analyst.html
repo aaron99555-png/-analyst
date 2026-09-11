@@ -3994,7 +3994,7 @@ body.quiz-locked{overflow:hidden!important}
     <div class="brand"><div class="logo">績</div><div><h1>台股擂台賽<span class="baseline-title-note">基準點9/1起算</span></h1><div class="sub">13 位分析師｜即時追蹤、出場結算、百分比績效排行</div></div></div>
     <div class="actions">
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only main-admin-only hidden">⟳ 一鍵更新目前價</button>
+        <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
   <button id="toggleTuanBtn" class="ghost" type="button">顯示團團</button>
   <button id="notificationSettingsBtn" class="ghost" type="button">🔔 通知設定</button>
@@ -4694,7 +4694,8 @@ async function saveBulkFailedPrices(){
       await syncSameStockCurrentPrice(
         job.tr.symbol,
         job.price,
-        '網路抓價失敗－管理員批次手動輸入'
+        '網路抓價失敗－管理員批次手動輸入',
+        {onlyTuan:isAdmin2()}
       );
       manualSuccess++;
     }catch(err){
@@ -6407,6 +6408,11 @@ function setAdmin(v,role=''){
     closeNotificationSettings();
     setTimeout(openQuizGate,0);
   }
+
+  const bulkBtn=$('#refreshAllBtn');
+  if(bulkBtn){
+    bulkBtn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
+  }
 }
 
 function updatePriceModeUI(){
@@ -7614,16 +7620,20 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
   e.preventDefault();
   e.stopPropagation();
 
-  if(!isMainAdmin()){
-    alert('一鍵更新目前價僅限管理者1使用');
+  if(!isAdmin){
     return;
   }
 
   const openEntries=Object.entries(trades||{})
-    .filter(([id,tr])=>tr && canViewTrade(tr) && calc(tr).open);
+    .filter(([id,tr])=>
+      tr &&
+      canViewTrade(tr) &&
+      calc(tr).open &&
+      (!isAdmin2() || tr.analyst==='團團')
+    );
 
   if(!openEntries.length){
-    alert('目前沒有持有中的股票可更新');
+    alert(isAdmin2()?'團團目前沒有持有中的股票可更新':'目前沒有持有中的股票可更新');
     return;
   }
 
@@ -7739,7 +7749,7 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
     alert(`一鍵更新失敗：${err?.message||'未知錯誤'}`);
   }finally{
     btn.disabled=false;
-    btn.textContent='⟳ 一鍵更新目前價';
+    btn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
   }
 });
 

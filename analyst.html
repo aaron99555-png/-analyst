@@ -4194,6 +4194,30 @@ body.dark .rank-row{
   background:rgba(255,255,255,.025)!important;
 }
 
+
+/* v163：新增交易真正置於所有內容最上方 */
+.entry-top-zone{
+  width:100%;
+  margin:0 0 14px 0;
+}
+.entry-top-zone #entryCard{
+  width:100%!important;
+  margin:0!important;
+}
+.entry-top-zone #entryCard.entry-card-pinned{
+  position:sticky!important;
+  top:8px;
+  z-index:700;
+}
+@media(max-width:700px){
+  .entry-top-zone{
+    margin-bottom:10px;
+  }
+  .entry-top-zone #entryCard.entry-card-pinned{
+    top:4px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4219,7 +4243,8 @@ body.dark .rank-row{
     </div>
   </div>
 
-  <div class="grid">
+  
+<div class="entry-top-zone">
 <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title entry-card-head">
   <div class="entry-card-title-wrap">
@@ -4248,6 +4273,9 @@ body.dark .rank-row{
       </div>
     </div>
 </section>
+</div>
+<div class="grid">
+
 <section class="card span12 shared-open-card">
       <div class="section-title shared-open-title-row">
         <h2>同時持有中股票</h2>

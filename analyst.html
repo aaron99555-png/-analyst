@@ -4477,6 +4477,53 @@ body.dark .rank-row{
   }
 }
 
+
+/* v165：共同持股依共識重要性分色 */
+.shared-consensus-badge{
+  font-weight:900!important;
+  letter-spacing:.01em;
+  border-width:1px!important;
+  box-shadow:none!important;
+}
+
+/* 2 位：一般共同持有－藍色 */
+.shared-consensus-badge.base{
+  color:#245d93!important;
+  background:rgba(66,133,192,.12)!important;
+  border-color:rgba(66,133,192,.35)!important;
+}
+
+/* 3 位：中高共識－橘金色 */
+.shared-consensus-badge.mid{
+  color:#a76513!important;
+  background:rgba(222,154,55,.15)!important;
+  border-color:rgba(222,154,55,.42)!important;
+}
+
+/* 4 位以上：高共識－紅色 */
+.shared-consensus-badge.high{
+  color:#b92f35!important;
+  background:rgba(205,61,67,.13)!important;
+  border-color:rgba(205,61,67,.40)!important;
+}
+
+/* 深色模式維持清楚對比 */
+body.dark .shared-consensus-badge.base{
+  color:#8fc4f1!important;
+  background:rgba(66,133,192,.18)!important;
+  border-color:rgba(116,177,228,.42)!important;
+}
+body.dark .shared-consensus-badge.mid{
+  color:#f2bd69!important;
+  background:rgba(222,154,55,.18)!important;
+  border-color:rgba(242,189,105,.42)!important;
+}
+body.dark .shared-consensus-badge.high{
+  color:#ff9297!important;
+  background:rgba(205,61,67,.20)!important;
+  border-color:rgba(255,146,151,.42)!important;
+}
+
 </style>
 </head>
 <body>

@@ -3986,6 +3986,33 @@ body.quiz-locked{overflow:hidden!important}
   opacity:.82;
 }
 
+
+/* v154：同時持有中股票－分析師名稱可點擊 */
+.shared-open-analyst-btn{
+  appearance:none;
+  border:1px solid var(--line);
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  font-size:11px;
+  font-weight:850;
+  padding:4px 8px;
+  border-radius:999px;
+  cursor:pointer;
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:3px;
+}
+.shared-open-analyst-btn:hover{
+  opacity:.82;
+}
+@media(max-width:700px){
+  .shared-open-analyst-btn{
+    min-height:30px;
+    font-size:11px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -5164,10 +5191,18 @@ function renderSharedOpenPositions(){
         <span class="shared-open-count">${names.length} 位持有</span>
       </div>
       <div class="shared-open-analysts">
-        ${names.map(n=>`<span class="shared-open-analyst">${n}</span>`).join('')}
+        ${names.map(n=>`<button class="shared-open-analyst shared-open-analyst-btn" type="button" data-shared-analyst="${esc(n)}">${esc(n)}</button>`).join('')}
       </div>
     </div>`;
   }).join('');
+
+  $$('[data-shared-analyst]').forEach(btn=>{
+    btn.onclick=()=>{
+      const name=String(btn.dataset.sharedAnalyst||'').trim();
+      if(!name)return;
+      renderAnalystTradesModal(name);
+    };
+  });
 }
 
 function renderTodayEntries(){

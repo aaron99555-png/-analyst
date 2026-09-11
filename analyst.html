@@ -4071,6 +4071,23 @@ body.quiz-locked{overflow:hidden!important}
   white-space:nowrap;
 }
 
+
+/* v159：抓價失敗視窗－點股票代號／股名前往 Yahoo 個股資訊 */
+.bulk-failed-yahoo-link{
+  display:inline-block;
+  color:inherit;
+  text-decoration:none;
+  cursor:pointer;
+}
+.bulk-failed-yahoo-link strong{
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:3px;
+}
+.bulk-failed-yahoo-link:hover{
+  opacity:.82;
+}
+
 </style>
 </head>
 <body>
@@ -4707,9 +4724,18 @@ function openBulkFailedPriceModal(items=[]){
     return `
       <div class="bulk-failed-price-row">
         <div class="bulk-failed-price-stock">
-          <strong>${esc(symbol)}${stockName?`　${esc(stockName)}`:''}</strong>
+          <a class="bulk-failed-yahoo-link"
+             href="${yahooStockUrl(symbol)}"
+             target="_blank"
+             rel="noopener noreferrer"
+             title="開啟 Yahoo 股市個股資訊">
+            <strong>${esc(symbol)}${stockName?`　${esc(stockName)}`:''}</strong>
+          </a>
           <small>${esc(reason)}</small>
-          <small><a href="${investingSearchUrl(symbol)}" target="_blank" rel="noopener noreferrer">Investing.com 查詢</a></small>
+          <small>
+            <a href="${yahooStockUrl(symbol)}" target="_blank" rel="noopener noreferrer">Yahoo 個股資訊</a>
+            ｜<a href="${investingSearchUrl(symbol)}" target="_blank" rel="noopener noreferrer">Investing.com 查詢</a>
+          </small>
         </div>
         <input
           type="number"
@@ -5190,6 +5216,74 @@ function filteredTrades(){
 function yahooStockUrl(symbol){
   return `https://tw.stock.yahoo.com/quote/${encodeURIComponent(String(symbol||'').trim())}`;
 }
+
+async function fetchYahooQuotePagePrice(sym){
+  const symbol=String(sym||'').trim();
+  if(!/^\d{4,6}$/.test(symbol))throw new Error('股票代號格式異常');
+
+  const url=yahooStockUrl(symbol);
+  let html='';
+
+  // 先直接抓 Yahoo 台股個股頁；若 CORS 阻擋再走 proxy。
+  try{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+    try{
+      const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+      if(r.ok)html=await r.text();
+    }finally{
+      clearTimeout(timer);
+    }
+  }catch(_){}
+
+  if(!html){
+    try{
+      const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),PRICE_FETCH_TIMEOUT);
+      try{
+        const r=await fetch(proxy,{cache:'no-store',signal:controller.signal});
+        if(r.ok)html=await r.text();
+      }finally{
+        clearTimeout(timer);
+      }
+    }catch(_){}
+  }
+
+  if(!html)throw new Error('Yahoo 個股資訊頁無法讀取');
+
+  // Yahoo 頁面可能在 JSON / script 中帶入 regularMarketPrice 或成交價欄位。
+  const patterns=[
+    /"regularMarketPrice"\s*:\s*\{"raw"\s*:\s*([0-9.]+)/i,
+    /"regularMarketPrice"\s*:\s*([0-9.]+)/i,
+    /"price"\s*:\s*\{"raw"\s*:\s*([0-9.]+)/i,
+    /"close"\s*:\s*([0-9.]+)/i,
+    /成交價[^0-9]{0,40}([0-9]+(?:\.[0-9]+)?)/i
+  ];
+
+  let price=0;
+  for(const p of patterns){
+    const m=html.match(p);
+    if(m){
+      const n=Number(m[1]);
+      if(Number.isFinite(n)&&n>0){
+        price=n;
+        break;
+      }
+    }
+  }
+
+  if(!(price>0))throw new Error('Yahoo 個股資訊頁未解析到有效價格');
+
+  return {
+    price,
+    source:'Yahoo 股市個股資訊頁',
+    mode:'latest',
+    market:'Taiwan',
+    tradeDate:today()
+  };
+}
+
 function shortMD(d){
   return d ? String(d).slice(0,10) : '';
 }
@@ -7433,13 +7527,21 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
     yahooError=e;
   }
 
+  let yahooPageError=null;
+  try{
+    return await fetchYahooQuotePagePrice(sym);
+  }catch(e){
+    yahooPageError=e;
+  }
+
   try{
     return await fetchInvestingTaiwanPrice(sym);
   }catch(investingError){
     throw new Error(
       `TWSE：${twseError?.message||'失敗'}｜`+
       `TPEx：${tpexError?.message||'失敗'}｜`+
-      `Yahoo .TWO：${yahooError?.message||'失敗'}｜`+
+      `Yahoo Finance：${yahooError?.message||'失敗'}｜`+
+      `Yahoo 個股頁：${yahooPageError?.message||'失敗'}｜`+
       `Investing.com：${investingError?.message||'失敗'}`
     );
   }

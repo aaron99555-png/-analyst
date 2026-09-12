@@ -2795,38 +2795,16 @@ html[data-theme="dark"] .section-title{
 }
 
 
-body
-@media(max-width:700px){
-  
-}
 
 
 
 
-/* v135：柔和暖色認證卡 */
-@keyframes quizShake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-6px)}
+
+25%{transform:translateX(-6px)}
   50%{transform:translateX(5px)}
   75%{transform:translateX(-3px)}
 }
-@keyframes quizSuccessPop{
-  from{transform:scale(.96);opacity:.3}
-  to{transform:scale(1);opacity:1}
-}
-body
-@media(max-width:700px){
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+to{transform:scale(1);opacity:1}
 }
 
 
@@ -6382,7 +6360,7 @@ if(localStorage.getItem('analystAdmin')==='1'){
   // 已登入管理者：直接進入。
   setAdmin(true,localStorage.getItem('analystAdminRole')||'main');
 }else{
-  // 一般使用者：直接進入頁面，不再進行考試驗證。
+  // 一般使用者：直接進入頁面。
   updateTuanToggleUI();
   refreshAnalystVisibilityOptions();
   updatePriceModeUI();

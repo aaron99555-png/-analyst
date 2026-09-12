@@ -6379,14 +6379,13 @@ function updatePriceModeUI(){
   }
 }
 if(localStorage.getItem('analystAdmin')==='1'){
-  // 已登入管理者：直接進入，完全不顯示考題。
+  // 已登入管理者：直接進入。
   setAdmin(true,localStorage.getItem('analystAdminRole')||'main');
 }else{
-  // 一般使用者：每次開啟 / 重新整理隨機抽一題。
+  // 一般使用者：直接進入頁面，不再進行考試驗證。
   updateTuanToggleUI();
   refreshAnalystVisibilityOptions();
   updatePriceModeUI();
-  setTimeout(openQuizGate,0);
 }
 
 $('#adminBtn').onclick=()=>{
@@ -6395,7 +6394,7 @@ $('#adminBtn').onclick=()=>{
 };
 $('#closeLogin').onclick=()=>{
   $('#loginModal').classList.remove('show');
-  // 尚未登入管理者時，取消登入才回到一般使用者考題。
+  
 };
 $('#doLogin').onclick=()=>{
   const pwd=$('#adminPwd').value;

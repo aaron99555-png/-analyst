@@ -4388,8 +4388,9 @@ html[data-theme="light"] .today-info-box{
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
-    grid-template-columns:42px minmax(112px,1fr) 42px 72px !important;
+    grid-template-columns:44px minmax(126px,150px) 44px minmax(72px,1fr) !important;
     gap:6px !important;
+    justify-content:start !important;
   }
   .date-picker-box,
   .date-arrow-btn,
@@ -4407,8 +4408,34 @@ html[data-theme="light"] .today-info-box{
     text-align:center !important;
   }
   .date-arrow-btn{
-    padding:0 !important;
-    font-size:22px !important;
+    width:44px !important;
+    max-width:44px !important;
+    min-width:44px !important;
+    padding:0 0 3px !important;
+    border:1px solid rgba(181,138,32,.38) !important;
+    border-radius:50% !important;
+    background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(244,236,219,.72)) !important;
+    color:#5a4823 !important;
+    box-shadow:0 3px 10px rgba(75,55,20,.10),inset 0 1px 0 rgba(255,255,255,.9) !important;
+    font-family:Arial,sans-serif !important;
+    font-size:30px !important;
+    font-weight:500 !important;
+    line-height:1 !important;
+  }
+  .date-arrow-btn:hover{
+    border-color:rgba(181,138,32,.7) !important;
+    background:linear-gradient(145deg,#fffdf8,#efe1bd) !important;
+  }
+  .date-arrow-btn:active{
+    transform:scale(.94);
+    box-shadow:inset 0 2px 5px rgba(75,55,20,.13) !important;
+  }
+  html[data-theme="dark"] .date-arrow-btn,
+  body.dark .date-arrow-btn{
+    background:linear-gradient(145deg,#292116,#17120c) !important;
+    border-color:rgba(244,215,125,.38) !important;
+    color:#f4d77d !important;
+    box-shadow:0 3px 12px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.05) !important;
   }
   .date-today-btn{
     padding:0 5px !important;
@@ -4469,7 +4496,8 @@ html[data-theme="light"] .today-info-box{
 
 @media(max-width:380px){
   .date-query-box{
-    grid-template-columns:42px minmax(0,1fr) 42px !important;
+    grid-template-columns:44px minmax(0,150px) 44px !important;
+    justify-content:center !important;
   }
   .date-today-btn{
     grid-column:1 / -1 !important;
@@ -4634,9 +4662,9 @@ html[data-theme="light"] .today-info-box{
           <button id="copyEntryBtn" class="mini ghost" type="button">複製</button>
         </div>
         <div class="date-query-box">
-          <button id="entryPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">←</button>
+          <button id="entryPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">‹</button>
           <input id="entryQueryDate" class="date-picker-box" type="date" aria-label="查詢進場日期">
-          <button id="entryNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">→</button>
+          <button id="entryNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">›</button>
           <button id="entryTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>
@@ -4650,9 +4678,9 @@ html[data-theme="light"] .today-info-box{
           <button id="copyExitBtn" class="mini ghost" type="button">複製</button>
         </div>
         <div class="date-query-box">
-          <button id="exitPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">←</button>
+          <button id="exitPrevDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="前一天">‹</button>
           <input id="exitQueryDate" class="date-picker-box" type="date" aria-label="查詢出場日期">
-          <button id="exitNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">→</button>
+          <button id="exitNextDayBtn" class="mini ghost date-arrow-btn" type="button" aria-label="後一天">›</button>
           <button id="exitTodayBtn" class="mini ghost date-today-btn" type="button">回到今天</button>
         </div>
       </div>

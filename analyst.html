@@ -4878,6 +4878,15 @@ function fillStockNameByCode(){
 }
 
 const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'});
+// 進出場卡片預設日期：台灣時間週六、週日均停留在週五。
+// 只調整查詢日期，不更動新增交易或結算日期，也不推算國定假日。
+function defaultActivityDate(dateText=today()){
+  const date=new Date(`${dateText}T00:00:00Z`);
+  const weekday=date.getUTCDay();
+  if(weekday===6)date.setUTCDate(date.getUTCDate()-1);
+  else if(weekday===0)date.setUTCDate(date.getUTCDate()-2);
+  return date.toISOString().slice(0,10);
+}
 const nowText=()=>new Date().toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false});
 
 $('#entryDate').value=today(); $('#fMonth').value=''; $('#fFrom').value=''; $('#fTo').value='';
@@ -5087,7 +5096,7 @@ function shiftDateInput(inputId,days){
 
 function renderTodayExits(){
   const picker=$('#exitQueryDate');
-  const d=(picker?.value)||today();
+  const d=(picker?.value)||defaultActivityDate();
   const title=$('#exitCardTitle');
   const list=$('#todayExits');
   if(!list)return;
@@ -5152,7 +5161,7 @@ async function copySharedStockAnalysts(symbol,stockName=''){
 
   const names=[...group.analysts];
   const label=`${group.symbol}${group.stockName?' '+group.stockName:(stockName?' '+stockName:'')}`;
-  const dateText=String($('#entryQueryDate')?.value||today()).replaceAll('-','/');
+  const dateText=String($('#entryQueryDate')?.value||defaultActivityDate()).replaceAll('-','/');
   const text=
 `| ${dateText} 同時持有分析師   |
 
@@ -5231,7 +5240,7 @@ function renderSharedOpenPositions(){
 function renderTodayEntries(){
   const el=$('#todayEntries');
   const picker=$('#entryQueryDate');
-  const d=(picker?.value)||today();
+  const d=(picker?.value)||defaultActivityDate();
   const title=$('#entryCardTitle');
   if(!el)return;
   if(title)title.textContent=`${shortMD(d)}進場股票`;
@@ -5718,7 +5727,7 @@ function buildRankCopyText(){
 }
 
 function getEntryRowsByDate(){
-  const d=$('#entryQueryDate')?.value || today();
+  const d=$('#entryQueryDate')?.value || defaultActivityDate();
   return Object.entries(trades||{})
     .map(([id,t])=>({id,t,c:calc(t)}))
     .filter(x=>canViewTrade(x.t) && x.t?.entryDate===d)
@@ -5726,7 +5735,7 @@ function getEntryRowsByDate(){
 }
 
 function buildEntryCopyText(){
-  const d=$('#entryQueryDate')?.value || today();
+  const d=$('#entryQueryDate')?.value || defaultActivityDate();
   const rows=getEntryRowsByDate();
   const lines=[`【${d} 分析師進場清單】`,''];
 
@@ -5748,7 +5757,7 @@ function buildEntryCopyText(){
 }
 
 function getExitRowsByDate(){
-  const d=$('#exitQueryDate')?.value || today();
+  const d=$('#exitQueryDate')?.value || defaultActivityDate();
   return Object.entries(trades||{})
     .map(([id,t])=>({id,t,c:calc(t)}))
     .filter(x=>canViewTrade(x.t) && x.t?.exitDate===d && !x.c.open)
@@ -5761,7 +5770,7 @@ function exitStatusText(t){
 }
 
 function buildExitCopyText(){
-  const d=$('#exitQueryDate')?.value || today();
+  const d=$('#exitQueryDate')?.value || defaultActivityDate();
   const rows=getExitRowsByDate();
   const lines=[`【${d} 分析師出場清單】`,''];
 
@@ -7927,8 +7936,26 @@ window.addEventListener('pageshow',()=>{
 function initDateQueryPickers(){
   const entry=$('#entryQueryDate');
   const exit=$('#exitQueryDate');
-  if(entry)entry.value=today();
-  if(exit)exit.value=today();
+  let entryAuto=true,exitAuto=true;
+  if(entry)entry.value=defaultActivityDate();
+  if(exit)exit.value=defaultActivityDate();
+  const syncActivityDates=()=>{
+    const date=defaultActivityDate();
+    if(entryAuto && entry && entry.value!==date){entry.value=date;renderTodayEntries();}
+    if(exitAuto && exit && exit.value!==date){exit.value=date;renderTodayExits();}
+    const weekend=date!==today();
+    ['#entryTodayBtn','#exitTodayBtn'].forEach(id=>{
+      const button=$(id);
+      if(button){
+        button.textContent=weekend?'回到週五':'回到今天';
+        button.title=weekend?'週末沿用週五的進出場資料':'顯示今天的進出場資料';
+      }
+    });
+  };
+  syncActivityDates();
+  // 網頁跨日或從背景返回時同步；手動查詢歷史日期不被覆蓋。
+  setInterval(()=>{if(!document.hidden)syncActivityDates();},60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncActivityDates();});
 
   [entry,exit,$('#fFrom'),$('#fTo')].forEach(input=>{
     if(!input)return;
@@ -7937,8 +7964,8 @@ function initDateQueryPickers(){
     });
   });
 
-  entry?.addEventListener('change',renderTodayEntries);
-  exit?.addEventListener('change',renderTodayExits);
+  entry?.addEventListener('change',()=>{entryAuto=false;renderTodayEntries();});
+  exit?.addEventListener('change',()=>{exitAuto=false;renderTodayExits();});
 
   
 $('#entryPrevDayBtn')?.addEventListener('click',()=>shiftDateInput('entryQueryDate',-1));
@@ -7946,11 +7973,13 @@ $('#entryNextDayBtn')?.addEventListener('click',()=>shiftDateInput('entryQueryDa
 $('#exitPrevDayBtn')?.addEventListener('click',()=>shiftDateInput('exitQueryDate',-1));
 $('#exitNextDayBtn')?.addEventListener('click',()=>shiftDateInput('exitQueryDate',1));
 $('#entryTodayBtn')?.addEventListener('click',()=>{
-    if(entry)entry.value=today();
+    entryAuto=true;
+    if(entry)entry.value=defaultActivityDate();
     renderTodayEntries();
   });
   $('#exitTodayBtn')?.addEventListener('click',()=>{
-    if(exit)exit.value=today();
+    exitAuto=true;
+    if(exit)exit.value=defaultActivityDate();
     renderTodayExits();
   });
 }

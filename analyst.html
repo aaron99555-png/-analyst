@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
 <title>台股擂台賽</title>
 <style>
 :root{
@@ -4332,7 +4332,72 @@ html[data-theme="light"] .rank-inline-chip{
   border-color:#eee3c7 !important;
 }
 
+/* 手機操作修正：依實際可視高度縮放，整張視窗可上下滑動。 */
+@media (max-width:700px), (max-height:500px) and (pointer:coarse){
+  html{height:auto;overflow-y:auto;scroll-padding-bottom:32px}
+  body{min-height:100vh;min-height:100dvh;overflow-y:auto}
+  .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px)) !important}
+  .actions,.form-actions,.row-actions{flex-wrap:wrap;gap:8px;height:auto}
+  button,.btn{
+    min-height:44px;max-width:100%;padding:10px 12px;
+    font-size:14px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;
+  }
+  input,select,textarea{font-size:16px;min-height:44px;scroll-margin-block:20px}
+  .formgrid > *,.filters > *{min-width:0}
+  .modal,#analystTradesModal{
+    top:var(--mobile-viewport-top,0px) !important;bottom:auto !important;
+    height:100vh;height:var(--mobile-viewport-height,100dvh);
+    padding:max(10px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px)) !important;
+    align-items:center !important;justify-items:center;
+    overflow-y:auto !important;overscroll-behavior:contain;
+  }
+  .modal .modal-card,
+  #analystTradesModal .modal-card,
+  #analystTradesModal .analyst-trades-modal-card{
+    width:100% !important;max-width:760px !important;min-width:0 !important;
+    max-height:100% !important;height:auto !important;min-height:0;
+    margin:0 !important;padding:14px !important;border-radius:16px !important;
+    overflow-y:auto !important;overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
+    scroll-padding-block:16px;
+  }
+  /* 不再用固定扣除標題高度的內層捲動，避免按鈕被裁切。 */
+  #analystTradesModal .analyst-trades-modal-head{position:static !important;overflow:visible !important}
+  #analystTradesModal #analystTradesBody,
+  #analystTradesModal .analyst-trades-body,
+  .modal .price-confirm-list,.modal .bulk-failed-price-list{
+    max-height:none !important;height:auto !important;overflow:visible !important;
+  }
+  .modal .section-title{flex-wrap:wrap}
+  .modal .price-confirm-actions{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+    margin-top:14px;padding-bottom:4px;
+  }
+  .modal button,
+  #analystTradesModal .analyst-trades-head-actions button,
+  #analystTradesModal #addTradeFromAnalystModalBtn,
+  #analystTradesModal #copyAnalystHoldingsBtn,
+  #analystTradesModal #closeAnalystTrades{
+    min-height:44px !important;min-width:0 !important;padding:10px !important;
+    font-size:14px !important;line-height:1.4 !important;
+    white-space:normal !important;overflow:visible !important;text-overflow:clip !important;
+  }
+}
 </style>
+<script>
+// 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
+(()=>{
+  const viewport=window.visualViewport;
+  const updateViewport=()=>{
+    document.documentElement.style.setProperty('--mobile-viewport-height',`${viewport?.height ?? window.innerHeight}px`);
+    document.documentElement.style.setProperty('--mobile-viewport-top',`${viewport?.offsetTop ?? 0}px`);
+  };
+  updateViewport();
+  window.addEventListener('resize',updateViewport,{passive:true});
+  viewport?.addEventListener('resize',updateViewport,{passive:true});
+  viewport?.addEventListener('scroll',updateViewport,{passive:true});
+})();
+</script>
 </head>
 <body>
 <div class="wrap">

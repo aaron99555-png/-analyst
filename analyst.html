@@ -4332,6 +4332,153 @@ html[data-theme="light"] .rank-inline-chip{
   border-color:#eee3c7 !important;
 }
 
+/* v167：手機卡片尺寸、文字層級與無框資訊排列 */
+.rank-inline-chip,
+html[data-theme="light"] .rank-inline-chip{
+  padding:2px 0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.today-info-box,
+html[data-theme="light"] .today-info-box{
+  padding:2px 0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+@media(max-width:700px){
+  /* 篩選欄位保留足夠寬度，避免輸入框互相擠壓。 */
+  .filter-card .filters{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:12px 10px !important;
+  }
+  .filter-card .filters > div:not(.form-actions){
+    min-width:0 !important;
+    min-height:74px !important;
+  }
+  .filter-card .filters label{
+    min-height:28px !important;
+    margin-bottom:5px !important;
+    line-height:1.25 !important;
+  }
+  .filter-card .filters input,
+  .filter-card .filters select{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:46px !important;
+    min-height:46px !important;
+    padding:0 10px !important;
+  }
+  .filter-card .filters > div:has(#fKeyword){
+    grid-column:1 / -1 !important;
+  }
+  .filter-card .form-actions{
+    grid-column:1 / -1 !important;
+    min-height:46px !important;
+  }
+  .filter-card .form-actions button{width:100% !important}
+
+  /* 日期切換列依可用寬度縮放，各控制項不再重疊。 */
+  .date-query-box{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    grid-template-columns:42px minmax(112px,1fr) 42px 72px !important;
+    gap:6px !important;
+  }
+  .date-picker-box,
+  .date-arrow-btn,
+  .date-today-btn{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:44px !important;
+    min-height:44px !important;
+    margin:0 !important;
+  }
+  .date-picker-box{
+    padding:0 4px !important;
+    font-size:14px !important;
+    text-align:center !important;
+  }
+  .date-arrow-btn{
+    padding:0 !important;
+    font-size:22px !important;
+  }
+  .date-today-btn{
+    padding:0 5px !important;
+    font-size:12px !important;
+    white-space:normal !important;
+    line-height:1.2 !important;
+  }
+
+  /* 股票名稱為視覺重點，價格資訊改小並移除外框。 */
+  .today-entry-stock b{font-size:20px !important;line-height:1.15 !important}
+  .today-entry-stock span{font-size:16px !important;line-height:1.3 !important;font-weight:900 !important}
+  .today-entry-price-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:16px !important;
+    padding:2px 0 !important;
+  }
+  .today-info-box label{
+    min-height:0 !important;
+    margin:0 0 2px !important;
+    font-size:11px !important;
+    line-height:1.25 !important;
+  }
+  .today-info-box b{
+    font-size:15px !important;
+    line-height:1.25 !important;
+    font-weight:800 !important;
+  }
+  .today-info-box .today-delta{
+    margin-top:3px !important;
+    font-size:11px !important;
+  }
+
+  /* 績效與損益使用兩欄純文字，維持高度一致。 */
+  .rank-inline-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px 14px !important;
+    align-items:start !important;
+  }
+  .rank-inline-chip{
+    display:grid !important;
+    justify-items:start !important;
+    align-content:start !important;
+    gap:2px !important;
+    min-height:42px !important;
+  }
+  .rank-inline-chip .k{
+    font-size:11px !important;
+    line-height:1.2 !important;
+  }
+  .rank-inline-chip .rank-value{
+    max-width:100% !important;
+    font-size:14px !important;
+    line-height:1.25 !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+  }
+}
+
+@media(max-width:380px){
+  .date-query-box{
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+  }
+  .date-today-btn{
+    grid-column:1 / -1 !important;
+  }
+  .filter-card .filters{grid-template-columns:1fr !important}
+  .filter-card .filters > div:has(#fKeyword),
+  .filter-card .form-actions{grid-column:1 !important}
+}
+
 /* 手機操作修正：依實際可視高度縮放，整張視窗可上下滑動。 */
 @media (max-width:700px), (max-height:500px) and (pointer:coarse){
   html{height:auto;overflow-y:auto;scroll-padding-bottom:32px}

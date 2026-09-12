@@ -4558,6 +4558,204 @@ html[data-theme="light"] .today-info-box{
     white-space:normal !important;overflow:visible !important;text-overflow:clip !important;
   }
 }
+
+/* v170：桌機與手機統一版面節奏 */
+:root{
+  --ui-gap:16px;
+  --ui-radius:18px;
+  --ui-focus:0 0 0 3px rgba(193,148,48,.18);
+}
+.wrap{width:100%;max-width:1440px;padding:24px 24px 44px !important}
+.grid{
+  width:100% !important;
+  grid-template-columns:repeat(12,minmax(0,1fr)) !important;
+  gap:var(--ui-gap) !important;
+  align-items:start;
+}
+.topbar{
+  margin-bottom:18px !important;padding:18px 20px !important;
+  border-radius:var(--ui-radius) !important;
+}
+.brand{min-width:0}.brand > div:last-child{min-width:0}
+.brand h1{line-height:1.2 !important}.brand .sub{line-height:1.45}
+.actions{justify-content:flex-end !important;align-items:center !important}
+.card{
+  min-width:0;padding:18px !important;border-radius:var(--ui-radius) !important;
+  overflow:visible;
+}
+.section-title{min-width:0;gap:12px !important}
+.section-title h2{line-height:1.35 !important}
+.section-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:none !important;box-shadow:var(--ui-focus) !important;
+}
+
+/* 桌機主資訊：篩選較寬，進出場並列，排行榜獨立一列。 */
+.grid > .filter-card.span3{grid-column:span 6 !important}
+.grid > .today-entry-card.span3,
+.grid > .today-exit-card.span3{grid-column:span 3 !important}
+.grid > .performance-rank-card{grid-column:1 / -1 !important}
+.filter-card .filters{
+  display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:12px !important;align-items:end !important;
+}
+.filter-card .filters > div{min-width:0 !important}
+.filter-card .filters > div:has(#fKeyword){grid-column:span 2 !important}
+.filter-card .filters label{min-height:20px !important;margin:0 0 5px !important}
+.filter-card .filters input,.filter-card .filters select,.filter-card .filters button{
+  height:44px !important;min-height:44px !important;
+}
+.filter-card .form-actions{grid-column:auto !important;height:auto !important}
+
+/* 日期操作維持箭頭緊貼日期，回到按鈕獨立一列。 */
+.date-query-box{
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  gap:7px !important;width:100% !important;
+}
+.date-today-btn{
+  grid-column:1 / -1 !important;width:100% !important;min-width:0 !important;
+  height:38px !important;min-height:38px !important;
+}
+.date-picker-box{height:44px !important;min-height:44px !important;font-size:13px !important}
+.date-arrow-btn{width:44px !important;height:44px !important;min-height:44px !important}
+.date-card-heading h2{font-size:17px !important;overflow-wrap:anywhere}
+
+/* 清單資訊層級 */
+.today-entry-list{gap:10px !important}
+.today-entry-item.compact{
+  gap:10px !important;padding:13px !important;border-radius:15px !important;
+  box-shadow:0 4px 14px rgba(44,35,20,.04);
+}
+.today-entry-stock b{font-size:19px !important}
+.today-entry-stock span{font-size:15px !important;font-weight:850 !important}
+.today-entry-time-row{font-size:11px !important;line-height:1.4 !important}
+.today-analyst-btn{max-width:100%;font-size:11px !important;padding:5px 8px !important;min-height:30px !important}
+.today-entry-price-grid{gap:14px !important;padding-top:3px !important}
+.today-empty-message{min-height:70px !important}
+
+/* 排行榜桌機雙欄，績效資訊保持純文字。 */
+.performance-rank-card .rank-list{gap:12px !important}
+.performance-rank-card .rank-group{
+  display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px !important;padding:12px !important;
+}
+.performance-rank-card .rank-group-title,
+.performance-rank-card .empty-rank,
+.performance-rank-card .rank-note{grid-column:1 / -1}
+.performance-rank-card .rank-row{height:100%;padding:12px !important}
+.performance-rank-card .rank-inline-metrics{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+.performance-rank-card .rank-inline-chip{min-height:38px !important}
+
+/* 圖表與總績效表格 */
+.visual-analytics-card{padding:20px !important}
+.visual-tabs{gap:6px !important;padding:5px !important}
+.visual-tabs button{min-height:40px !important}
+.visual-chart-wrap{height:clamp(300px,34vw,430px) !important}
+.analyst-quick-filter{padding:2px 0 8px !important}
+.table-wrap{
+  max-width:100%;overflow:auto !important;scrollbar-gutter:stable;
+  border-radius:14px !important;
+}
+th,td{padding:10px 11px !important}
+tbody td{line-height:1.45}
+
+@media(min-width:701px) and (max-width:1100px){
+  .grid > .filter-card.span3{grid-column:1 / -1 !important}
+  .grid > .today-entry-card.span3,
+  .grid > .today-exit-card.span3{grid-column:span 6 !important}
+  .filter-card .filters{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+  .filter-card .filters > div:has(#fKeyword){grid-column:span 2 !important}
+  .performance-rank-card .rank-group{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+  :root{--ui-gap:11px;--ui-radius:16px}
+  .wrap{padding:10px 10px calc(34px + env(safe-area-inset-bottom,0px)) !important}
+  .grid{display:grid !important;grid-template-columns:1fr !important;gap:11px !important}
+  .grid > .shared-open-card{order:9 !important}
+  .grid > .filter-card.span3{grid-column:1 !important;order:10 !important}
+  .grid > .today-entry-card.span3{grid-column:1 !important;order:11 !important}
+  .grid > .today-exit-card.span3{grid-column:1 !important;order:12 !important}
+  .grid > .performance-rank-card{grid-column:1 !important;order:13 !important}
+  .grid > .visual-analytics-card{order:14 !important}
+  .grid > .quick-price-card{order:15 !important}
+  .topbar{padding:14px !important;margin-bottom:11px !important}
+  .brand{width:100%}.logo{width:44px !important;height:44px !important;flex:0 0 44px}
+  .brand h1{font-size:22px !important}
+  .baseline-title-note{display:inline-block;margin:5px 0 0 0 !important}
+  .actions{width:100%;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important}
+  .actions > button{width:100% !important}
+  .price-update-wrap,.admin-data-tools{grid-column:1 / -1 !important}
+  .price-note{font-size:10px !important;line-height:1.45 !important}
+  .card{padding:14px !important}
+  .card:hover{transform:none !important}
+  .section-title{margin-bottom:11px !important;padding-bottom:8px !important}
+  .section-title h2{font-size:18px !important}
+  .section-title .status{line-height:1.4}
+  .shared-open-title-row{align-items:flex-start !important;flex-direction:column !important}
+  .shared-open-title-actions{width:100% !important;align-items:stretch !important}
+  .shared-open-title-actions button{width:100% !important}
+
+  .filter-card .filters{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important}
+  .filter-card .filters > div:not(.form-actions){min-height:70px !important}
+  .filter-card .filters > div:has(#fKeyword){grid-column:1 / -1 !important}
+  .filter-card .form-actions{grid-column:1 / -1 !important}
+  .filter-card .filters input,.filter-card .filters select{font-size:16px !important}
+
+  .date-card-title{gap:8px !important}
+  .date-card-heading{align-items:center !important}
+  .date-query-box{grid-template-columns:44px minmax(0,1fr) 44px !important;gap:7px !important}
+  .date-picker-box{font-size:14px !important}
+  .date-today-btn{height:40px !important;min-height:40px !important}
+  .today-entry-top{gap:8px !important}
+  .today-entry-stock b{font-size:20px !important}
+  .today-entry-stock span{font-size:16px !important}
+  .today-entry-item.compact{padding:12px !important}
+
+  .performance-rank-card .rank-group{grid-template-columns:1fr !important;padding:9px !important}
+  .performance-rank-card .rank-row{padding:10px !important}
+  .rank-toolbar{display:grid !important;gap:8px !important}
+  .rank-metric-switch{width:100% !important;display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+  .rank-metric-switch button{min-width:0 !important;padding:7px 4px !important;font-size:11px !important}
+  .visual-tabs-six{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  .visual-tabs button{white-space:normal !important;line-height:1.25 !important}
+  .visual-chart-wrap{height:300px !important}
+  .holdings-title{align-items:flex-start !important;flex-direction:column !important}
+  .title-with-badge{gap:6px !important}
+  .table-wrap{margin-inline:0 !important;border-radius:12px !important}
+  th,td{padding:9px 8px !important;font-size:12px !important}
+}
+
+@media(max-width:380px){
+  .filter-card .filters{grid-template-columns:1fr !important}
+  .filter-card .filters > div:has(#fKeyword),.filter-card .form-actions{grid-column:1 !important}
+  .rank-metric-switch{grid-template-columns:1fr !important}
+  .visual-tabs-six{grid-template-columns:1fr 1fr !important}
+}
+
+/* v171：桌機版排行榜銜接篩選區，填補進出場卡片造成的列高空白。 */
+@media(min-width:1101px){
+  .grid > .filter-card.span3{
+    grid-column:1 / span 6 !important;
+  }
+  .grid > .today-entry-card.span3{
+    grid-column:7 / span 3 !important;
+    grid-row:span 2 !important;
+  }
+  .grid > .today-exit-card.span3{
+    grid-column:10 / span 3 !important;
+    grid-row:span 2 !important;
+  }
+  .grid > .performance-rank-card{
+    grid-column:1 / span 6 !important;
+  }
+}
+@media(max-width:1100px){
+  .grid > .today-entry-card.span3,
+  .grid > .today-exit-card.span3{
+    grid-row:auto !important;
+  }
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -4687,7 +4885,7 @@ html[data-theme="light"] .today-info-box{
       <div id="todayExits" class="today-entry-list"></div>
     </section>
 
-    <section class="card span3">
+    <section class="card span12 performance-rank-card">
       <div class="section-title rank-title-row">
         <h2>績效排行榜</h2>
         <div class="section-actions">
@@ -5884,6 +6082,14 @@ function currentRankConfig(){
   }[rankMetric] || {label:'總績效',perf:r=>r.totalPerf,money:r=>r.total,eligible:r=>r.tradesCount>0};
 }
 
+// 複製文字只保留日期；完整時間仍可在網頁畫面查看。
+function copyDateOnly(value){
+  const text=String(value||'').trim();
+  if(!text)return '—';
+  const matched=text.match(/^\d{4}[-/]\d{2}[-/]\d{2}/);
+  return matched ? matched[0] : text.split(/[T\s]/)[0];
+}
+
 function buildRankCopyText(){
   const cfg=currentRankConfig();
   const data=analystSummary().filter(cfg.eligible).sort((a,b)=>cfg.perf(b)-cfg.perf(a));
@@ -5972,8 +6178,8 @@ function buildSingleExitPerformanceText(t){
   return [
     `【${t.analyst||''}｜${t.symbol||''} ${t.stockName||''}】`,
     `${status}`,
-    `進場：${t.entryDate||'—'}｜${fmt(t.entryPrice)}`,
-    `出場：${t.exitDate||'—'}｜${fmt(t.exitPrice)}`,
+    `進場：${copyDateOnly(t.entryDate)}｜${fmt(t.entryPrice)}`,
+    `出場：${copyDateOnly(t.exitDate)}｜${fmt(t.exitPrice)}`,
     `績效：${pct(c.perf)}`,
     `損益：${fmtMoney(c.realized)}`
   ].join('\n');
@@ -6023,7 +6229,10 @@ function analystTradeListSource(){
 let currentAnalystModalName='';
 
 async function copyTextSmart(text){
-  const value=String(text||'').trim();
+  // 所有複製結果統一只保留日期，移除日期後方的時、分、秒。
+  const value=String(text||'')
+    .replace(/(\d{4}[-/]\d{2}[-/]\d{2})(?:T|\s+)\d{1,2}:\d{2}(?::\d{2})?/g,'$1')
+    .trim();
   if(!value)return false;
   try{
     if(navigator.clipboard?.writeText){
@@ -6071,7 +6280,7 @@ function buildAnalystHoldingsCopyText(name){
   if(openRows.length){
     openRows.forEach(({tr},index)=>{
       const status=tr.partialSettlement?'部分出場後持有':'持有中';
-      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${status}｜進場 ${tr.entryDate||'—'}｜進場價 ${fmt(tr.entryPrice)}｜`);
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${status}｜進場 ${copyDateOnly(tr.entryDate)}｜進場價 ${fmt(tr.entryPrice)}｜`);
       if(index<openRows.length-1)lines.push('');
     });
   }else{
@@ -6085,7 +6294,7 @@ function buildAnalystHoldingsCopyText(name){
   if(closedRows.length){
     closedRows.forEach(({tr,c},index)=>{
       const exitStatus=(tr.exitType==='partial'||(!tr.exitType&&tr.partialSettlement&&tr.sourceTradeId))?'部分出場':'全部出場';
-      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${tr.entryDate||'—'} ${fmt(tr.entryPrice)}｜出場 ${formatExitDateTime(tr)} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
+      lines.push(`${tr.symbol||''} ${tr.stockName||''}｜${exitStatus}｜進場 ${copyDateOnly(tr.entryDate)} ${fmt(tr.entryPrice)}｜出場 ${copyDateOnly(tr.exitDate)} ${fmt(tr.exitPrice)}｜績效 ${pct(c.perf)}`);
       if(index<closedRows.length-1)lines.push('');
     });
   }else{

@@ -4524,6 +4524,97 @@ body.dark .shared-consensus-badge.high{
   border-color:rgba(255,146,151,.42)!important;
 }
 
+
+/* v166：排行榜將績效與損益金額併成同一行，節省空間 */
+.rank-row.rank-inline-row{
+  grid-template-columns:42px minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:flex-start !important;
+}
+.rank-row.rank-inline-row .rank-main{
+  min-width:0;
+  display:grid;
+  gap:10px;
+}
+.rank-row.rank-inline-row .rank-name-wrap{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.rank-row.rank-inline-row .rank-name{
+  min-width:0;
+  max-width:100%;
+}
+.rank-inline-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  min-width:0;
+}
+.rank-inline-chip{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 14px;
+  border:1px solid rgba(212,175,55,.18);
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+}
+.rank-inline-chip .k{
+  font-size:12px;
+  white-space:nowrap;
+}
+.rank-inline-chip .rank-value{
+  min-width:0;
+  font-size:16px !important;
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+@media(max-width:700px){
+  .rank-row.rank-inline-row{
+    grid-template-columns:34px minmax(0,1fr) !important;
+    gap:8px !important;
+    padding:12px !important;
+  }
+  .rank-row.rank-inline-row .rank-no{
+    grid-row:1 / span 2;
+    margin-top:2px;
+  }
+  .rank-row.rank-inline-row .rank-main{
+    gap:8px;
+  }
+  .rank-row.rank-inline-row .rank-name-wrap{
+    margin-bottom:0 !important;
+  }
+  .rank-inline-metrics{
+    grid-template-columns:1fr !important;
+    gap:8px;
+  }
+  .rank-inline-chip{
+    padding:8px 10px;
+  }
+  .rank-inline-chip .k,
+  .rank-inline-chip .rank-value{
+    display:inline-block;
+  }
+  .rank-inline-chip .rank-value{
+    font-size:15px !important;
+  }
+}
+
+/* 淺色模式下排行榜內框清楚些 */
+html[data-theme="light"] .rank-inline-chip{
+  background:#fffdfa !important;
+  border-color:#eee3c7 !important;
+}
+
 </style>
 </head>
 <body>
@@ -6443,11 +6534,24 @@ function renderRank(){
   const rankRows=ranked.map((r,i)=>{
     const perf=cfg.perf(r);
     const money=cfg.money(r);
-    return `<div class="rank-row rank-compact">
+    return `<div class="rank-row rank-compact rank-inline-row">
       <div class="rank-no">${i+1}</div>
-      <div class="rank-name-wrap"><button class="rank-name rank-name-btn" type="button" data-rank-analyst="${esc(r.name)}">${esc(r.name)}</button>${analystExternalLink(r.name)}</div>
-      <div><div class="k">${cfg.label}</div><div class="rank-value ${perf>=0?'pos':'neg'}">${pct(perf)}</div></div>
-      <div><div class="k">損益金額</div><div class="rank-value ${money>=0?'pos':'neg'}">${fmtMoney(money)}</div></div>
+      <div class="rank-main">
+        <div class="rank-name-wrap">
+          <button class="rank-name rank-name-btn" type="button" data-rank-analyst="${esc(r.name)}">${esc(r.name)}</button>
+          ${analystExternalLink(r.name)}
+        </div>
+        <div class="rank-inline-metrics">
+          <div class="rank-inline-chip">
+            <span class="k">${cfg.label}</span>
+            <span class="rank-value ${perf>=0?'pos':'neg'}">${pct(perf)}</span>
+          </div>
+          <div class="rank-inline-chip">
+            <span class="k">損益金額</span>
+            <span class="rank-value ${money>=0?'pos':'neg'}">${fmtMoney(money)}</span>
+          </div>
+        </div>
+      </div>
     </div>`;
   }).join('');
 

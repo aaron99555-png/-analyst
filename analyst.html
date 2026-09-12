@@ -4756,6 +4756,50 @@ tbody td{line-height:1.45}
     grid-row:auto !important;
   }
 }
+
+/* v172：手機清單操作欄改為單排四鍵，避免整筆資料被撐高。 */
+@media(max-width:700px){
+  thead .admin-col,
+  #tbody td.admin-col{
+    width:228px !important;
+    min-width:228px !important;
+    max-width:228px !important;
+    padding:7px 6px !important;
+    vertical-align:middle !important;
+  }
+  #tbody .row-actions{
+    display:grid !important;
+    grid-template-columns:repeat(4,52px) !important;
+    gap:4px !important;
+    width:220px !important;
+    height:32px !important;
+    min-height:32px !important;
+    align-items:center !important;
+    justify-content:start !important;
+    flex-wrap:nowrap !important;
+  }
+  #tbody .row-actions button{
+    width:52px !important;
+    min-width:52px !important;
+    max-width:52px !important;
+    height:32px !important;
+    min-height:32px !important;
+    padding:0 3px !important;
+    margin:0 !important;
+    border-radius:8px !important;
+    font-size:11px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+  }
+  #tbody .row-actions button[data-up]{font-size:0 !important}
+  #tbody .row-actions button[data-up]::after{
+    content:"更新";
+    font-size:11px;
+    line-height:1;
+  }
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

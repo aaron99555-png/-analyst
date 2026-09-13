@@ -1887,6 +1887,70 @@ body{
   flex-wrap:wrap;
   margin-bottom:10px;
 }
+
+/* v172：分析師總績效表顯示範圍切換 */
+.performance-table-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  margin-left:auto;
+}
+.performance-table-switch{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px;
+  padding:3px;
+  border:1px solid rgba(212,175,55,.28);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+}
+.performance-table-switch button{
+  min-width:0;
+  border:0;
+  border-radius:7px;
+  padding:7px 10px;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:850;
+  line-height:1.25;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.performance-table-switch button.active{
+  background:linear-gradient(135deg,#d4af37,#f0d77b);
+  color:#111;
+}
+html[data-theme="light"] .performance-table-switch{
+  background:#eee8dc;
+}
+html[data-theme="light"] .performance-table-switch button{
+  color:#5e594f;
+}
+html[data-theme="light"] .performance-table-switch button.active{
+  color:#1d170d;
+}
+@media(max-width:700px){
+  .performance-table-controls{
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:7px;
+    margin-left:0;
+  }
+  .performance-table-switch{
+    width:100%;
+    box-sizing:border-box;
+  }
+  .performance-table-switch button{
+    padding:8px 3px;
+    font-size:10px;
+  }
+  .performance-table-controls .status{
+    white-space:nowrap;
+  }
+}
 .rank-toolbar .rank-period{margin:0 !important;}
 .rank-metric-switch{
   display:grid;
@@ -5001,7 +5065,14 @@ tbody td{line-height:1.45}
 <section class="card span12">
       <div class="section-title holdings-title">
         <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span><span class="holdings-badge settled-badge">已結算 <b id="mClosed">0</b> 檔</span></div>
-        <span class="status" id="countText">0 筆</span>
+        <div class="performance-table-controls">
+          <div class="performance-table-switch" role="group" aria-label="分析師總績效表顯示切換">
+            <button type="button" data-performance-table-metric="total" class="active">總績效</button>
+            <button type="button" data-performance-table-metric="unrealized">未實現績效</button>
+            <button type="button" data-performance-table-metric="realized">已實現績效</button>
+          </div>
+          <span class="status" id="countText">總績效 0 筆</span>
+        </div>
       </div>
       <div class="analyst-quick-filter" id="analystQuickFilter"></div>
       <div class="table-wrap"><table><thead><tr>
@@ -5357,6 +5428,25 @@ function calc(t){
 }
 
 let performanceSort={key:'entryDate',dir:'desc'};
+const PERFORMANCE_TABLE_METRIC_KEY='analystPerformanceTableMetric';
+let performanceTableMetric=(()=>{
+  const saved=localStorage.getItem(PERFORMANCE_TABLE_METRIC_KEY);
+  return ['total','unrealized','realized'].includes(saved)?saved:'total';
+})();
+
+function performanceTableRows(rows){
+  if(performanceTableMetric==='unrealized')return rows.filter(([,t])=>calc(t).open);
+  if(performanceTableMetric==='realized')return rows.filter(([,t])=>!calc(t).open);
+  return rows;
+}
+
+function performanceTableMetricLabel(){
+  return performanceTableMetric==='unrealized'
+    ?'未實現績效'
+    :performanceTableMetric==='realized'
+      ?'已實現績效'
+      :'總績效';
+}
 
 function filteredEntries(){
   const a=$('#fAnalyst').value, month=$('#fMonth')?.value||'', from=$('#fFrom').value, to=$('#fTo').value, st=$('#fStatus').value, kw=$('#fKeyword').value.trim().toLowerCase();
@@ -5724,6 +5814,16 @@ function renderAnalystQuickFilter(){
 }
 
 document.addEventListener('click',e=>{
+  const tableMetricBtn=e.target.closest('[data-performance-table-metric]');
+  if(tableMetricBtn){
+    const metric=tableMetricBtn.dataset.performanceTableMetric||'total';
+    if(['total','unrealized','realized'].includes(metric)){
+      performanceTableMetric=metric;
+      localStorage.setItem(PERFORMANCE_TABLE_METRIC_KEY,metric);
+      render();
+    }
+    return;
+  }
   const chip=e.target.closest('[data-quick-analyst]');
   if(chip){
     const sel=$('#fAnalyst');
@@ -6249,9 +6349,15 @@ function render(){
     th.classList.toggle('sort-active',th.dataset.sort===performanceSort.key);
     th.dataset.dir=th.dataset.sort===performanceSort.key?performanceSort.dir:'';
   });
-  const rows=filteredEntries(); $('#countText').textContent=`${rows.length} 筆`;
-  let html='', openN=0, unreal=0, realized=0;
-  rows.forEach(([id,t])=>{ const c=calc(t); if(c.open)openN++; unreal+=c.unreal; realized+=c.realized;
+  $$('[data-performance-table-metric]').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.performanceTableMetric===performanceTableMetric);
+  });
+  const allRows=filteredEntries();
+  const rows=performanceTableRows(allRows);
+  $('#countText').textContent=`${performanceTableMetricLabel()} ${rows.length} 筆`;
+  const openN=allRows.filter(([,t])=>calc(t).open).length;
+  let html='';
+  rows.forEach(([id,t])=>{ const c=calc(t);
     html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer">${esc(t.symbol)}</a> ${esc(t.stockName)}</td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span>${fmt(t.currentPrice||t.entryPrice)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
@@ -6259,7 +6365,7 @@ function render(){
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
-  setMetric('#mClosed',rows.length-openN,false);
+  setMetric('#mClosed',allRows.length-openN,false);
   renderRank(); renderVisualAnalytics(); bindRows();
 }
 function setMetric(sel,v,money){const el=$(sel);el.textContent=money?fmtMoney(v):fmt(v); if(money){el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)}}

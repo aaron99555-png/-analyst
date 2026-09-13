@@ -1888,13 +1888,19 @@ body{
   margin-bottom:10px;
 }
 
-/* v172：分析師總績效表顯示範圍切換 */
-.performance-table-controls{
+/* v173：分析師總績效表顯示範圍切換－獨立列，不占用原標題功能 */
+.performance-table-toolbar{
   display:flex;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:space-between;
   gap:10px;
-  margin-left:auto;
+  margin:0 0 10px;
+}
+.performance-table-toolbar-label{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
 }
 .performance-table-switch{
   display:grid;
@@ -1932,12 +1938,11 @@ html[data-theme="light"] .performance-table-switch button.active{
   color:#1d170d;
 }
 @media(max-width:700px){
-  .performance-table-controls{
+  .performance-table-toolbar{
     width:100%;
     display:grid;
-    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-columns:auto minmax(0,1fr);
     gap:7px;
-    margin-left:0;
   }
   .performance-table-switch{
     width:100%;
@@ -1946,9 +1951,6 @@ html[data-theme="light"] .performance-table-switch button.active{
   .performance-table-switch button{
     padding:8px 3px;
     font-size:10px;
-  }
-  .performance-table-controls .status{
-    white-space:nowrap;
   }
 }
 .rank-toolbar .rank-period{margin:0 !important;}
@@ -5065,13 +5067,14 @@ tbody td{line-height:1.45}
 <section class="card span12">
       <div class="section-title holdings-title">
         <div class="title-with-badge"><h2>分析師總績效</h2><span class="holdings-badge">目前持股 <b id="mOpen">0</b> 檔</span><span class="holdings-badge settled-badge">已結算 <b id="mClosed">0</b> 檔</span></div>
-        <div class="performance-table-controls">
-          <div class="performance-table-switch" role="group" aria-label="分析師總績效表顯示切換">
-            <button type="button" data-performance-table-metric="total" class="active">總績效</button>
-            <button type="button" data-performance-table-metric="unrealized">未實現績效</button>
-            <button type="button" data-performance-table-metric="realized">已實現績效</button>
-          </div>
-          <span class="status" id="countText">總績效 0 筆</span>
+        <span class="status" id="countText">0 筆</span>
+      </div>
+      <div class="performance-table-toolbar">
+        <span class="performance-table-toolbar-label">顯示內容</span>
+        <div class="performance-table-switch" role="group" aria-label="分析師總績效表顯示切換">
+          <button type="button" data-performance-table-metric="total" class="active">總績效</button>
+          <button type="button" data-performance-table-metric="unrealized">未實現績效</button>
+          <button type="button" data-performance-table-metric="realized">已實現績效</button>
         </div>
       </div>
       <div class="analyst-quick-filter" id="analystQuickFilter"></div>
@@ -5428,24 +5431,12 @@ function calc(t){
 }
 
 let performanceSort={key:'entryDate',dir:'desc'};
-const PERFORMANCE_TABLE_METRIC_KEY='analystPerformanceTableMetric';
-let performanceTableMetric=(()=>{
-  const saved=localStorage.getItem(PERFORMANCE_TABLE_METRIC_KEY);
-  return ['total','unrealized','realized'].includes(saved)?saved:'total';
-})();
+let performanceTableMetric='total';
 
 function performanceTableRows(rows){
   if(performanceTableMetric==='unrealized')return rows.filter(([,t])=>calc(t).open);
   if(performanceTableMetric==='realized')return rows.filter(([,t])=>!calc(t).open);
   return rows;
-}
-
-function performanceTableMetricLabel(){
-  return performanceTableMetric==='unrealized'
-    ?'未實現績效'
-    :performanceTableMetric==='realized'
-      ?'已實現績效'
-      :'總績效';
 }
 
 function filteredEntries(){
@@ -5819,7 +5810,6 @@ document.addEventListener('click',e=>{
     const metric=tableMetricBtn.dataset.performanceTableMetric||'total';
     if(['total','unrealized','realized'].includes(metric)){
       performanceTableMetric=metric;
-      localStorage.setItem(PERFORMANCE_TABLE_METRIC_KEY,metric);
       render();
     }
     return;
@@ -6354,7 +6344,7 @@ function render(){
   });
   const allRows=filteredEntries();
   const rows=performanceTableRows(allRows);
-  $('#countText').textContent=`${performanceTableMetricLabel()} ${rows.length} 筆`;
+  $('#countText').textContent=`${rows.length} 筆`;
   const openN=allRows.filter(([,t])=>calc(t).open).length;
   let html='';
   rows.forEach(([id,t])=>{ const c=calc(t);

@@ -5033,11 +5033,11 @@ tbody td{line-height:1.45}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
 /*
-v126 股價來源規則：
+v167 股價來源規則：
 - 上市：TWSE 官方 STOCK_DAY 月盤後資料
-- 上櫃：TPEx 櫃買中心官方 OpenAPI 優先，Yahoo Finance .TWO 備援；再加 Investing.com 備援
+- 上櫃：TPEx 櫃買中心官方 OpenAPI 優先，Yahoo Finance .TWO 備援
 - GitHub / proxy 僅作為傳輸 relay，不視為主要行情資料庫
-- 所有主要來源皆失敗時，由現有流程跳出空白手動輸入
+- 所有主要來源皆失敗時，在同一視窗批次呈現並提供空白手動輸入
 - 絕不沿用舊 currentPrice 當作本次更新成功
 */
 
@@ -7436,7 +7436,7 @@ async function fetchTWSEOfficialAfterHours(sym){
   };
 }
 
-// 上櫃：Yahoo Finance .TWO 為主。
+// 上櫃：TPEx 官方 OpenAPI 為主，Yahoo Finance .TWO 僅作備援。
 
 function rocDateToISO(v){
   const s=String(v||'').replace(/\D/g,'').trim();
@@ -7733,6 +7733,11 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
   const sym=String(symbol||'').trim();
   if(!/^\d{4,6}$/.test(sym))throw new Error('股票代號格式異常');
 
+  // 市場判斷採官方資料是否查得到該代號：
+  // 1. 上市股由 TWSE 官方盤後資料回傳。
+  // 2. TWSE 查無代號時，再由 TPEx 官方 OpenAPI 查詢上櫃股。
+  // 3. TPEx 官方失敗才使用 Yahoo Finance .TWO 備援。
+  // 4. 三者皆失敗時交由批次手動輸入，絕不沿用舊價格。
   let twseError=null;
   try{
     return await fetchTWSEOfficialAfterHours(sym);
@@ -7754,24 +7759,11 @@ async function getLatestPrice(symbol,{allowIntraday=false}={}){
     yahooError=e;
   }
 
-  let yahooPageError=null;
-  try{
-    return await fetchYahooQuotePagePrice(sym);
-  }catch(e){
-    yahooPageError=e;
-  }
-
-  try{
-    return await fetchInvestingTaiwanPrice(sym);
-  }catch(investingError){
-    throw new Error(
-      `TWSE：${twseError?.message||'失敗'}｜`+
-      `TPEx：${tpexError?.message||'失敗'}｜`+
-      `Yahoo Finance：${yahooError?.message||'失敗'}｜`+
-      `Yahoo 個股頁：${yahooPageError?.message||'失敗'}｜`+
-      `Investing.com：${investingError?.message||'失敗'}`
-    );
-  }
+  throw new Error(
+    `TWSE：${twseError?.message||'失敗'}｜`+
+    `TPEx：${tpexError?.message||'失敗'}｜`+
+    `Yahoo Finance .TWO：${yahooError?.message||'失敗'}`
+  );
 }
 
 async function writeValidatedPrice(id,q){
@@ -7830,6 +7822,120 @@ function openPriceConfirm(items){
         return {...x,price};
       }).filter(x=>Number.isFinite(x.price)&&x.price>0);
       done(result);
+    };
+  });
+}
+
+// 一鍵更新時，將所有抓價失敗股票集中在同一個視窗補輸入。
+// 留白直接略過，不會帶入或寫回原有價格。
+function openBulkFailedPriceModal(items){
+  return new Promise(resolve=>{
+    const modal=$('#bulkFailedPriceModal');
+    const list=$('#bulkFailedPriceList');
+    const save=$('#bulkFailedPriceSave');
+    const cancel=$('#bulkFailedPriceCancel');
+
+    if(!modal || !list || !save || !cancel){
+      resolve({manualSuccess:0,skipped:items.length,failed:0});
+      return;
+    }
+
+    list.innerHTML=items.map((item,i)=>{
+      const reason=String(item?.error?.message||'網路行情抓取失敗');
+      return `
+        <div class="bulk-failed-price-row">
+          <div class="bulk-failed-price-stock">
+            <a class="bulk-failed-yahoo-link"
+               href="${yahooStockUrl(item.symbol)}"
+               target="_blank"
+               rel="noopener noreferrer"
+               title="開啟 Yahoo 個股資訊">
+              <strong>${esc(item.symbol)} ${esc(item.stockName||'')}</strong>
+            </a>
+            <small>${esc(reason)}</small>
+          </div>
+          <input type="number"
+                 inputmode="decimal"
+                 min="0"
+                 step="0.01"
+                 placeholder="輸入目前價（留白略過）"
+                 aria-label="${esc(item.symbol)} ${esc(item.stockName||'')} 目前價"
+                 data-bulk-failed-price-index="${i}">
+        </div>
+      `;
+    }).join('');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('show');
+    requestAnimationFrame(()=>{
+      list.querySelector('[data-bulk-failed-price-index]')?.focus();
+    });
+
+    const finish=result=>{
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      save.onclick=null;
+      cancel.onclick=null;
+      resolve(result);
+    };
+
+    cancel.onclick=()=>finish({
+      manualSuccess:0,
+      skipped:items.length,
+      failed:0
+    });
+
+    save.onclick=async()=>{
+      const entered=[];
+      let skipped=0;
+
+      for(let i=0;i<items.length;i++){
+        const input=list.querySelector(`[data-bulk-failed-price-index="${i}"]`);
+        const raw=String(input?.value||'').trim();
+        if(!raw){
+          skipped++;
+          continue;
+        }
+
+        const price=Number(raw);
+        if(!Number.isFinite(price)||price<=0){
+          alert(`${items[i].symbol} ${items[i].stockName||''} 的價格格式不正確`);
+          input?.focus();
+          return;
+        }
+        entered.push({...items[i],price});
+      }
+
+      save.disabled=true;
+      cancel.disabled=true;
+      const originalText=save.textContent;
+      let manualSuccess=0;
+      let failed=0;
+
+      try{
+        for(let i=0;i<entered.length;i++){
+          const item=entered[i];
+          save.textContent=`更新中 ${i+1}/${entered.length}`;
+          try{
+            await syncSameStockCurrentPrice(
+              item.symbol,
+              item.price,
+              '盤後行情抓取失敗－批次手動輸入',
+              {onlyTuan:isAdmin2()}
+            );
+            manualSuccess++;
+          }catch(error){
+            failed++;
+            console.error('批次手動價格寫入失敗',item.symbol,error);
+          }
+        }
+
+        finish({manualSuccess,skipped,failed});
+      }finally{
+        save.disabled=false;
+        cancel.disabled=false;
+        save.textContent=originalText;
+      }
     };
   });
 }

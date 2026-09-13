@@ -4868,10 +4868,180 @@ tbody td{line-height:1.45}
     line-height:1;
   }
 }
+
+/* v174：觸控手機強制使用單欄版型，避免瀏覽器以桌面寬度呈現而擠成三欄。 */
+html.mobile-device,
+html.mobile-device body{
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:hidden !important;
+}
+html.mobile-device .wrap{
+  width:100% !important;
+  max-width:100% !important;
+  padding:10px 10px calc(34px + env(safe-area-inset-bottom,0px)) !important;
+}
+html.mobile-device .grid{
+  display:flex !important;
+  flex-direction:column !important;
+  width:100% !important;
+  max-width:100% !important;
+  gap:12px !important;
+}
+html.mobile-device .grid > *{
+  flex:none !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  grid-column:1 / -1 !important;
+  grid-row:auto !important;
+}
+html.mobile-device .grid > .shared-open-card{order:1 !important}
+html.mobile-device .grid > .filter-card{order:2 !important}
+html.mobile-device .grid > .today-entry-card{order:3 !important}
+html.mobile-device .grid > .today-exit-card{order:4 !important}
+html.mobile-device .grid > .performance-rank-card{order:5 !important}
+html.mobile-device .grid > .visual-analytics-card{order:6 !important}
+html.mobile-device .grid > .quick-price-card{order:7 !important}
+html.mobile-device .grid > .performance-table-card{order:8 !important}
+html.mobile-device .card{
+  padding:14px !important;
+  border-radius:17px !important;
+}
+html.mobile-device .topbar{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:11px !important;
+  padding:14px !important;
+}
+html.mobile-device .brand{
+  width:100% !important;
+  align-items:flex-start !important;
+}
+html.mobile-device .actions{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:8px !important;
+}
+html.mobile-device .actions > button{
+  width:100% !important;
+  min-width:0 !important;
+}
+html.mobile-device .price-update-wrap,
+html.mobile-device .admin-data-tools{
+  grid-column:1 / -1 !important;
+}
+html.mobile-device .shared-open-list{
+  grid-template-columns:1fr !important;
+}
+html.mobile-device .filter-card .section-title,
+html.mobile-device .shared-open-title-row{
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:7px !important;
+}
+html.mobile-device .filter-card .filters{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+html.mobile-device .filter-card .filters > div{
+  width:100% !important;
+  min-width:0 !important;
+  height:auto !important;
+  min-height:68px !important;
+  overflow:visible !important;
+}
+html.mobile-device .filter-card .filters > div:has(#fKeyword),
+html.mobile-device .filter-card .form-actions{
+  grid-column:1 / -1 !important;
+}
+html.mobile-device .filter-card .filters input,
+html.mobile-device .filter-card .filters select,
+html.mobile-device .filter-card .filters button{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  min-height:44px !important;
+  font-size:16px !important;
+}
+html.mobile-device .date-card-title{
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:9px !important;
+}
+html.mobile-device .date-card-heading{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:8px !important;
+}
+html.mobile-device .date-query-box{
+  display:grid !important;
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  gap:7px !important;
+  width:100% !important;
+  align-items:center !important;
+}
+html.mobile-device .date-picker-box,
+html.mobile-device .date-arrow-btn{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  min-height:44px !important;
+}
+html.mobile-device .date-today-btn{
+  grid-column:1 / -1 !important;
+  width:100% !important;
+  height:40px !important;
+  min-height:40px !important;
+}
+html.mobile-device .today-entry-list,
+html.mobile-device .performance-rank-card .rank-group{
+  grid-template-columns:1fr !important;
+}
+html.mobile-device .rank-toolbar{
+  display:block !important;
+}
+html.mobile-device .rank-metric-switch{
+  width:100% !important;
+  margin-top:8px !important;
+}
+html.mobile-device .visual-tabs-six{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+}
+html.mobile-device .performance-table-toolbar{
+  grid-template-columns:auto minmax(0,1fr) !important;
+}
+html.mobile-device .table-wrap{
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+@media(max-width:420px){
+  html.mobile-device .filter-card .filters{
+    grid-template-columns:1fr 1fr !important;
+  }
+  html.mobile-device .performance-table-switch button{
+    padding-inline:3px !important;
+    font-size:10px !important;
+  }
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
 (()=>{
+  const ua=String(navigator.userAgent||'');
+  const isTouchDevice=(navigator.maxTouchPoints||0)>0 || matchMedia('(pointer:coarse)').matches;
+  const isMobileUA=/Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  const isIPadDesktop=/Macintosh/i.test(ua) && (navigator.maxTouchPoints||0)>1;
+  const shortSide=Math.min(Number(screen.width)||innerWidth,Number(screen.height)||innerHeight);
+  if(isMobileUA || isIPadDesktop || (isTouchDevice && shortSide<=900)){
+    document.documentElement.classList.add('mobile-device');
+  }
   const viewport=window.visualViewport;
   const updateViewport=()=>{
     document.documentElement.style.setProperty('--mobile-viewport-height',`${viewport?.height ?? window.innerHeight}px`);

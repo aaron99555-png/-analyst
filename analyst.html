@@ -6514,19 +6514,24 @@ function renderVisualAnalytics(){
   }
 
   if(visualMode==='profitcompare'){
-    title.textContent='分析師損益比較｜全部期間';
-    note.textContent='比較未實現損益、已實現損益與總損益；固定顯示全部交易資料';
+    title.textContent='分析師績效比較（%）｜全部期間';
+    note.textContent='以投入成本為基準，比較未實現績效、已實現績效與總績效；統一使用百分比呈現';
     const rows=analystSummaryAll().filter(r=>r.tradesCount>0);
     if(!rows.length)return fail('目前沒有可比較的分析師交易資料');
     const opt=visualBaseOptions(false);
+    opt.scales.y.ticks.callback=v=>`${Number(v).toLocaleString('zh-TW',{maximumFractionDigits:2})}%`;
+    opt.plugins.tooltip.callbacks.label=(ctx)=>{
+      const v=Number(ctx.raw||0);
+      return `${ctx.dataset.label||''} ${v>=0?'+':''}${v.toFixed(2)}%`;
+    };
     visualAnalyticsChart=new Chart(canvas,{
       type:'bar',
       data:{
         labels:rows.map(r=>r.name),
         datasets:[
-          {label:'未實現損益',data:rows.map(r=>Math.round(r.unrealized))},
-          {label:'已實現損益',data:rows.map(r=>Math.round(r.realized))},
-          {label:'總損益',data:rows.map(r=>Math.round(r.total))}
+          {label:'未實現績效',data:rows.map(r=>Number(r.unrealizedPerf.toFixed(2)))},
+          {label:'已實現績效',data:rows.map(r=>Number(r.realizedPerf.toFixed(2)))},
+          {label:'總績效',data:rows.map(r=>Number(r.totalPerf.toFixed(2)))}
         ]
       },
       options:opt

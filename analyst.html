@@ -5098,6 +5098,22 @@ html.mobile-device .table-wrap{
     font-size:10px !important;
   }
 }
+
+/* v176：分析師目前持股視窗固定在最上層，不受釘選新增交易遮擋。 */
+#analystTradesModal{
+  z-index:10000 !important;
+  isolation:isolate;
+}
+#analystTradesModal .analyst-trades-modal-card{
+  position:relative;
+  z-index:1;
+}
+body.analyst-modal-open{
+  overflow:hidden !important;
+}
+body.analyst-modal-open #entryCard.entry-card-pinned{
+  z-index:1 !important;
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -6832,10 +6848,12 @@ function renderAnalystTradesModal(name){
   `;
 
   modal.classList.add('show');
+  document.body.classList.add('analyst-modal-open');
 }
 
 function closeAnalystTradesModal(){
   $('#analystTradesModal')?.classList.remove('show');
+  document.body.classList.remove('analyst-modal-open');
 }
 
 $('#addTradeFromAnalystModalBtn')?.addEventListener('click',()=>{

@@ -5114,6 +5114,133 @@ body.analyst-modal-open{
 body.analyst-modal-open #entryCard.entry-card-pinned{
   z-index:1 !important;
 }
+
+
+/* v178：停損警示高反差視窗 */
+#stopLossAlertModal{
+  background:rgba(0,0,0,.78) !important;
+  backdrop-filter:blur(3px);
+  z-index:120 !important;
+}
+#stopLossAlertModal .stoploss-alert-card{
+  width:min(500px,94vw);
+  border:2px solid #ff4d4f !important;
+  background:
+    radial-gradient(circle at 85% 5%,rgba(255,77,79,.22),transparent 30%),
+    linear-gradient(155deg,#2a0b0c 0%,#17090a 58%,#0f0909 100%) !important;
+  box-shadow:0 0 0 4px rgba(255,77,79,.12),0 22px 70px rgba(0,0,0,.72),0 0 36px rgba(255,45,45,.2) !important;
+}
+.stoploss-alert-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-bottom:12px;
+  margin-bottom:14px;
+  border-bottom:1px solid rgba(255,120,120,.28);
+}
+.stoploss-alert-icon{
+  flex:0 0 auto;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ff3b30;
+  color:#fff;
+  font-size:24px;
+  font-weight:1000;
+  box-shadow:0 0 0 5px rgba(255,59,48,.14),0 0 20px rgba(255,59,48,.35);
+}
+.stoploss-alert-title{
+  color:#ffd84d !important;
+  font-size:22px !important;
+  font-weight:1000 !important;
+  letter-spacing:.5px;
+  text-shadow:0 1px 12px rgba(255,216,77,.18);
+}
+.stoploss-alert-sub{
+  margin-top:2px;
+  color:#ffc0c0;
+  font-size:12px;
+  font-weight:800;
+}
+.stoploss-alert-stock{
+  padding:10px 12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid rgba(255,105,105,.34);
+  background:rgba(255,255,255,.045);
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+}
+.stoploss-alert-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.stoploss-alert-metric{
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.10);
+}
+.stoploss-alert-metric span{
+  display:block;
+  color:#d9b8b8;
+  font-size:11px;
+  margin-bottom:3px;
+}
+.stoploss-alert-metric b{
+  display:block;
+  color:#fff;
+  font-size:17px;
+}
+.stoploss-alert-metric.breach{
+  grid-column:1/-1;
+  background:rgba(255,42,42,.14);
+  border-color:rgba(255,85,85,.52);
+}
+.stoploss-alert-metric.breach b{
+  color:#ff6668;
+  font-size:20px;
+}
+.stoploss-alert-question{
+  margin:14px 0 2px;
+  color:#ffe5e5;
+  text-align:center;
+  font-size:14px;
+  font-weight:900;
+}
+.stoploss-alert-actions{
+  display:grid;
+  grid-template-columns:1fr 1.25fr;
+  gap:10px;
+  margin-top:14px;
+}
+#stopLossAlertCancel{
+  background:#22191a !important;
+  color:#eee !important;
+  border:1px solid #6a4a4c !important;
+}
+#stopLossAlertSettle{
+  background:linear-gradient(135deg,#ff5a52,#d71920) !important;
+  color:#fff !important;
+  border:1px solid #ff7772 !important;
+  font-weight:1000 !important;
+  box-shadow:0 7px 22px rgba(215,25,32,.34),inset 0 1px 0 rgba(255,255,255,.22);
+}
+#stopLossAlertSettle:hover{
+  filter:brightness(1.12);
+  border-color:#ffb0ac !important;
+}
+@media(max-width:700px){
+  #stopLossAlertModal .stoploss-alert-card{padding:16px !important}
+  .stoploss-alert-title{font-size:20px !important}
+  .stoploss-alert-grid{grid-template-columns:1fr 1fr}
+  .stoploss-alert-actions{grid-template-columns:1fr 1fr}
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -5372,6 +5499,31 @@ v167 股價來源規則：
 */
 
 </script>
+
+
+
+<div id="stopLossAlertModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="stopLossAlertTitle">
+  <div class="modal-card stoploss-alert-card">
+    <div class="stoploss-alert-head">
+      <div class="stoploss-alert-icon">!</div>
+      <div>
+        <div id="stopLossAlertTitle" class="stoploss-alert-title">⚠️ 停損警示</div>
+        <div class="stoploss-alert-sub">目前價已跌破設定停損價</div>
+      </div>
+    </div>
+    <div id="stopLossAlertStock" class="stoploss-alert-stock"></div>
+    <div class="stoploss-alert-grid">
+      <div class="stoploss-alert-metric"><span>目前價</span><b id="stopLossAlertCurrent">—</b></div>
+      <div class="stoploss-alert-metric"><span>停損價</span><b id="stopLossAlertStop">—</b></div>
+      <div class="stoploss-alert-metric breach"><span>已低於停損</span><b id="stopLossAlertGap">—</b></div>
+    </div>
+    <div class="stoploss-alert-question">是否立即進入結算流程？</div>
+    <div class="stoploss-alert-actions">
+      <button id="stopLossAlertCancel" type="button">暫不結算</button>
+      <button id="stopLossAlertSettle" type="button">立即結算</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal hidden" id="priceConfirmModal">
   <div class="modal-card" style="max-width:760px">
@@ -8294,6 +8446,60 @@ function openBulkFailedPriceModal(items){
   });
 }
 
+
+
+function showStopLossWarning({tr,currentPrice,stopLoss,gap,gapPct}){
+  return new Promise(resolve=>{
+    const modal=$('#stopLossAlertModal');
+    const cancel=$('#stopLossAlertCancel');
+    const settle=$('#stopLossAlertSettle');
+    const stock=$('#stopLossAlertStock');
+    const current=$('#stopLossAlertCurrent');
+    const stop=$('#stopLossAlertStop');
+    const gapEl=$('#stopLossAlertGap');
+
+    if(!modal||!cancel||!settle){
+      resolve(confirm(
+        `⚠️ 停損警示\n\n${tr.analyst||''}｜${tr.symbol||''} ${tr.stockName||''}\n`+
+        `目前價：${fmt(currentPrice)}\n停損價：${fmt(stopLoss)}\n`+
+        `低於停損：${fmt(gap)}（-${gapPct.toFixed(2)}%）\n\n是否立即進入結算流程？`
+      ));
+      return;
+    }
+
+    stock.textContent=`${tr.analyst||''}｜${tr.symbol||''} ${tr.stockName||''}`;
+    current.textContent=fmt(currentPrice);
+    stop.textContent=fmt(stopLoss);
+    gapEl.textContent=`${fmt(gap)}（-${gapPct.toFixed(2)}%）`;
+
+    let settled=false;
+    const done=(value)=>{
+      if(settled)return;
+      settled=true;
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      cancel.onclick=null;
+      settle.onclick=null;
+      modal.onclick=null;
+      document.removeEventListener('keydown',onKeydown);
+      resolve(value);
+    };
+    const onKeydown=(event)=>{
+      if(event.key==='Escape')done(false);
+      if(event.key==='Enter')done(true);
+    };
+
+    cancel.onclick=()=>done(false);
+    settle.onclick=()=>done(true);
+    modal.onclick=(event)=>{if(event.target===modal)done(false)};
+    document.addEventListener('keydown',onKeydown);
+    modal.classList.remove('hidden');
+    modal.classList.add('show');
+    requestAnimationFrame(()=>settle.focus());
+  });
+}
+
+
 /* v177：目前價跌破停損價時，警示並詢問是否進入結算流程。 */
 const stopLossPromptLocks=new Set();
 async function offerStopLossSettlement(tradeIds,currentPrice){
@@ -8318,14 +8524,13 @@ async function offerStopLossSettlement(tradeIds,currentPrice){
     stopLossPromptLocks.add(lockKey);
 
     try{
-      const shouldSettle=confirm(
-        `⚠️ 停損警示\n\n`+
-        `${tr.analyst||''}｜${tr.symbol||''} ${tr.stockName||''}\n`+
-        `目前價：${fmt(numericPrice)}\n`+
-        `停損價：${fmt(stopLoss)}\n`+
-        `低於停損：${fmt(gap)}（-${gapPct.toFixed(2)}%）\n\n`+
-        `是否立即進入結算流程？`
-      );
+      const shouldSettle=await showStopLossWarning({
+        tr,
+        currentPrice:numericPrice,
+        stopLoss,
+        gap,
+        gapPct
+      });
 
       if(shouldSettle){
         try{

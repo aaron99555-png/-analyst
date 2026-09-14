@@ -5241,6 +5241,80 @@ body.analyst-modal-open #entryCard.entry-card-pinned{
   .stoploss-alert-actions{grid-template-columns:1fr 1fr}
 }
 
+
+/* v179：停損警示文字可讀性強化，避免淺色模式覆蓋文字顏色 */
+#stopLossAlertModal .stoploss-alert-sub{
+  color:#ffd6d6 !important;
+  -webkit-text-fill-color:#ffd6d6 !important;
+  opacity:1 !important;
+}
+#stopLossAlertModal .stoploss-alert-stock{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:rgba(255,255,255,.085) !important;
+  border-color:rgba(255,135,135,.52) !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.55) !important;
+}
+#stopLossAlertModal .stoploss-alert-metric{
+  background:rgba(255,255,255,.07) !important;
+  border-color:rgba(255,255,255,.20) !important;
+}
+#stopLossAlertModal .stoploss-alert-metric span{
+  color:#ffdede !important;
+  -webkit-text-fill-color:#ffdede !important;
+  font-weight:800 !important;
+  opacity:1 !important;
+}
+#stopLossAlertModal .stoploss-alert-metric b{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  font-weight:1000 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.5) !important;
+}
+#stopLossAlertModal .stoploss-alert-metric.breach{
+  background:rgba(170,0,0,.32) !important;
+  border-color:#ff555a !important;
+}
+#stopLossAlertModal .stoploss-alert-metric.breach span{
+  color:#ffd0d0 !important;
+  -webkit-text-fill-color:#ffd0d0 !important;
+}
+#stopLossAlertModal .stoploss-alert-metric.breach b{
+  color:#ff7075 !important;
+  -webkit-text-fill-color:#ff7075 !important;
+  text-shadow:0 0 12px rgba(255,80,85,.18) !important;
+}
+#stopLossAlertModal .stoploss-alert-question{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  font-size:15px !important;
+  font-weight:1000 !important;
+  opacity:1 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.55) !important;
+}
+#stopLossAlertModal #stopLossAlertCancel{
+  background:#2a2223 !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  border-color:#8b6769 !important;
+  text-shadow:none !important;
+}
+#stopLossAlertModal #stopLossAlertSettle{
+  background:linear-gradient(135deg,#ff5a52,#e51f29) !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  border-color:#ff8a85 !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.28) !important;
+}
+#stopLossAlertModal .stoploss-alert-title{
+  color:#ffdf55 !important;
+  -webkit-text-fill-color:#ffdf55 !important;
+}
+#stopLossAlertModal .stoploss-alert-icon{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

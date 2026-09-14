@@ -8294,6 +8294,55 @@ function openBulkFailedPriceModal(items){
   });
 }
 
+/* v177：目前價跌破停損價時，警示並詢問是否進入結算流程。 */
+const stopLossPromptLocks=new Set();
+async function offerStopLossSettlement(tradeIds,currentPrice){
+  const numericPrice=Number(currentPrice);
+  if(!Number.isFinite(numericPrice)||numericPrice<=0)return 0;
+
+  const breached=(tradeIds||[])
+    .map(id=>({id,tr:trades?.[id]}))
+    .filter(({tr})=>{
+      const stopLoss=Number(tr?.stopLoss);
+      return tr && calc(tr).open && stopLoss>0 && numericPrice<stopLoss;
+    });
+
+  for(const {id,tr} of breached){
+    if(!canSettleTrade(tr))continue;
+
+    const stopLoss=Number(tr.stopLoss);
+    const gap=stopLoss-numericPrice;
+    const gapPct=stopLoss>0?gap/stopLoss*100:0;
+    const lockKey=`${id}|${numericPrice}|${stopLoss}`;
+    if(stopLossPromptLocks.has(lockKey))continue;
+    stopLossPromptLocks.add(lockKey);
+
+    try{
+      const shouldSettle=confirm(
+        `⚠️ 停損警示\n\n`+
+        `${tr.analyst||''}｜${tr.symbol||''} ${tr.stockName||''}\n`+
+        `目前價：${fmt(numericPrice)}\n`+
+        `停損價：${fmt(stopLoss)}\n`+
+        `低於停損：${fmt(gap)}（-${gapPct.toFixed(2)}%）\n\n`+
+        `是否立即進入結算流程？`
+      );
+
+      if(shouldSettle){
+        try{
+          await settleTrade(id);
+        }catch(error){
+          console.error('停損警示後結算失敗',id,error);
+          alert(`結算未完成：${error?.message||'未知錯誤'}`);
+        }
+      }
+    }finally{
+      setTimeout(()=>stopLossPromptLocks.delete(lockKey),1500);
+    }
+  }
+
+  return breached.length;
+}
+
 async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}){
   const normalized=String(symbol||'').trim().toUpperCase();
   const numericPrice=Number(price);
@@ -8339,7 +8388,14 @@ async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}
   clearTimeout(cloudRenderTimer);
   render();
 
-  return {count:sameStockIds.length,updatedAt,price:numericPrice};
+  const stopLossTriggered=await offerStopLossSettlement(sameStockIds,numericPrice);
+
+  return {
+    count:sameStockIds.length,
+    updatedAt,
+    price:numericPrice,
+    stopLossTriggered
+  };
 }
 
 async function writeManualOrFetchedPrice(id,item){

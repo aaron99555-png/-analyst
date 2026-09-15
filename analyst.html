@@ -5894,6 +5894,111 @@ html[data-theme="light"] .visual-value-mode-switch{
   }
 }
 
+
+
+/* v188：分析師快速選單－分析師名稱與持有檔數放大 */
+.filter-card .analyst-quick-menu-btn{
+  min-height:44px !important;
+  padding:8px 9px !important;
+  gap:7px !important;
+}
+.filter-card .analyst-quick-name{
+  font-size:12px !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+}
+.filter-card .analyst-quick-count{
+  min-width:34px !important;
+  height:24px !important;
+  padding:0 7px !important;
+  font-size:11px !important;
+  line-height:24px !important;
+  font-weight:900 !important;
+}
+@media(max-width:700px){
+  .filter-card .analyst-quick-menu-btn{
+    min-height:46px !important;
+    padding:7px 7px !important;
+    gap:6px !important;
+  }
+  .filter-card .analyst-quick-name{
+    font-size:11px !important;
+    line-height:1.2 !important;
+  }
+  .filter-card .analyst-quick-count{
+    min-width:32px !important;
+    height:23px !important;
+    padding:0 6px !important;
+    font-size:10px !important;
+    line-height:23px !important;
+  }
+}
+
+
+
+/* v189：分析師快速選單恢復 v187 字級，允許名稱與檔數自然換行 */
+.filter-card .analyst-quick-menu-btn{
+  min-height:36px !important;
+  height:auto !important;
+  padding:6px 7px !important;
+  gap:5px !important;
+  font-size:10px !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  overflow:visible !important;
+  white-space:normal !important;
+}
+.filter-card .analyst-quick-name{
+  min-width:0 !important;
+  max-width:100% !important;
+  font-size:10px !important;
+  line-height:1.25 !important;
+  font-weight:850 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+.filter-card .analyst-quick-count{
+  flex:0 0 auto !important;
+  min-width:27px !important;
+  height:20px !important;
+  padding:0 5px !important;
+  font-size:9px !important;
+  line-height:20px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+@media(max-width:700px){
+  .filter-card .analyst-quick-menu-btn{
+    min-height:40px !important;
+    height:auto !important;
+    padding:6px 6px !important;
+    gap:4px !important;
+    font-size:10px !important;
+    align-content:center !important;
+  }
+  .filter-card .analyst-quick-name{
+    font-size:10px !important;
+    line-height:1.2 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:unset !important;
+    overflow-wrap:anywhere !important;
+  }
+  .filter-card .analyst-quick-count{
+    min-width:27px !important;
+    height:20px !important;
+    padding:0 5px !important;
+    font-size:9px !important;
+    line-height:20px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

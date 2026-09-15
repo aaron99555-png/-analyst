@@ -5999,6 +5999,72 @@ html[data-theme="light"] .visual-value-mode-switch{
   }
 }
 
+
+
+/* v190：分析師快速選單字體微幅放大，並保留自動換行 */
+.filter-card .analyst-quick-menu-btn{
+  font-size:11px !important;
+  padding:7px 8px !important;
+  gap:5px !important;
+  min-height:38px !important;
+  height:auto !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  white-space:normal !important;
+  overflow:visible !important;
+}
+.filter-card .analyst-quick-name{
+  min-width:0 !important;
+  max-width:100% !important;
+  font-size:11px !important;
+  line-height:1.25 !important;
+  font-weight:850 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+.filter-card .analyst-quick-count{
+  flex:0 0 auto !important;
+  min-width:29px !important;
+  height:21px !important;
+  padding:0 6px !important;
+  font-size:10px !important;
+  line-height:21px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+@media(max-width:700px){
+  .filter-card .analyst-quick-menu-btn{
+    min-height:42px !important;
+    height:auto !important;
+    padding:7px 7px !important;
+    gap:4px !important;
+    font-size:11px !important;
+    align-content:center !important;
+  }
+  .filter-card .analyst-quick-name{
+    font-size:11px !important;
+    line-height:1.22 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:unset !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+  }
+  .filter-card .analyst-quick-count{
+    min-width:29px !important;
+    height:21px !important;
+    padding:0 6px !important;
+    font-size:10px !important;
+    line-height:21px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

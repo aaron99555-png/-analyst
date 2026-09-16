@@ -6860,497 +6860,6 @@ html[data-theme="light"] .price-trend-badge.down{
 
 
 
-/* v196：手機版按鈕提高對比與辨識度 */
-@media (max-width:700px){
-  /* 一般按鈕：深藍灰底＋白字，避免和卡片背景融在一起 */
-  button,
-  .btn,
-  button.ghost,
-  .mini.ghost{
-    background:#25324a !important;
-    color:#ffffff !important;
-    border-color:#64748b !important;
-    box-shadow:0 1px 3px rgba(0,0,0,.20) !important;
-  }
-  button:hover,
-  .btn:hover{
-    background:#334766 !important;
-    color:#ffffff !important;
-    border-color:#94a3b8 !important;
-  }
-
-  /* 主要操作：亮金色 */
-  button.primary,
-  .primary,
-  .refresh-hero{
-    background:linear-gradient(135deg,#ffd65a,#e4aa13) !important;
-    color:#17120a !important;
-    border-color:#ffe597 !important;
-    font-weight:900 !important;
-    box-shadow:0 2px 7px rgba(194,142,15,.28) !important;
-  }
-
-  /* 危險操作：明顯紅色 */
-  button.danger,
-  .danger,
-  .today-delete-btn.danger{
-    background:#b91c1c !important;
-    color:#ffffff !important;
-    border-color:#f87171 !important;
-    box-shadow:0 2px 6px rgba(185,28,28,.22) !important;
-  }
-  button.danger:hover,
-  .danger:hover{
-    background:#dc2626 !important;
-    border-color:#fca5a5 !important;
-  }
-
-  /* 被選取／目前模式：亮金底＋深字 */
-  button.active,
-  .visual-tabs button.active,
-  .rank-metric-switch button.active,
-  .performance-table-switch button.active,
-  .visual-value-mode-switch button.active,
-  .analyst-chip.active{
-    background:#f3b61f !important;
-    color:#17120a !important;
-    border-color:#ffd76a !important;
-    box-shadow:0 0 0 2px rgba(243,182,31,.18) !important;
-  }
-
-  /* 分析師快速選單：一般狀態也提高對比 */
-  .analyst-quick-menu-btn,
-  .analyst-quick-filter button,
-  .analyst-chip{
-    background:#263752 !important;
-    color:#ffffff !important;
-    border-color:#70829f !important;
-  }
-  .analyst-quick-menu-btn:hover,
-  .analyst-quick-filter button:hover,
-  .analyst-chip:hover{
-    background:#385174 !important;
-    border-color:#9db0cb !important;
-  }
-
-  /* 日期控制：左右箭頭與回到今天更清楚 */
-  .date-arrow-btn,
-  .date-today-btn{
-    background:#273b5b !important;
-    color:#ffffff !important;
-    border-color:#7890b3 !important;
-  }
-  .date-arrow-btn:hover,
-  .date-today-btn:hover{
-    background:#36567f !important;
-    border-color:#a4b9d8 !important;
-  }
-
-  /* 分析師總績效操作欄：四個動作直接分色 */
-  .performance-table-card #tbody .row-actions button[data-up]{
-    background:#1d4ed8 !important;
-    color:#ffffff !important;
-    border-color:#60a5fa !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-settle]{
-    background:#b7791f !important;
-    color:#ffffff !important;
-    border-color:#f6c453 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-edit]{
-    background:#475569 !important;
-    color:#ffffff !important;
-    border-color:#94a3b8 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-del]{
-    background:#b91c1c !important;
-    color:#ffffff !important;
-    border-color:#f87171 !important;
-  }
-
-  /* 今日進出場的小按鈕避免灰到看不見 */
-  .today-entry-card .mini,
-  .today-exit-card .mini{
-    font-weight:850 !important;
-  }
-
-  /* 深/淺色模式都維持同樣高反差 */
-  html[data-theme="light"] button:not(.primary):not(.danger):not(.active),
-  html[data-theme="light"] .ghost,
-  html[data-theme="light"] .mini.ghost{
-    background:#31415c !important;
-    color:#ffffff !important;
-    border-color:#71809a !important;
-  }
-}
-
-
-
-/* v197：手機版按鈕改為柔和高辨識度風格，避免高對比底色吃掉文字 */
-@media (max-width:700px){
-  /* 一般按鈕：奶油白／金灰細框／深色字 */
-  button,
-  .btn,
-  button.ghost,
-  .mini.ghost{
-    background:#f7f2e8 !important;
-    color:#3b3326 !important;
-    border:1px solid #c9b98f !important;
-    box-shadow:0 1px 2px rgba(63,50,24,.10) !important;
-    text-shadow:none !important;
-  }
-  button:hover,
-  .btn:hover,
-  button.ghost:hover,
-  .mini.ghost:hover{
-    background:#fffaf0 !important;
-    color:#241f17 !important;
-    border-color:#b99945 !important;
-  }
-
-  /* 主要操作：柔和金色，不使用過亮黃 */
-  button.primary,
-  .primary,
-  .refresh-hero{
-    background:linear-gradient(135deg,#e8c96d,#d2aa42) !important;
-    color:#2b210c !important;
-    border:1px solid #b88e2d !important;
-    font-weight:900 !important;
-    box-shadow:0 2px 5px rgba(133,97,22,.18) !important;
-  }
-
-  /* 危險操作：淡紅底＋深紅字 */
-  button.danger,
-  .danger,
-  .today-delete-btn.danger{
-    background:#fff0f0 !important;
-    color:#a42525 !important;
-    border:1px solid #e5a1a1 !important;
-    box-shadow:none !important;
-    font-weight:850 !important;
-  }
-  button.danger:hover,
-  .danger:hover{
-    background:#ffe4e4 !important;
-    color:#861a1a !important;
-    border-color:#d87979 !important;
-  }
-
-  /* 選取狀態：淡金底＋深字 */
-  button.active,
-  .visual-tabs button.active,
-  .rank-metric-switch button.active,
-  .performance-table-switch button.active,
-  .visual-value-mode-switch button.active,
-  .analyst-chip.active{
-    background:#f4df9d !important;
-    color:#30250e !important;
-    border:1px solid #c69b35 !important;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.40) !important;
-  }
-
-  /* 分析師快速選單：暖灰卡片感 */
-  .analyst-quick-menu-btn,
-  .analyst-quick-filter button,
-  .analyst-chip{
-    background:#f5f0e7 !important;
-    color:#443a2a !important;
-    border:1px solid #c9bca2 !important;
-    box-shadow:0 1px 2px rgba(48,39,25,.08) !important;
-  }
-  .analyst-quick-menu-btn:hover,
-  .analyst-quick-filter button:hover,
-  .analyst-chip:hover{
-    background:#fffaf2 !important;
-    color:#2b241a !important;
-    border-color:#b59656 !important;
-  }
-
-  /* 日期按鈕：淡灰藍＋深藍字 */
-  .date-arrow-btn,
-  .date-today-btn{
-    background:#eef2f6 !important;
-    color:#334155 !important;
-    border:1px solid #aeb8c5 !important;
-    box-shadow:none !important;
-  }
-  .date-arrow-btn:hover,
-  .date-today-btn:hover{
-    background:#e3e9f0 !important;
-    color:#1f2937 !important;
-    border-color:#8998aa !important;
-  }
-
-  /* 分析師總績效操作：改用淺色語意按鈕，文字更清楚 */
-  .performance-table-card #tbody .row-actions button[data-up]{
-    background:#edf5ff !important;
-    color:#245da8 !important;
-    border:1px solid #9abce8 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-settle]{
-    background:#fff6df !important;
-    color:#8a5b09 !important;
-    border:1px solid #ddbd70 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-edit]{
-    background:#f1f3f5 !important;
-    color:#4b5563 !important;
-    border:1px solid #b7bec8 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-del]{
-    background:#fff0f0 !important;
-    color:#a42525 !important;
-    border:1px solid #e1a0a0 !important;
-  }
-
-  .performance-table-card #tbody .row-actions button{
-    text-shadow:none !important;
-    font-weight:850 !important;
-  }
-
-  .today-entry-card .mini,
-  .today-exit-card .mini{
-    font-weight:800 !important;
-  }
-
-  /* 深色模式：維持低飽和深底＋亮字，不會再變成暗字 */
-  html[data-theme="disabled-dark"] button:not(.primary):not(.danger):not(.active),
-  body.disabled-dark button:not(.primary):not(.danger):not(.active),
-  html[data-theme="disabled-dark"] .ghost,
-  body.disabled-dark .ghost,
-  html[data-theme="disabled-dark"] .mini.ghost,
-  body.disabled-dark .mini.ghost{
-    background:#282722 !important;
-    color:#f5edd9 !important;
-    border-color:#6d6555 !important;
-  }
-
-  html[data-theme="disabled-dark"] .analyst-quick-menu-btn,
-  html[data-theme="disabled-dark"] .analyst-quick-filter button,
-  html[data-theme="disabled-dark"] .analyst-chip,
-  body.disabled-dark .analyst-quick-menu-btn,
-  body.disabled-dark .analyst-quick-filter button,
-  body.disabled-dark .analyst-chip{
-    background:#292821 !important;
-    color:#f7efdc !important;
-    border-color:#756c59 !important;
-  }
-
-  html[data-theme="disabled-dark"] .date-arrow-btn,
-  html[data-theme="disabled-dark"] .date-today-btn,
-  body.disabled-dark .date-arrow-btn,
-  body.disabled-dark .date-today-btn{
-    background:#28303a !important;
-    color:#eef4fb !important;
-    border-color:#657487 !important;
-  }
-
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-up],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-up]{
-    background:#20334a !important;
-    color:#b8d8ff !important;
-    border-color:#4e78a6 !important;
-  }
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-settle],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-settle]{
-    background:#3a311e !important;
-    color:#f4d88b !important;
-    border-color:#8d743e !important;
-  }
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-edit],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-edit]{
-    background:#30343a !important;
-    color:#e2e8f0 !important;
-    border-color:#66707d !important;
-  }
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-del],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-del]{
-    background:#432323 !important;
-    color:#ffcdcd !important;
-    border-color:#8e4e4e !important;
-  }
-}
-
-
-
-/* v198：手機版按鈕改為清晰 Outline 風格－不靠底色辨識，文字永遠優先 */
-@media (max-width:700px){
-  /* 所有按鈕：白底、黑字、清楚邊框 */
-  button,
-  .btn,
-  button.ghost,
-  .mini.ghost,
-  .analyst-quick-menu-btn,
-  .analyst-quick-filter button,
-  .analyst-chip,
-  .date-arrow-btn,
-  .date-today-btn,
-  .performance-table-card #tbody .row-actions button{
-    background:#ffffff !important;
-    color:#111827 !important;
-    border:1.5px solid #64748b !important;
-    box-shadow:none !important;
-    text-shadow:none !important;
-    font-weight:800 !important;
-  }
-
-  /* 按鈕內所有文字、圖示、偽元素強制跟隨可讀文字色 */
-  button *,
-  .btn *,
-  button::before,
-  button::after,
-  .btn::before,
-  .btn::after{
-    color:inherit !important;
-    text-shadow:none !important;
-  }
-
-  button:hover,
-  .btn:hover,
-  button.ghost:hover,
-  .mini.ghost:hover{
-    background:#f8fafc !important;
-    color:#0f172a !important;
-    border-color:#334155 !important;
-  }
-
-  /* 主要操作：黑底白字，最穩定清楚 */
-  button.primary,
-  .primary,
-  .refresh-hero{
-    background:#111827 !important;
-    color:#ffffff !important;
-    border:1.5px solid #111827 !important;
-    box-shadow:none !important;
-    text-shadow:none !important;
-  }
-
-  /* 選取中：深色實心，未選取維持白底 */
-  button.active,
-  .visual-tabs button.active,
-  .rank-metric-switch button.active,
-  .performance-table-switch button.active,
-  .visual-value-mode-switch button.active,
-  .analyst-chip.active{
-    background:#1e293b !important;
-    color:#ffffff !important;
-    border-color:#1e293b !important;
-    box-shadow:none !important;
-  }
-
-  /* 刪除只用紅色框線＋紅字，不用紅底 */
-  button.danger,
-  .danger,
-  .today-delete-btn.danger,
-  .performance-table-card #tbody .row-actions button[data-del]{
-    background:#ffffff !important;
-    color:#b91c1c !important;
-    border:1.5px solid #dc2626 !important;
-  }
-
-  /* 操作按鈕用左側色條區分功能，底色仍保持白色 */
-  .performance-table-card #tbody .row-actions button[data-up]{
-    background:#ffffff !important;
-    color:#1d4ed8 !important;
-    border:1.5px solid #94a3b8 !important;
-    border-left:4px solid #2563eb !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-settle]{
-    background:#ffffff !important;
-    color:#92400e !important;
-    border:1.5px solid #94a3b8 !important;
-    border-left:4px solid #d97706 !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-edit]{
-    background:#ffffff !important;
-    color:#334155 !important;
-    border:1.5px solid #94a3b8 !important;
-    border-left:4px solid #64748b !important;
-  }
-  .performance-table-card #tbody .row-actions button[data-del]{
-    border-left:4px solid #dc2626 !important;
-  }
-
-  /* 日期按鈕乾淨化 */
-  .date-arrow-btn,
-  .date-today-btn{
-    background:#ffffff !important;
-    color:#1e293b !important;
-    border-color:#94a3b8 !important;
-  }
-
-  /* 分析師快速選單：白卡＋深色文字，可換行 */
-  .analyst-quick-menu-btn,
-  .analyst-quick-filter button,
-  .analyst-chip{
-    background:#ffffff !important;
-    color:#111827 !important;
-    border-color:#cbd5e1 !important;
-    white-space:normal !important;
-  }
-
-  /* 深色模式：反轉為深灰底＋純白字，同樣不靠彩色底 */
-  html[data-theme="disabled-dark"] button,
-  body.disabled-dark button,
-  html[data-theme="disabled-dark"] .btn,
-  body.disabled-dark .btn,
-  html[data-theme="disabled-dark"] .analyst-quick-menu-btn,
-  body.disabled-dark .analyst-quick-menu-btn,
-  html[data-theme="disabled-dark"] .analyst-quick-filter button,
-  body.disabled-dark .analyst-quick-filter button,
-  html[data-theme="disabled-dark"] .analyst-chip,
-  body.disabled-dark .analyst-chip,
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button,
-  body.disabled-dark .performance-table-card #tbody .row-actions button{
-    background:#1f2937 !important;
-    color:#ffffff !important;
-    border-color:#94a3b8 !important;
-    text-shadow:none !important;
-  }
-
-  html[data-theme="disabled-dark"] button.primary,
-  body.disabled-dark button.primary,
-  html[data-theme="disabled-dark"] .primary,
-  body.disabled-dark .primary,
-  html[data-theme="disabled-dark"] .refresh-hero,
-  body.disabled-dark .refresh-hero,
-  html[data-theme="disabled-dark"] button.active,
-  body.disabled-dark button.active{
-    background:#f8fafc !important;
-    color:#111827 !important;
-    border-color:#f8fafc !important;
-  }
-
-  html[data-theme="disabled-dark"] button.danger,
-  body.disabled-dark button.danger,
-  html[data-theme="disabled-dark"] .danger,
-  body.disabled-dark .danger,
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-del],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-del]{
-    background:#1f2937 !important;
-    color:#fecaca !important;
-    border-color:#ef4444 !important;
-  }
-
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-up],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-up]{
-    color:#bfdbfe !important;
-    border-left-color:#60a5fa !important;
-  }
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-settle],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-settle]{
-    color:#fde68a !important;
-    border-left-color:#f59e0b !important;
-  }
-  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-edit],
-  body.disabled-dark .performance-table-card #tbody .row-actions button[data-edit]{
-    color:#e2e8f0 !important;
-    border-left-color:#cbd5e1 !important;
-  }
-}
-
-
-
 /* v200：移除深色模式，統一為清楚舒適的淺色按鈕系統 */
 html,html[data-theme="light"]{color-scheme:light!important;}
 html[data-theme="light"] body{background:#f3f0e8!important;color:#25231f!important;}
@@ -7920,6 +7429,65 @@ html[data-theme="light"] button[id^="copy"]::before,
 html[data-theme="light"] button[id^="copy"]::after{
   color:#ffffff !important;
   -webkit-text-fill-color:#ffffff !important;
+}
+
+
+
+/* v205：手機版按鈕配色完全沿用桌機版
+   已移除 v196 / v197 / v198 的手機專用配色覆蓋。
+   此區只保留尺寸與操作友善性，不另外指定背景色或文字色。 */
+@media(max-width:700px){
+  html[data-theme="light"] button,
+  html[data-theme="light"] .btn{
+    opacity:1 !important;
+    text-shadow:none !important;
+  }
+}
+
+
+/* v206：所有「複製」類按鈕文字統一改為深色 */
+html[data-theme="light"] #copySharedHoldingsBtn,
+html[data-theme="light"] #copyAnalystHoldingsBtn,
+html[data-theme="light"] #copyRankBtn,
+html[data-theme="light"] #copyEntryBtn,
+html[data-theme="light"] #copyExitBtn,
+html[data-theme="light"] button[id^="copy"],
+html[data-theme="light"] .shared-copy-analysts-btn{
+  color:#2b2b2b !important;
+  -webkit-text-fill-color:#2b2b2b !important;
+  text-shadow:none !important;
+  opacity:1 !important;
+}
+
+/* 按鈕內文字、圖示同步改深色 */
+html[data-theme="light"] #copySharedHoldingsBtn *,
+html[data-theme="light"] #copyAnalystHoldingsBtn *,
+html[data-theme="light"] #copyRankBtn *,
+html[data-theme="light"] #copyEntryBtn *,
+html[data-theme="light"] #copyExitBtn *,
+html[data-theme="light"] button[id^="copy"] *,
+html[data-theme="light"] .shared-copy-analysts-btn *{
+  color:#2b2b2b !important;
+  -webkit-text-fill-color:#2b2b2b !important;
+}
+
+/* 偽元素文字也改深色 */
+html[data-theme="light"] #copySharedHoldingsBtn::before,
+html[data-theme="light"] #copySharedHoldingsBtn::after,
+html[data-theme="light"] #copyAnalystHoldingsBtn::before,
+html[data-theme="light"] #copyAnalystHoldingsBtn::after,
+html[data-theme="light"] #copyRankBtn::before,
+html[data-theme="light"] #copyRankBtn::after,
+html[data-theme="light"] #copyEntryBtn::before,
+html[data-theme="light"] #copyEntryBtn::after,
+html[data-theme="light"] #copyExitBtn::before,
+html[data-theme="light"] #copyExitBtn::after,
+html[data-theme="light"] button[id^="copy"]::before,
+html[data-theme="light"] button[id^="copy"]::after,
+html[data-theme="light"] .shared-copy-analysts-btn::before,
+html[data-theme="light"] .shared-copy-analysts-btn::after{
+  color:#2b2b2b !important;
+  -webkit-text-fill-color:#2b2b2b !important;
 }
 
 </style>

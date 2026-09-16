@@ -7490,6 +7490,309 @@ html[data-theme="light"] .shared-copy-analysts-btn::after{
   -webkit-text-fill-color:#2b2b2b !important;
 }
 
+
+
+/* v207：全站按鈕統一高可讀配色
+   原則：淺色底＝深色字；深色底＝白字。桌機/手機共用同一套色票。 */
+:root{
+  --btn-light-bg:#f7f3ea;
+  --btn-light-hover:#efe7d8;
+  --btn-light-border:#cdbf9f;
+  --btn-light-text:#2d2924;
+  --btn-dark-bg:#405675;
+  --btn-dark-hover:#334865;
+  --btn-dark-border:#6f82a0;
+  --btn-dark-text:#ffffff;
+  --btn-gold-bg:#fff1c9;
+  --btn-gold-border:#d6b35a;
+  --btn-gold-text:#654800;
+  --btn-blue-light-bg:#e9f2f9;
+  --btn-blue-light-border:#9dbbd0;
+  --btn-blue-light-text:#174c70;
+  --btn-red-light-bg:#fff0f0;
+  --btn-red-light-border:#dda0a0;
+  --btn-red-light-text:#992727;
+}
+
+/* 基礎按鈕：淺色底、深色字 */
+html[data-theme="light"] button,
+html[data-theme="light"] .btn{
+  background:var(--btn-light-bg) !important;
+  color:var(--btn-light-text) !important;
+  -webkit-text-fill-color:var(--btn-light-text) !important;
+  border:1px solid var(--btn-light-border) !important;
+  box-shadow:0 2px 6px rgba(76,61,35,.08) !important;
+  text-shadow:none !important;
+  opacity:1 !important;
+  transition:background .16s ease,border-color .16s ease,transform .12s ease,box-shadow .16s ease !important;
+}
+html[data-theme="light"] button:hover,
+html[data-theme="light"] .btn:hover{
+  background:var(--btn-light-hover) !important;
+  border-color:#b8a77f !important;
+  box-shadow:0 4px 10px rgba(76,61,35,.12) !important;
+}
+html[data-theme="light"] button:active,
+html[data-theme="light"] .btn:active{
+  transform:translateY(1px);
+}
+html[data-theme="light"] button:disabled,
+html[data-theme="light"] .btn:disabled{
+  opacity:.48 !important;
+  cursor:not-allowed !important;
+}
+
+/* 深色主要按鈕：深底白字 */
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .btn.primary,
+html[data-theme="light"] .refresh-hero,
+html[data-theme="light"] #refreshAllBtn,
+html[data-theme="light"] #adminBtn,
+html[data-theme="light"] #saveBtn,
+html[data-theme="light"] #doLogin,
+html[data-theme="light"] #quickPriceUpdateBtn,
+html[data-theme="light"] #priceConfirmSave,
+html[data-theme="light"] #bulkFailedPriceSave,
+html[data-theme="light"] .modal-settle-btn,
+html[data-theme="light"] [data-settle].primary,
+html[data-theme="light"] [data-add-analyst].primary{
+  background:var(--btn-dark-bg) !important;
+  color:var(--btn-dark-text) !important;
+  -webkit-text-fill-color:var(--btn-dark-text) !important;
+  border-color:var(--btn-dark-border) !important;
+  box-shadow:0 4px 12px rgba(53,72,101,.20) !important;
+}
+html[data-theme="light"] button.primary:hover,
+html[data-theme="light"] .btn.primary:hover,
+html[data-theme="light"] .refresh-hero:hover,
+html[data-theme="light"] #refreshAllBtn:hover,
+html[data-theme="light"] #adminBtn:hover,
+html[data-theme="light"] #saveBtn:hover,
+html[data-theme="light"] #doLogin:hover,
+html[data-theme="light"] #quickPriceUpdateBtn:hover{
+  background:var(--btn-dark-hover) !important;
+}
+html[data-theme="light"] button.primary *,
+html[data-theme="light"] .btn.primary *,
+html[data-theme="light"] .refresh-hero *,
+html[data-theme="light"] #refreshAllBtn *,
+html[data-theme="light"] #adminBtn *,
+html[data-theme="light"] #saveBtn *,
+html[data-theme="light"] #doLogin *,
+html[data-theme="light"] #quickPriceUpdateBtn *,
+html[data-theme="light"] #priceConfirmSave *,
+html[data-theme="light"] #bulkFailedPriceSave *,
+html[data-theme="light"] .modal-settle-btn *,
+html[data-theme="light"] [data-settle].primary *,
+html[data-theme="light"] [data-add-analyst].primary *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* 工具按鈕：深藍灰底白字 */
+html[data-theme="light"] #toggleTuanBtn,
+html[data-theme="light"] #exportDataBtn,
+html[data-theme="light"] #importDataBtn,
+html[data-theme="light"] #pinEntryCardBtn,
+html[data-theme="light"] #toggleEntryCardBtn,
+html[data-theme="light"] .rank-name-btn,
+html[data-theme="light"] .table-analyst-btn{
+  background:#465d7d !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  border-color:#778aa5 !important;
+}
+html[data-theme="light"] #toggleTuanBtn *,
+html[data-theme="light"] #exportDataBtn *,
+html[data-theme="light"] #importDataBtn *,
+html[data-theme="light"] #pinEntryCardBtn *,
+html[data-theme="light"] #toggleEntryCardBtn *,
+html[data-theme="light"] .rank-name-btn *,
+html[data-theme="light"] .table-analyst-btn *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* 複製類：淺米色底深字（沿用你指定的深色文字） */
+html[data-theme="light"] #copySharedHoldingsBtn,
+html[data-theme="light"] #copyAnalystHoldingsBtn,
+html[data-theme="light"] #copyRankBtn,
+html[data-theme="light"] #copyEntryBtn,
+html[data-theme="light"] #copyExitBtn,
+html[data-theme="light"] button[id^="copy"],
+html[data-theme="light"] .copy-perf-btn,
+html[data-theme="light"] .shared-copy-analysts-btn{
+  background:#f5ead4 !important;
+  color:#332c22 !important;
+  -webkit-text-fill-color:#332c22 !important;
+  border-color:#cdb887 !important;
+  text-shadow:none !important;
+}
+html[data-theme="light"] #copySharedHoldingsBtn *,
+html[data-theme="light"] #copyAnalystHoldingsBtn *,
+html[data-theme="light"] #copyRankBtn *,
+html[data-theme="light"] #copyEntryBtn *,
+html[data-theme="light"] #copyExitBtn *,
+html[data-theme="light"] button[id^="copy"] *,
+html[data-theme="light"] .copy-perf-btn *,
+html[data-theme="light"] .shared-copy-analysts-btn *{
+  color:#332c22 !important;
+  -webkit-text-fill-color:#332c22 !important;
+}
+
+/* 日期操作：箭頭深色白字；回到今天淺藍底深字 */
+html[data-theme="light"] .date-arrow-btn{
+  background:#405675 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  border-color:#71839e !important;
+}
+html[data-theme="light"] .date-today-btn{
+  background:#e9f0f6 !important;
+  color:#29445d !important;
+  -webkit-text-fill-color:#29445d !important;
+  border-color:#a8bac9 !important;
+}
+
+/* 分析師快速選單／共同持股分析師：淺藍灰底深字 */
+html[data-theme="light"] .analyst-chip,
+html[data-theme="light"] .analyst-quick-menu-btn,
+html[data-theme="light"] .analyst-quick-filter button,
+html[data-theme="light"] .today-analyst-btn,
+html[data-theme="light"] .shared-open-analyst-btn{
+  background:#edf2f6 !important;
+  color:#26394c !important;
+  -webkit-text-fill-color:#26394c !important;
+  border-color:#aebdca !important;
+}
+html[data-theme="light"] .analyst-chip *,
+html[data-theme="light"] .analyst-quick-menu-btn *,
+html[data-theme="light"] .analyst-quick-filter button *,
+html[data-theme="light"] .today-analyst-btn *,
+html[data-theme="light"] .shared-open-analyst-btn *{
+  color:#26394c !important;
+  -webkit-text-fill-color:#26394c !important;
+}
+html[data-theme="light"] .analyst-chip.active,
+html[data-theme="light"] .analyst-quick-menu-btn.active,
+html[data-theme="light"] .analyst-quick-filter button.active{
+  background:#405675 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  border-color:#71839e !important;
+}
+html[data-theme="light"] .analyst-chip.active *,
+html[data-theme="light"] .analyst-quick-menu-btn.active *,
+html[data-theme="light"] .analyst-quick-filter button.active *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* 切換型按鈕：未選淺底深字；選取深底白字 */
+html[data-theme="light"] .visual-tabs button,
+html[data-theme="light"] .rank-metric-switch button,
+html[data-theme="light"] .performance-table-switch button,
+html[data-theme="light"] [data-visual-value-mode]{
+  background:#f4f1e9 !important;
+  color:#37322b !important;
+  -webkit-text-fill-color:#37322b !important;
+  border-color:#cfc4ad !important;
+}
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active,
+html[data-theme="light"] .performance-table-switch button.active,
+html[data-theme="light"] [data-visual-value-mode].active{
+  background:#405675 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  border-color:#71839e !important;
+}
+html[data-theme="light"] .visual-tabs button.active *,
+html[data-theme="light"] .rank-metric-switch button.active *,
+html[data-theme="light"] .performance-table-switch button.active *,
+html[data-theme="light"] [data-visual-value-mode].active *{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* 表格操作鈕：全部採淺底深字，功能色柔和但辨識清楚 */
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-up],
+html[data-theme="light"] [data-up]:not(.primary){
+  background:var(--btn-blue-light-bg) !important;
+  color:var(--btn-blue-light-text) !important;
+  -webkit-text-fill-color:var(--btn-blue-light-text) !important;
+  border-color:var(--btn-blue-light-border) !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-settle]{
+  background:var(--btn-gold-bg) !important;
+  color:var(--btn-gold-text) !important;
+  -webkit-text-fill-color:var(--btn-gold-text) !important;
+  border-color:var(--btn-gold-border) !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-edit],
+html[data-theme="light"] [data-edit]{
+  background:#eef1f4 !important;
+  color:#344350 !important;
+  -webkit-text-fill-color:#344350 !important;
+  border-color:#b7c0c8 !important;
+}
+html[data-theme="light"] button.danger,
+html[data-theme="light"] .danger,
+html[data-theme="light"] [data-del]{
+  background:var(--btn-red-light-bg) !important;
+  color:var(--btn-red-light-text) !important;
+  -webkit-text-fill-color:var(--btn-red-light-text) !important;
+  border-color:var(--btn-red-light-border) !important;
+}
+
+/* 停損立即結算：深紅底白字；取消使用淺底深字 */
+html[data-theme="light"] #stopLossAlertSettle{
+  background:#b93838 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  border-color:#d56b6b !important;
+}
+html[data-theme="light"] #stopLossAlertCancel{
+  background:#f3f0ea !important;
+  color:#322f2a !important;
+  -webkit-text-fill-color:#322f2a !important;
+  border-color:#c9c0b0 !important;
+}
+
+/* Modal / 關閉 / 清除：淺底深字 */
+html[data-theme="light"] #logoutBtn,
+html[data-theme="light"] #cancelEditBtn,
+html[data-theme="light"] #clearFilterBtn,
+html[data-theme="light"] #closeAnalystTrades,
+html[data-theme="light"] #closeLogin,
+html[data-theme="light"] #priceConfirmCancel,
+html[data-theme="light"] #bulkFailedPriceCancel,
+html[data-theme="light"] .manual-price-btn,
+html[data-theme="light"] .modal-price-btn{
+  background:#f3f0ea !important;
+  color:#34302a !important;
+  -webkit-text-fill-color:#34302a !important;
+  border-color:#c9c0b0 !important;
+}
+
+/* 所有偽元素與子元素跟隨按鈕文字色，避免「底色正確但字被舊 CSS 蓋掉」 */
+html[data-theme="light"] button::before,
+html[data-theme="light"] button::after,
+html[data-theme="light"] .btn::before,
+html[data-theme="light"] .btn::after{
+  color:inherit !important;
+  -webkit-text-fill-color:currentColor !important;
+}
+
+/* 手機版僅調整尺寸，不另改顏色，確保與桌機完全一致 */
+@media(max-width:700px){
+  html[data-theme="light"] button,
+  html[data-theme="light"] .btn{
+    font-weight:850 !important;
+    opacity:1 !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -12007,53 +12310,5 @@ applyEntryCardState();
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>
 
-<script>
-/* v202：依實際背景色自動修正按鈕文字對比 */
-(()=>{
-  const parseRGB=s=>{
-    const m=String(s||'').match(/rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)(?:\s*,\s*(\d+(?:\.\d+)?))?\s*\)/i);
-    if(!m)return null;
-    return {r:+m[1],g:+m[2],b:+m[3],a:m[4]==null?1:+m[4]};
-  };
-  const luminance=c=>{
-    const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};
-    return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b);
-  };
-  const needsWhite=btn=>{
-    const cs=getComputedStyle(btn);
-    const colors=[];
-    const bg=parseRGB(cs.backgroundColor);
-    if(bg&&bg.a>.18) colors.push(bg);
-    const grad=String(cs.backgroundImage||'');
-    const matches=grad.match(/rgba?\([^)]*\)/gi)||[];
-    matches.forEach(x=>{const c=parseRGB(x); if(c&&c.a>.18)colors.push(c)});
-    if(!colors.length)return false;
-    const darkest=Math.min(...colors.map(luminance));
-    const avg={
-      r:colors.reduce((s,c)=>s+c.r,0)/colors.length,
-      g:colors.reduce((s,c)=>s+c.g,0)/colors.length,
-      b:colors.reduce((s,c)=>s+c.b,0)/colors.length
-    };
-    const avgLum=colors.reduce((s,c)=>s+luminance(c),0)/colors.length;
-    const blueish=avg.b>avg.r*1.12 && avg.b>avg.g*.98 && avgLum<.62;
-    return darkest<.24 || avgLum<.34 || blueish;
-  };
-  const fixOne=btn=>{
-    if(!(btn instanceof Element))return;
-    btn.classList.toggle('force-white-button-text',needsWhite(btn));
-  };
-  const fixAll=root=>{
-    if(root?.matches?.('button,.btn'))fixOne(root);
-    root?.querySelectorAll?.('button,.btn').forEach(fixOne);
-  };
-  const run=()=>fixAll(document);
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
-  else run();
-  window.addEventListener('load',run,{once:true});
-  new MutationObserver(muts=>{
-    muts.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)fixAll(n)}));
-  }).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
 
 </body></html>

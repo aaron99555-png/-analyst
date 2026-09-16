@@ -7800,6 +7800,76 @@ html[data-theme="light"] .performance-table-card #tbody .row-actions button::bef
   }
 }
 
+
+
+/* v202：深色／藍底按鈕一律白字，淺色底維持深字 */
+html[data-theme="light"] button.force-white-button-text,
+html[data-theme="light"] .btn.force-white-button-text,
+html[data-theme="light"] button.force-white-button-text *,
+html[data-theme="light"] .btn.force-white-button-text *{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  text-shadow:none !important;
+}
+html[data-theme="light"] button.force-white-button-text::before,
+html[data-theme="light"] button.force-white-button-text::after,
+html[data-theme="light"] .btn.force-white-button-text::before,
+html[data-theme="light"] .btn.force-white-button-text::after{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+/* 已知深色 / 藍色主要按鈕直接固定白字，避免初始載入閃爍 */
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .btn.primary,
+html[data-theme="light"] .refresh-hero,
+html[data-theme="light"] #adminBtn,
+html[data-theme="light"] #quickPriceUpdateBtn,
+html[data-theme="light"] #saveBtn,
+html[data-theme="light"] #doLogin,
+html[data-theme="light"] #priceConfirmSave,
+html[data-theme="light"] #bulkFailedPriceSave,
+html[data-theme="light"] #stopLossAlertSettle,
+html[data-theme="light"] .modal-settle-btn,
+html[data-theme="light"] [data-settle].primary,
+html[data-theme="light"] [data-add-analyst].primary{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+html[data-theme="light"] button.primary *,
+html[data-theme="light"] .refresh-hero *,
+html[data-theme="light"] #adminBtn *,
+html[data-theme="light"] #quickPriceUpdateBtn *,
+html[data-theme="light"] #saveBtn *,
+html[data-theme="light"] #doLogin *,
+html[data-theme="light"] #priceConfirmSave *,
+html[data-theme="light"] #bulkFailedPriceSave *,
+html[data-theme="light"] #stopLossAlertSettle *,
+html[data-theme="light"] .modal-settle-btn *,
+html[data-theme="light"] [data-settle].primary *,
+html[data-theme="light"] [data-add-analyst].primary *{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+@media(max-width:700px){
+  html[data-theme="light"] button.force-white-button-text,
+  html[data-theme="light"] button.primary,
+  html[data-theme="light"] .refresh-hero,
+  html[data-theme="light"] #adminBtn,
+  html[data-theme="light"] #quickPriceUpdateBtn,
+  html[data-theme="light"] #saveBtn,
+  html[data-theme="light"] #doLogin,
+  html[data-theme="light"] #priceConfirmSave,
+  html[data-theme="light"] #bulkFailedPriceSave,
+  html[data-theme="light"] #stopLossAlertSettle,
+  html[data-theme="light"] .modal-settle-btn{
+    color:#ffffff !important;
+    -webkit-text-fill-color:#ffffff !important;
+    font-weight:900 !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -12316,4 +12386,54 @@ applyEntryCardState();
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>
+
+<script>
+/* v202：依實際背景色自動修正按鈕文字對比 */
+(()=>{
+  const parseRGB=s=>{
+    const m=String(s||'').match(/rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)(?:\s*,\s*(\d+(?:\.\d+)?))?\s*\)/i);
+    if(!m)return null;
+    return {r:+m[1],g:+m[2],b:+m[3],a:m[4]==null?1:+m[4]};
+  };
+  const luminance=c=>{
+    const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};
+    return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b);
+  };
+  const needsWhite=btn=>{
+    const cs=getComputedStyle(btn);
+    const colors=[];
+    const bg=parseRGB(cs.backgroundColor);
+    if(bg&&bg.a>.18) colors.push(bg);
+    const grad=String(cs.backgroundImage||'');
+    const matches=grad.match(/rgba?\([^)]*\)/gi)||[];
+    matches.forEach(x=>{const c=parseRGB(x); if(c&&c.a>.18)colors.push(c)});
+    if(!colors.length)return false;
+    const darkest=Math.min(...colors.map(luminance));
+    const avg={
+      r:colors.reduce((s,c)=>s+c.r,0)/colors.length,
+      g:colors.reduce((s,c)=>s+c.g,0)/colors.length,
+      b:colors.reduce((s,c)=>s+c.b,0)/colors.length
+    };
+    const avgLum=colors.reduce((s,c)=>s+luminance(c),0)/colors.length;
+    const blueish=avg.b>avg.r*1.12 && avg.b>avg.g*.98 && avgLum<.62;
+    return darkest<.24 || avgLum<.34 || blueish;
+  };
+  const fixOne=btn=>{
+    if(!(btn instanceof Element))return;
+    btn.classList.toggle('force-white-button-text',needsWhite(btn));
+  };
+  const fixAll=root=>{
+    if(root?.matches?.('button,.btn'))fixOne(root);
+    root?.querySelectorAll?.('button,.btn').forEach(fixOne);
+  };
+  const run=()=>fixAll(document);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
+  else run();
+  window.addEventListener('load',run,{once:true});
+  new MutationObserver(muts=>{
+    muts.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)fixAll(n)}));
+  }).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
 </body></html>

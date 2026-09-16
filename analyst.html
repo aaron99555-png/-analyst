@@ -7793,6 +7793,44 @@ html[data-theme="light"] .btn::after{
   }
 }
 
+
+/* v208：績效排行榜／分析師總績效－分析師名字改為深色清楚文字 */
+html[data-theme="light"] .performance-rank-card .rank-name-btn,
+html[data-theme="light"] .performance-table-card .table-analyst-btn{
+  background:transparent !important;
+  color:#2b2b2b !important;
+  -webkit-text-fill-color:#2b2b2b !important;
+  border:0 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  opacity:1 !important;
+}
+
+/* 名字內部若有 span 等元素，也維持深色 */
+html[data-theme="light"] .performance-rank-card .rank-name-btn *,
+html[data-theme="light"] .performance-table-card .table-analyst-btn *{
+  color:#2b2b2b !important;
+  -webkit-text-fill-color:#2b2b2b !important;
+}
+
+/* Hover 用金棕色，仍保持淺底可讀 */
+html[data-theme="light"] .performance-rank-card .rank-name-btn:hover,
+html[data-theme="light"] .performance-table-card .table-analyst-btn:hover{
+  color:#8a6518 !important;
+  -webkit-text-fill-color:#8a6518 !important;
+  background:transparent !important;
+}
+
+/* 手機、桌機統一 */
+@media(max-width:700px){
+  html[data-theme="light"] .performance-rank-card .rank-name-btn,
+  html[data-theme="light"] .performance-table-card .table-analyst-btn{
+    color:#222222 !important;
+    -webkit-text-fill-color:#222222 !important;
+    background:transparent !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

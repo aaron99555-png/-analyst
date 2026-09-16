@@ -7870,6 +7870,58 @@ html[data-theme="light"] [data-add-analyst].primary *{
   }
 }
 
+
+/* v203：工具類深色按鈕固定白字 */
+html[data-theme="light"] #exportDataBtn,
+html[data-theme="light"] #importDataBtn,
+html[data-theme="light"] #pinEntryCardBtn,
+html[data-theme="light"] #toggleEntryCardBtn,
+html[data-theme="light"] #copySharedHoldingsBtn,
+html[data-theme="light"] #copyAnalystHoldingsBtn,
+html[data-theme="light"] #copyRankBtn,
+html[data-theme="light"] #copyEntryBtn,
+html[data-theme="light"] #copyExitBtn,
+html[data-theme="light"] button[id^="copy"]{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.18) !important;
+  opacity:1 !important;
+}
+
+/* 按鈕內若有 span / b / icon，也一律跟著變白 */
+html[data-theme="light"] #exportDataBtn *,
+html[data-theme="light"] #importDataBtn *,
+html[data-theme="light"] #pinEntryCardBtn *,
+html[data-theme="light"] #toggleEntryCardBtn *,
+html[data-theme="light"] #copySharedHoldingsBtn *,
+html[data-theme="light"] #copyAnalystHoldingsBtn *,
+html[data-theme="light"] #copyRankBtn *,
+html[data-theme="light"] #copyEntryBtn *,
+html[data-theme="light"] #copyExitBtn *,
+html[data-theme="light"] button[id^="copy"] *{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+/* 偽元素文字也固定白色 */
+html[data-theme="light"] #exportDataBtn::before,
+html[data-theme="light"] #exportDataBtn::after,
+html[data-theme="light"] #importDataBtn::before,
+html[data-theme="light"] #importDataBtn::after,
+html[data-theme="light"] #pinEntryCardBtn::before,
+html[data-theme="light"] #pinEntryCardBtn::after,
+html[data-theme="light"] #toggleEntryCardBtn::before,
+html[data-theme="light"] #toggleEntryCardBtn::after,
+html[data-theme="light"] #copySharedHoldingsBtn::before,
+html[data-theme="light"] #copySharedHoldingsBtn::after,
+html[data-theme="light"] #copyAnalystHoldingsBtn::before,
+html[data-theme="light"] #copyAnalystHoldingsBtn::after,
+html[data-theme="light"] button[id^="copy"]::before,
+html[data-theme="light"] button[id^="copy"]::after{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

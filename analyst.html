@@ -9309,10 +9309,15 @@ let rankMetric='total';
 
 
 function analystExternalLink(name){
-  if(name==='股市期皇后-莊佳螢'){
-    return `<a class="analyst-external-link" href="https://www.youtube.com/channel/UCIoSO49Mhgh2iy_MOWfSl6w" target="_blank" rel="noopener noreferrer" title="前往 YouTube 頻道" aria-label="前往股市期皇后-莊佳螢 YouTube 頻道">↗</a>`;
-  }
-  return '';
+  const links={
+    '股市期皇后-莊佳螢':'https://www.youtube.com/channel/UCIoSO49Mhgh2iy_MOWfSl6w',
+    '漁夫林睿閎':'https://www.youtube.com/@-john4000',
+    '艾綸劉育綸':'https://www.youtube.com/@Alansays',
+    'E神張貽程':'https://www.youtube.com/@m168'
+  };
+  const url=links[name];
+  if(!url)return '';
+  return `<a class="analyst-external-link" href="${url}" target="_blank" rel="noopener noreferrer" title="前往 YouTube 頻道" aria-label="前往${esc(name)} YouTube 頻道">↗</a>`;
 }
 
 function renderRank(){

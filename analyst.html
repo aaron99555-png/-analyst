@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-theme="light">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
@@ -7347,6 +7347,209 @@ html[data-theme="light"] .price-trend-badge.down{
   }
 }
 
+
+
+/* v200：移除深色模式，統一為清楚舒適的淺色按鈕系統 */
+html,html[data-theme="light"]{color-scheme:light!important;}
+html[data-theme="light"] body{background:#f3f0e8!important;color:#25231f!important;}
+#themeToggleBtn{display:none!important;}
+
+/* 全站按鈕：霧白底、深色字、柔和邊框 */
+html[data-theme="light"] button,
+html[data-theme="light"] .btn,
+html[data-theme="light"] input[type="button"],
+html[data-theme="light"] input[type="submit"]{
+  background:#f8f7f3!important;
+  color:#2f3338!important;
+  border:1px solid #c9c5bb!important;
+  box-shadow:0 1px 2px rgba(44,39,30,.06)!important;
+  text-shadow:none!important;
+  font-weight:800!important;
+  opacity:1!important;
+}
+html[data-theme="light"] button *,
+html[data-theme="light"] .btn *{color:inherit!important;text-shadow:none!important;}
+html[data-theme="light"] button:hover,
+html[data-theme="light"] .btn:hover{
+  background:#efede7!important;
+  color:#1f2328!important;
+  border-color:#a9a398!important;
+  box-shadow:0 2px 5px rgba(44,39,30,.09)!important;
+}
+html[data-theme="light"] button:active,
+html[data-theme="light"] .btn:active{
+  transform:translateY(1px);
+  box-shadow:none!important;
+}
+html[data-theme="light"] button:focus-visible,
+html[data-theme="light"] .btn:focus-visible{
+  outline:3px solid rgba(76,110,138,.22)!important;
+  outline-offset:2px!important;
+}
+
+/* 主要動作：沉穩琥珀色＋白字 */
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .primary,
+html[data-theme="light"] .refresh-hero{
+  background:#9a681f!important;
+  color:#ffffff!important;
+  border-color:#9a681f!important;
+  box-shadow:0 2px 5px rgba(114,76,25,.16)!important;
+}
+html[data-theme="light"] button.primary:hover,
+html[data-theme="light"] .primary:hover,
+html[data-theme="light"] .refresh-hero:hover{
+  background:#835817!important;
+  color:#ffffff!important;
+  border-color:#835817!important;
+}
+
+/* 危險操作：淡紅底＋深紅字 */
+html[data-theme="light"] button.danger,
+html[data-theme="light"] .danger,
+html[data-theme="light"] .today-delete-btn.danger{
+  background:#fff4f3!important;
+  color:#a82727!important;
+  border-color:#dfa7a3!important;
+}
+html[data-theme="light"] button.danger:hover,
+html[data-theme="light"] .danger:hover{
+  background:#fde6e3!important;
+  color:#8f1e1e!important;
+  border-color:#ca7c76!important;
+}
+
+/* Ghost 改成真正容易閱讀的淺灰按鈕 */
+html[data-theme="light"] button.ghost,
+html[data-theme="light"] .mini.ghost,
+html[data-theme="light"] .ghost{
+  background:#f5f4f0!important;
+  color:#384047!important;
+  border-color:#c8c5bd!important;
+}
+html[data-theme="light"] button.ghost:hover,
+html[data-theme="light"] .mini.ghost:hover{
+  background:#e9e7e1!important;
+  color:#22272b!important;
+  border-color:#a8a49b!important;
+}
+
+/* 各種切換列：未選淺藍灰，選取深藍灰 */
+html[data-theme="light"] .visual-tabs button,
+html[data-theme="light"] .rank-metric-switch button,
+html[data-theme="light"] .performance-table-switch button,
+html[data-theme="light"] [data-visual-value-mode]{
+  background:#eef2f5!important;
+  color:#3e4a54!important;
+  border-color:#c4cdd5!important;
+}
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active,
+html[data-theme="light"] .performance-table-switch button.active,
+html[data-theme="light"] [data-visual-value-mode].active,
+html[data-theme="light"] button.active{
+  background:#50697d!important;
+  color:#ffffff!important;
+  border-color:#50697d!important;
+  box-shadow:0 2px 5px rgba(52,77,97,.16)!important;
+}
+
+/* 日期操作：淡藍灰，字色固定深藍 */
+html[data-theme="light"] .date-arrow-btn,
+html[data-theme="light"] .date-today-btn{
+  background:#edf3f7!important;
+  color:#36556d!important;
+  border-color:#b9cad6!important;
+}
+html[data-theme="light"] .date-arrow-btn:hover,
+html[data-theme="light"] .date-today-btn:hover{
+  background:#dfeaf1!important;
+  color:#28465d!important;
+  border-color:#96afc0!important;
+}
+
+/* 分析師快速選單：暖米色卡片，深咖字 */
+html[data-theme="light"] .analyst-quick-menu-btn,
+html[data-theme="light"] .analyst-quick-filter button,
+html[data-theme="light"] .analyst-chip{
+  background:#f7f1e5!important;
+  color:#493d2c!important;
+  border-color:#d6c7ad!important;
+  white-space:normal!important;
+}
+html[data-theme="light"] .analyst-quick-menu-btn:hover,
+html[data-theme="light"] .analyst-quick-filter button:hover,
+html[data-theme="light"] .analyst-chip:hover{
+  background:#efe4d0!important;
+  color:#392f22!important;
+  border-color:#c1aa84!important;
+}
+html[data-theme="light"] .analyst-quick-menu-btn.active,
+html[data-theme="light"] .analyst-quick-filter button.active,
+html[data-theme="light"] .analyst-chip.active{
+  background:#705d3e!important;
+  color:#ffffff!important;
+  border-color:#705d3e!important;
+}
+
+/* 分析師績效操作：以淡色底區分，文字固定深色 */
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-up]{
+  background:#edf5fc!important;color:#245a87!important;border-color:#abc8df!important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-settle]{
+  background:#fff5df!important;color:#805711!important;border-color:#dfc17c!important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-edit]{
+  background:#f0f2f4!important;color:#46515b!important;border-color:#c3c9cf!important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-del]{
+  background:#fff0ef!important;color:#a62d2d!important;border-color:#dfaaa7!important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-up]:hover{background:#dfeefa!important;}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-settle]:hover{background:#fbeac5!important;}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-edit]:hover{background:#e4e8eb!important;}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-del]:hover{background:#f9dedd!important;}
+
+/* 複製 / 清除 / 一般小按鈕保持高可讀性 */
+html[data-theme="light"] .copy-perf-btn,
+html[data-theme="light"] [id^="copy"],
+html[data-theme="light"] #clearFilterBtn,
+html[data-theme="light"] #cancelEditBtn{
+  background:#f2f0ea!important;
+  color:#3f454a!important;
+  border-color:#c9c4b9!important;
+}
+
+/* 登入/登出分開處理 */
+html[data-theme="light"] #adminBtn{
+  background:#8e621f!important;color:#fff!important;border-color:#8e621f!important;
+}
+html[data-theme="light"] #logoutBtn{
+  background:#f0f1f2!important;color:#48515a!important;border-color:#c4c9ce!important;
+}
+
+/* Disabled 仍看得到字 */
+html[data-theme="light"] button:disabled,
+html[data-theme="light"] .btn:disabled{
+  background:#eceae5!important;
+  color:#8a8780!important;
+  border-color:#d5d1c8!important;
+  opacity:1!important;
+  cursor:not-allowed!important;
+}
+
+/* 手機：按鈕字色與背景沿用同一套，不再另做深色覆蓋 */
+@media(max-width:700px){
+  html[data-theme="light"] button,
+  html[data-theme="light"] .btn{
+    text-shadow:none!important;
+    -webkit-text-fill-color:currentColor!important;
+  }
+  html[data-theme="light"] .performance-table-card #tbody .row-actions button{
+    font-weight:900!important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -7388,8 +7591,7 @@ html[data-theme="light"] .price-trend-badge.down{
 
         <div class="price-note"><b>上市：TWSE 官方｜上櫃：TPEx 官方</b>｜官方來源失敗才使用 Yahoo Finance 備援；仍失敗則手動輸入｜<b>相同股票代號會同步更新</b>｜績效與正式結算以已完成收盤價為準</div>
       </div>
-      <button id="themeToggleBtn" class="ghost theme-toggle-btn" type="button" aria-label="切換深淺色模式">☀ 淺色模式</button>
-      <button id="adminBtn" class="primary">管理者登入</button>
+<button id="adminBtn" class="primary">管理者登入</button>
       <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>
   </div>
@@ -8382,26 +8584,13 @@ document.addEventListener('click',e=>{
 
 
 const THEME_KEY='analystPerformanceTheme';
-function applyTheme(theme){
-  const mode=theme==='light'?'light':'dark';
-  document.documentElement.dataset.theme=mode;
-  try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
-  const btn=$('#themeToggleBtn');
-  if(btn){
-    btn.textContent=mode==='dark'?'☀ 淺色模式':'☾ 深色模式';
-    btn.setAttribute('aria-label',mode==='dark'?'切換為淺色模式':'切換為深色模式');
-  }
-  // Chart.js canvas needs a redraw so labels/grid remain readable after theme change.
+function applyTheme(){
+  document.documentElement.dataset.theme='light';
+  document.body?.classList.remove('dark');
+  try{localStorage.removeItem(THEME_KEY);}catch(e){}
   try{renderVisualAnalytics();}catch(e){}
 }
-function initTheme(){
-  let saved='light';
-  try{saved=localStorage.getItem(THEME_KEY)||'light';}catch(e){}
-  applyTheme(saved);
-}
-$('#themeToggleBtn')?.addEventListener('click',()=>{
-  applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
-});
+function initTheme(){ applyTheme(); }
 initTheme();
 
 let visualMode='profitcompare';
@@ -9309,10 +9498,15 @@ let rankMetric='total';
 
 
 function analystExternalLink(name){
-  if(name==='股市期皇后-莊佳螢'){
-    return `<a class="analyst-external-link" href="https://www.youtube.com/channel/UCIoSO49Mhgh2iy_MOWfSl6w" target="_blank" rel="noopener noreferrer" title="前往 YouTube 頻道" aria-label="前往股市期皇后-莊佳螢 YouTube 頻道">↗</a>`;
-  }
-  return '';
+  const links={
+    '股市期皇后-莊佳螢':'https://www.youtube.com/channel/UCIoSO49Mhgh2iy_MOWfSl6w',
+    '漁夫林睿閎':'https://www.youtube.com/@-john4000',
+    '艾綸劉育綸':'https://www.youtube.com/@Alansays',
+    'E神張貽程':'https://www.youtube.com/@m168'
+  };
+  const url=links[name];
+  if(!url)return '';
+  return `<a class="analyst-external-link" href="${url}" target="_blank" rel="noopener noreferrer" title="前往 YouTube 頻道" aria-label="前往${esc(name)} YouTube 頻道">↗</a>`;
 }
 
 function renderRank(){

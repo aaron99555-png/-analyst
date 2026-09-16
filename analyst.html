@@ -2,6 +2,8 @@
 <html lang="zh-Hant" data-theme="light">
 <head>
 <meta charset="utf-8" />
+<meta name="color-scheme" content="only light" />
+<meta name="supported-color-schemes" content="light" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
 <title>台股擂台賽</title>
 <style>
@@ -2747,16 +2749,16 @@ footer{
 }
 
 /* 深色模式也做小幅質感提升 */
-html[data-theme="dark"] body{
+html[data-theme="disabled-dark"] body{
   background:
     radial-gradient(circle at top right,rgba(217,178,76,.08),transparent 26%),
     #0b0b0b !important;
 }
-html[data-theme="dark"] .card{
+html[data-theme="disabled-dark"] .card{
   border-color:rgba(217,178,76,.18) !important;
   box-shadow:0 10px 26px rgba(0,0,0,.24);
 }
-html[data-theme="dark"] .section-title{
+html[data-theme="disabled-dark"] .section-title{
   padding-bottom:9px;
   border-bottom:1px solid rgba(217,178,76,.12);
 }
@@ -3972,8 +3974,8 @@ tbody tr:hover{background:rgba(179,139,75,.045)}
   }
 }
 
-body.dark .today-entry-item,
-body.dark .rank-row{
+body.disabled-dark .today-entry-item,
+body.disabled-dark .rank-row{
   background:rgba(255,255,255,.025)!important;
 }
 
@@ -4291,17 +4293,17 @@ body.dark .rank-row{
 }
 
 /* 深色模式維持清楚對比 */
-body.dark .shared-consensus-badge.base{
+body.disabled-dark .shared-consensus-badge.base{
   color:#8fc4f1!important;
   background:rgba(66,133,192,.18)!important;
   border-color:rgba(116,177,228,.42)!important;
 }
-body.dark .shared-consensus-badge.mid{
+body.disabled-dark .shared-consensus-badge.mid{
   color:#f2bd69!important;
   background:rgba(222,154,55,.18)!important;
   border-color:rgba(242,189,105,.42)!important;
 }
-body.dark .shared-consensus-badge.high{
+body.disabled-dark .shared-consensus-badge.high{
   color:#ff9297!important;
   background:rgba(205,61,67,.20)!important;
   border-color:rgba(255,146,151,.42)!important;
@@ -4496,8 +4498,8 @@ html[data-theme="light"] .today-info-box{
     transform:scale(.94);
     box-shadow:inset 0 2px 5px rgba(75,55,20,.13) !important;
   }
-  html[data-theme="dark"] .date-arrow-btn,
-  body.dark .date-arrow-btn{
+  html[data-theme="disabled-dark"] .date-arrow-btn,
+  body.disabled-dark .date-arrow-btn{
     background:linear-gradient(145deg,#292116,#17120c) !important;
     border-color:rgba(244,215,125,.38) !important;
     color:#f4d77d !important;
@@ -7112,57 +7114,57 @@ html[data-theme="light"] .price-trend-badge.down{
   }
 
   /* 深色模式：維持低飽和深底＋亮字，不會再變成暗字 */
-  html[data-theme="dark"] button:not(.primary):not(.danger):not(.active),
-  body.dark button:not(.primary):not(.danger):not(.active),
-  html[data-theme="dark"] .ghost,
-  body.dark .ghost,
-  html[data-theme="dark"] .mini.ghost,
-  body.dark .mini.ghost{
+  html[data-theme="disabled-dark"] button:not(.primary):not(.danger):not(.active),
+  body.disabled-dark button:not(.primary):not(.danger):not(.active),
+  html[data-theme="disabled-dark"] .ghost,
+  body.disabled-dark .ghost,
+  html[data-theme="disabled-dark"] .mini.ghost,
+  body.disabled-dark .mini.ghost{
     background:#282722 !important;
     color:#f5edd9 !important;
     border-color:#6d6555 !important;
   }
 
-  html[data-theme="dark"] .analyst-quick-menu-btn,
-  html[data-theme="dark"] .analyst-quick-filter button,
-  html[data-theme="dark"] .analyst-chip,
-  body.dark .analyst-quick-menu-btn,
-  body.dark .analyst-quick-filter button,
-  body.dark .analyst-chip{
+  html[data-theme="disabled-dark"] .analyst-quick-menu-btn,
+  html[data-theme="disabled-dark"] .analyst-quick-filter button,
+  html[data-theme="disabled-dark"] .analyst-chip,
+  body.disabled-dark .analyst-quick-menu-btn,
+  body.disabled-dark .analyst-quick-filter button,
+  body.disabled-dark .analyst-chip{
     background:#292821 !important;
     color:#f7efdc !important;
     border-color:#756c59 !important;
   }
 
-  html[data-theme="dark"] .date-arrow-btn,
-  html[data-theme="dark"] .date-today-btn,
-  body.dark .date-arrow-btn,
-  body.dark .date-today-btn{
+  html[data-theme="disabled-dark"] .date-arrow-btn,
+  html[data-theme="disabled-dark"] .date-today-btn,
+  body.disabled-dark .date-arrow-btn,
+  body.disabled-dark .date-today-btn{
     background:#28303a !important;
     color:#eef4fb !important;
     border-color:#657487 !important;
   }
 
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-up],
-  body.dark .performance-table-card #tbody .row-actions button[data-up]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-up],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-up]{
     background:#20334a !important;
     color:#b8d8ff !important;
     border-color:#4e78a6 !important;
   }
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-settle],
-  body.dark .performance-table-card #tbody .row-actions button[data-settle]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-settle],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-settle]{
     background:#3a311e !important;
     color:#f4d88b !important;
     border-color:#8d743e !important;
   }
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-edit],
-  body.dark .performance-table-card #tbody .row-actions button[data-edit]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-edit],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-edit]{
     background:#30343a !important;
     color:#e2e8f0 !important;
     border-color:#66707d !important;
   }
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-del],
-  body.dark .performance-table-card #tbody .row-actions button[data-del]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-del],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-del]{
     background:#432323 !important;
     color:#ffcdcd !important;
     border-color:#8e4e4e !important;
@@ -7288,60 +7290,60 @@ html[data-theme="light"] .price-trend-badge.down{
   }
 
   /* 深色模式：反轉為深灰底＋純白字，同樣不靠彩色底 */
-  html[data-theme="dark"] button,
-  body.dark button,
-  html[data-theme="dark"] .btn,
-  body.dark .btn,
-  html[data-theme="dark"] .analyst-quick-menu-btn,
-  body.dark .analyst-quick-menu-btn,
-  html[data-theme="dark"] .analyst-quick-filter button,
-  body.dark .analyst-quick-filter button,
-  html[data-theme="dark"] .analyst-chip,
-  body.dark .analyst-chip,
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button,
-  body.dark .performance-table-card #tbody .row-actions button{
+  html[data-theme="disabled-dark"] button,
+  body.disabled-dark button,
+  html[data-theme="disabled-dark"] .btn,
+  body.disabled-dark .btn,
+  html[data-theme="disabled-dark"] .analyst-quick-menu-btn,
+  body.disabled-dark .analyst-quick-menu-btn,
+  html[data-theme="disabled-dark"] .analyst-quick-filter button,
+  body.disabled-dark .analyst-quick-filter button,
+  html[data-theme="disabled-dark"] .analyst-chip,
+  body.disabled-dark .analyst-chip,
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button,
+  body.disabled-dark .performance-table-card #tbody .row-actions button{
     background:#1f2937 !important;
     color:#ffffff !important;
     border-color:#94a3b8 !important;
     text-shadow:none !important;
   }
 
-  html[data-theme="dark"] button.primary,
-  body.dark button.primary,
-  html[data-theme="dark"] .primary,
-  body.dark .primary,
-  html[data-theme="dark"] .refresh-hero,
-  body.dark .refresh-hero,
-  html[data-theme="dark"] button.active,
-  body.dark button.active{
+  html[data-theme="disabled-dark"] button.primary,
+  body.disabled-dark button.primary,
+  html[data-theme="disabled-dark"] .primary,
+  body.disabled-dark .primary,
+  html[data-theme="disabled-dark"] .refresh-hero,
+  body.disabled-dark .refresh-hero,
+  html[data-theme="disabled-dark"] button.active,
+  body.disabled-dark button.active{
     background:#f8fafc !important;
     color:#111827 !important;
     border-color:#f8fafc !important;
   }
 
-  html[data-theme="dark"] button.danger,
-  body.dark button.danger,
-  html[data-theme="dark"] .danger,
-  body.dark .danger,
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-del],
-  body.dark .performance-table-card #tbody .row-actions button[data-del]{
+  html[data-theme="disabled-dark"] button.danger,
+  body.disabled-dark button.danger,
+  html[data-theme="disabled-dark"] .danger,
+  body.disabled-dark .danger,
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-del],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-del]{
     background:#1f2937 !important;
     color:#fecaca !important;
     border-color:#ef4444 !important;
   }
 
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-up],
-  body.dark .performance-table-card #tbody .row-actions button[data-up]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-up],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-up]{
     color:#bfdbfe !important;
     border-left-color:#60a5fa !important;
   }
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-settle],
-  body.dark .performance-table-card #tbody .row-actions button[data-settle]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-settle],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-settle]{
     color:#fde68a !important;
     border-left-color:#f59e0b !important;
   }
-  html[data-theme="dark"] .performance-table-card #tbody .row-actions button[data-edit],
-  body.dark .performance-table-card #tbody .row-actions button[data-edit]{
+  html[data-theme="disabled-dark"] .performance-table-card #tbody .row-actions button[data-edit],
+  body.disabled-dark .performance-table-card #tbody .row-actions button[data-edit]{
     color:#e2e8f0 !important;
     border-left-color:#cbd5e1 !important;
   }
@@ -7547,6 +7549,254 @@ html[data-theme="light"] .btn:disabled{
   }
   html[data-theme="light"] .performance-table-card #tbody .row-actions button{
     font-weight:900!important;
+  }
+}
+
+
+
+/* v201：真正移除深色模式 + 手機按鈕文字高可讀性 */
+:root{
+  color-scheme:only light !important;
+  --bg:#f5f3ee !important;
+  --panel:#ffffff !important;
+  --panel2:#faf8f3 !important;
+  --text:#1f2933 !important;
+  --muted:#667085 !important;
+  --line:#d6d1c7 !important;
+  --gold:#b7892d !important;
+  --gold2:#8c6722 !important;
+}
+html,
+html[data-theme="light"],
+body,
+body.disabled-dark{
+  color-scheme:only light !important;
+  background:#f5f3ee !important;
+  color:#1f2933 !important;
+}
+html{background:#f5f3ee !important;}
+body::before{display:none !important;}
+#themeToggleBtn{display:none !important;visibility:hidden !important;pointer-events:none !important;}
+
+/* 所有主要區塊固定淺色，不再受舊主題樣式影響 */
+html[data-theme="light"] .topbar,
+html[data-theme="light"] .card,
+html[data-theme="light"] .chart-box,
+html[data-theme="light"] .visual-chart-wrap,
+html[data-theme="light"] .rank-group,
+html[data-theme="light"] .rank-row,
+html[data-theme="light"] .today-entry-item,
+html[data-theme="light"] .shared-open-item,
+html[data-theme="light"] .modal-card,
+html[data-theme="light"] .table-wrap,
+html[data-theme="light"] .price-confirm-row,
+html[data-theme="light"] .bulk-failed-price-row{
+  background:#ffffff !important;
+  color:#1f2933 !important;
+  border-color:#d6d1c7 !important;
+  box-shadow:0 4px 16px rgba(31,41,51,.06) !important;
+}
+html[data-theme="light"] table{background:#ffffff !important;color:#1f2933 !important;}
+html[data-theme="light"] th{background:#eee9df !important;color:#3d352a !important;}
+html[data-theme="light"] td{background:#ffffff !important;color:#27313b !important;}
+html[data-theme="light"] tbody tr:nth-child(even) td{background:#faf9f6 !important;}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{
+  background:#ffffff !important;
+  color:#1f2933 !important;
+  border-color:#c9c4ba !important;
+  -webkit-text-fill-color:#1f2933 !important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{
+  color:#8a8f98 !important;
+  -webkit-text-fill-color:#8a8f98 !important;
+}
+
+/* 全站按鈕：白底深字，先確保文字永遠看得到 */
+html[data-theme="light"] button,
+html[data-theme="light"] .btn,
+html[data-theme="light"] input[type="button"],
+html[data-theme="light"] input[type="submit"]{
+  background:#ffffff !important;
+  color:#17202a !important;
+  -webkit-text-fill-color:#17202a !important;
+  border:1.5px solid #aeb6c0 !important;
+  box-shadow:0 1px 3px rgba(31,41,51,.08) !important;
+  text-shadow:none !important;
+  font-weight:800 !important;
+  opacity:1 !important;
+}
+/* 修正舊版 .card * 規則把按鈕內 span/b/i 的字改暗 */
+html[data-theme="light"] .card button *,
+html[data-theme="light"] .card .btn *,
+html[data-theme="light"] .modal-card button *,
+html[data-theme="light"] .topbar button *,
+html[data-theme="light"] button > span,
+html[data-theme="light"] button > b,
+html[data-theme="light"] button > i{
+  color:inherit !important;
+  -webkit-text-fill-color:currentColor !important;
+  text-shadow:none !important;
+}
+html[data-theme="light"] button::before,
+html[data-theme="light"] button::after{
+  color:inherit !important;
+  -webkit-text-fill-color:currentColor !important;
+  text-shadow:none !important;
+}
+html[data-theme="light"] button:hover,
+html[data-theme="light"] .btn:hover{
+  background:#f2f5f7 !important;
+  color:#111820 !important;
+  -webkit-text-fill-color:#111820 !important;
+  border-color:#7f8a96 !important;
+}
+
+/* 主要操作：沉穩藍底白字 */
+html[data-theme="light"] button.primary,
+html[data-theme="light"] .primary,
+html[data-theme="light"] .refresh-hero,
+html[data-theme="light"] #adminBtn{
+  background:#315f7d !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  border-color:#315f7d !important;
+}
+html[data-theme="light"] button.primary *,
+html[data-theme="light"] .primary *,
+html[data-theme="light"] .refresh-hero *{
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+html[data-theme="light"] button.primary:hover,
+html[data-theme="light"] .primary:hover,
+html[data-theme="light"] .refresh-hero:hover{
+  background:#274d66 !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+/* 選取狀態：淡金底黑字，避免深底看不清楚 */
+html[data-theme="light"] button.active,
+html[data-theme="light"] .visual-tabs button.active,
+html[data-theme="light"] .rank-metric-switch button.active,
+html[data-theme="light"] .performance-table-switch button.active,
+html[data-theme="light"] [data-visual-value-mode].active,
+html[data-theme="light"] .analyst-chip.active,
+html[data-theme="light"] .analyst-quick-menu-btn.active,
+html[data-theme="light"] .analyst-quick-filter button.active{
+  background:#f2dfaa !important;
+  color:#33270f !important;
+  -webkit-text-fill-color:#33270f !important;
+  border-color:#b99542 !important;
+  box-shadow:none !important;
+}
+html[data-theme="light"] button.active *,
+html[data-theme="light"] .visual-tabs button.active *,
+html[data-theme="light"] .rank-metric-switch button.active *,
+html[data-theme="light"] .performance-table-switch button.active *{
+  color:#33270f !important;
+  -webkit-text-fill-color:#33270f !important;
+}
+
+/* 一般切換鈕 */
+html[data-theme="light"] .visual-tabs button,
+html[data-theme="light"] .rank-metric-switch button,
+html[data-theme="light"] .performance-table-switch button,
+html[data-theme="light"] [data-visual-value-mode]{
+  background:#f5f7f9 !important;
+  color:#263442 !important;
+  -webkit-text-fill-color:#263442 !important;
+  border-color:#b8c1ca !important;
+}
+
+/* 日期控制：淡藍底深藍字 */
+html[data-theme="light"] .date-arrow-btn,
+html[data-theme="light"] .date-today-btn{
+  background:#eaf3f8 !important;
+  color:#234e68 !important;
+  -webkit-text-fill-color:#234e68 !important;
+  border-color:#9db9ca !important;
+}
+
+/* 分析師快速選單：暖白底深字，內容可換行 */
+html[data-theme="light"] .analyst-quick-menu-btn,
+html[data-theme="light"] .analyst-quick-filter button,
+html[data-theme="light"] .analyst-chip{
+  background:#fbf7ef !important;
+  color:#3b342b !important;
+  -webkit-text-fill-color:#3b342b !important;
+  border-color:#cdbf9f !important;
+  white-space:normal !important;
+}
+html[data-theme="light"] .analyst-quick-menu-btn *,
+html[data-theme="light"] .analyst-quick-filter button *,
+html[data-theme="light"] .analyst-chip *{
+  color:#3b342b !important;
+  -webkit-text-fill-color:#3b342b !important;
+}
+
+/* 危險操作：淡紅底深紅字 */
+html[data-theme="light"] button.danger,
+html[data-theme="light"] .danger,
+html[data-theme="light"] .today-delete-btn.danger,
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-del]{
+  background:#fff1f1 !important;
+  color:#9f2323 !important;
+  -webkit-text-fill-color:#9f2323 !important;
+  border-color:#d99b9b !important;
+}
+
+/* 績效表操作鈕：淡色區分，但全部使用深字 */
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-up]{
+  background:#eaf4fb !important;
+  color:#194f75 !important;
+  -webkit-text-fill-color:#194f75 !important;
+  border-color:#9fc2d8 !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-settle]{
+  background:#fff3cf !important;
+  color:#704e09 !important;
+  -webkit-text-fill-color:#704e09 !important;
+  border-color:#d8bb68 !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-edit]{
+  background:#eef1f4 !important;
+  color:#344350 !important;
+  -webkit-text-fill-color:#344350 !important;
+  border-color:#b7c0c8 !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button[data-del]{
+  background:#fff0f0 !important;
+  color:#9f2323 !important;
+  -webkit-text-fill-color:#9f2323 !important;
+  border-color:#d99b9b !important;
+}
+html[data-theme="light"] .performance-table-card #tbody .row-actions button::after,
+html[data-theme="light"] .performance-table-card #tbody .row-actions button::before{
+  color:inherit !important;
+  -webkit-text-fill-color:currentColor !important;
+}
+
+/* 手機版：字體略放大、不要用半透明文字 */
+@media(max-width:700px){
+  html[data-theme="light"] button,
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] .analyst-quick-menu-btn,
+  html[data-theme="light"] .analyst-quick-filter button,
+  html[data-theme="light"] .analyst-chip{
+    font-size:12px !important;
+    line-height:1.25 !important;
+    font-weight:850 !important;
+    opacity:1 !important;
+    text-shadow:none !important;
+  }
+  html[data-theme="light"] .performance-table-card #tbody .row-actions button{
+    font-size:11px !important;
+    font-weight:900 !important;
+    opacity:1 !important;
   }
 }
 

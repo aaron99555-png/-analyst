@@ -6065,6 +6065,60 @@ html[data-theme="light"] .visual-value-mode-switch{
   }
 }
 
+
+
+/* v192：目前價與前一交易日收盤比較－上漲／下跌小標籤 */
+.current-price-line{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  min-width:0;
+}
+.price-trend-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  padding:2px 6px;
+  border-radius:999px;
+  font-size:10px;
+  line-height:1.35;
+  font-weight:900;
+  white-space:nowrap;
+  vertical-align:middle;
+  border:1px solid transparent;
+}
+.price-trend-badge.up{
+  color:#ff6b6b;
+  background:rgba(239,68,68,.12);
+  border-color:rgba(239,68,68,.34);
+}
+.price-trend-badge.down{
+  color:#45d483;
+  background:rgba(34,197,94,.12);
+  border-color:rgba(34,197,94,.34);
+}
+html[data-theme="light"] .price-trend-badge.up{
+  color:#c62828;
+  background:rgba(220,38,38,.10);
+  border-color:rgba(220,38,38,.26);
+}
+html[data-theme="light"] .price-trend-badge.down{
+  color:#15803d;
+  background:rgba(22,163,74,.10);
+  border-color:rgba(22,163,74,.26);
+}
+@media(max-width:700px){
+  .price-trend-badge{
+    font-size:9px;
+    padding:2px 5px;
+  }
+  .today-info-box .current-price-line{
+    gap:5px;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -6448,6 +6502,25 @@ function todayPriceDelta(tr,basePrice){
   const cls=pctValue>0?'pos':pctValue<0?'neg':'';
   const arrow=pctValue>0?'▲':pctValue<0?'▼':'•';
   return `<span class="today-delta ${cls}">${arrow} ${pctValue>0?'+':''}${pctValue.toFixed(2)}%</span>`;
+}
+
+function priceTrendBadge(tr){
+  const current=Number(tr?.currentPrice);
+  const previous=Number(tr?.previousClose);
+  if(!(current>0)||!(previous>0))return '';
+
+  const diff=current-previous;
+  const epsilon=Math.max(0.000001,Math.abs(previous)*1e-9);
+  if(Math.abs(diff)<=epsilon)return '';
+
+  const up=diff>0;
+  const label=up?'上漲📈':'下跌📉';
+  const cls=up?'up':'down';
+  const diffPct=previous>0?diff/previous*100:0;
+  const sign=diffPct>0?'+':'';
+  const dateText=tr?.previousCloseDate?`（${esc(tr.previousCloseDate)}）`:'';
+  const title=`前一交易日收盤${dateText}：${fmt(previous)}｜${label} ${sign}${diffPct.toFixed(2)}%`;
+  return `<span class="price-trend-badge ${cls}" title="${title}">${label}</span>`;
 }
 function sharedConsensusInfo(count){
   const n=Number(count)||0;
@@ -6876,7 +6949,7 @@ function renderTodayExits(){
         </div>
         <div class="today-info-box current">
           <label>目前價</label>
-          <b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b>
+          <div class="current-price-line"><b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b>${priceTrendBadge(tr)}</div>
           ${todayPriceDelta(tr,tr.entryPrice)}
         </div>
       </div>
@@ -7015,7 +7088,7 @@ function renderTodayEntries(){
         </div>
         <div class="today-info-box current">
           <label>目前價</label>
-          <b>${fmt(tr.currentPrice||tr.entryPrice)}</b>
+          <div class="current-price-line"><b>${fmt(tr.currentPrice||tr.entryPrice)}</b>${priceTrendBadge(tr)}</div>
           ${todayPriceDelta(tr,tr.entryPrice)}
         </div>
       </div>
@@ -7717,7 +7790,7 @@ function render(){
   let html='';
   rows.forEach(([id,t])=>{ const c=calc(t);
     html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer" title="前往 Yahoo 個股資訊">${esc(t.symbol)} ${esc(t.stockName)}</a></td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
-  <span>${fmt(t.currentPrice||t.entryPrice)}</span>
+  <span class="current-price-line"><span>${fmt(t.currentPrice||t.entryPrice)}</span>${priceTrendBadge(t)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
 </td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${canUpdatePrice(t)&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
   });
@@ -7923,7 +7996,7 @@ function renderAnalystTradesModal(name){
       <div class="analyst-trade-grid">
         <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
-        <span>目前價 <b>${fmt(tr.currentPrice||tr.entryPrice)}</b></span>
+        <span>目前價 <span class="current-price-line"><b>${fmt(tr.currentPrice||tr.entryPrice)}</b>${priceTrendBadge(tr)}</span></span>
         <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
@@ -8893,8 +8966,11 @@ async function fetchTWSEOfficialAfterHours(sym){
   if(!valid.length)throw new Error('TWSE 官方盤後資料沒有有效收盤價');
 
   const latest=valid[valid.length-1];
+  const previous=valid.length>=2?valid[valid.length-2]:null;
   return {
     price:latest.price,
+    reference:previous?.price||null,
+    referenceDate:previous?.date||'',
     source:'TWSE 官方盤後資料',
     mode:'closed',
     market:'TWSE',
@@ -8980,8 +9056,37 @@ async function fetchTPExOfficialAfterHours(sym){
         row?.date ??
         '';
 
+      const rawPrevious=
+        row?.PreviousClose ??
+        row?.PreviousClosingPrice ??
+        row?.ReferencePrice ??
+        row?.LastClosingPrice ??
+        row?.["昨收"] ??
+        row?.["前日收盤價"] ??
+        '';
+      let reference=Number(String(rawPrevious??'').replace(/,/g,'').trim());
+
+      // TPEx 最新收盤資料若沒有直接提供昨收，嘗試以「今日收盤－漲跌價差」還原。
+      if(!(reference>0)){
+        const rawChange=
+          row?.Change ??
+          row?.ChangeAmount ??
+          row?.PriceChange ??
+          row?.["漲跌"] ??
+          row?.["漲跌價差"] ??
+          '';
+        const changeText=String(rawChange??'').replace(/,/g,'').replace(/[^0-9+\-.]/g,'').trim();
+        const change=Number(changeText);
+        if(Number.isFinite(change)){
+          const restored=price-change;
+          if(restored>0)reference=restored;
+        }
+      }
+
       return {
         price,
+        reference:reference>0?reference:null,
+        referenceDate:'',
         source:'TPEx 櫃買中心官方收盤行情',
         mode:'closed',
         market:'TPEx',
@@ -9052,14 +9157,19 @@ async function fetchYahooTaiwanAfterHours(sym){
         const mm=Number(timeParts.find(x=>x.type==='minute')?.value||0);
         const afterClose=(hh*60+mm)>=14*60+30;
 
-        let latest=valid[valid.length-1];
+        let latestIndex=valid.length-1;
+        let latest=valid[latestIndex];
         // 盤中若 Yahoo 已產生當日日K，退回上一個已完成交易日，避免把盤中價當收盤價。
         if(latest.tradeDate===today && !afterClose && valid.length>1){
-          latest=valid[valid.length-2];
+          latestIndex=valid.length-2;
+          latest=valid[latestIndex];
         }
+        const previous=latestIndex>0?valid[latestIndex-1]:null;
 
         return {
           price:latest.price,
+          reference:previous?.price||null,
+          referenceDate:previous?.tradeDate||'',
           source:`Yahoo Finance ${ticker} 收盤備援`,
           mode:'closed',
           market:suffix==='TW'?'TWSE':'TPEx',
@@ -9262,8 +9372,35 @@ async function writeValidatedPrice(id,q){
   await update(ref(db,`analystPerformance/trades/${id}`),{
     currentPrice:q.price,
     priceUpdatedAt:nowText(),
-    priceSource:q.source
+    priceSource:q.source,
+    previousClose:Number(q?.reference)>0?Number(q.reference):null,
+    previousCloseDate:q?.referenceDate||null
   });
+}
+
+
+/* v193：手動輸入目前價若與原本價格差異超過 10%，需再次確認。 */
+function confirmManualPriceDeviation({symbol='',stockName='',oldPrice,newPrice}){
+  const oldNum=Number(oldPrice);
+  const newNum=Number(newPrice);
+  if(!Number.isFinite(oldNum)||oldNum<=0 || !Number.isFinite(newNum)||newNum<=0){
+    return true;
+  }
+
+  const changePct=(newNum/oldNum-1)*100;
+  if(Math.abs(changePct)<=10)return true;
+
+  const direction=changePct>0?'高於':'低於';
+  const arrow=changePct>0?'📈':'📉';
+  return confirm(
+    `⚠️ 價格異常確認\n\n`+
+    `${symbol} ${stockName}\n`+
+    `原本目前價：${fmt(oldNum)}\n`+
+    `本次輸入價：${fmt(newNum)}\n`+
+    `差異：${changePct>0?'+':''}${changePct.toFixed(2)}% ${arrow}\n\n`+
+    `本次價格${direction}原本價格超過 10%，可能有輸入錯誤。\n`+
+    `是否仍確認使用此價格？`
+  );
 }
 
 
@@ -9299,11 +9436,23 @@ function openPriceConfirm(items){
 
     cancel.onclick=()=>done(null);
     save.onclick=()=>{
-      const result=items.map((x,i)=>{
+      const result=[];
+      for(let i=0;i<items.length;i++){
+        const x=items[i];
         const input=list.querySelector(`[data-price-index="${i}"]`);
         const price=Number(input?.value);
-        return {...x,price};
-      }).filter(x=>Number.isFinite(x.price)&&x.price>0);
+        if(!Number.isFinite(price)||price<=0)continue;
+        if(!confirmManualPriceDeviation({
+          symbol:x.symbol,
+          stockName:x.stockName,
+          oldPrice:x.oldPrice,
+          newPrice:price
+        })){
+          input?.focus();
+          return;
+        }
+        result.push({...x,price});
+      }
       done(result);
     };
   });
@@ -9386,6 +9535,19 @@ function openBulkFailedPriceModal(items){
           input?.focus();
           return;
         }
+
+        const baseTrade=trades?.[items[i].id];
+        const oldPrice=Number(baseTrade?.currentPrice||baseTrade?.entryPrice||0);
+        if(!confirmManualPriceDeviation({
+          symbol:items[i].symbol,
+          stockName:items[i].stockName,
+          oldPrice,
+          newPrice:price
+        })){
+          input?.focus();
+          return;
+        }
+
         entered.push({...items[i],price});
       }
 
@@ -9525,9 +9687,11 @@ async function offerStopLossSettlement(tradeIds,currentPrice){
   return breached.length;
 }
 
-async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}){
+async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false,previousClose=null,previousCloseDate=''}={}){
   const normalized=String(symbol||'').trim().toUpperCase();
   const numericPrice=Number(price);
+  const numericPrevious=Number(previousClose);
+  const hasFreshPrevious=Number.isFinite(numericPrevious)&&numericPrevious>0;
   if(!normalized)throw new Error('股票代號不存在');
   if(!Number.isFinite(numericPrice)||numericPrice<=0)throw new Error('價格格式異常');
 
@@ -9552,6 +9716,10 @@ async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}
     patch[`${tid}/currentPrice`]=numericPrice;
     patch[`${tid}/priceUpdatedAt`]=updatedAt;
     patch[`${tid}/priceSource`]=priceSource;
+    // 只有網路行情有帶「前一交易日收盤」時才顯示漲跌標籤；
+    // 手動輸入會清除舊比較基準，避免拿過期昨收誤判。
+    patch[`${tid}/previousClose`]=hasFreshPrevious?numericPrevious:null;
+    patch[`${tid}/previousCloseDate`]=hasFreshPrevious?(previousCloseDate||''):null;
   });
 
   await update(ref(db,'analystPerformance/trades'),patch);
@@ -9563,7 +9731,9 @@ async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false}={}
       ...trades[tid],
       currentPrice:numericPrice,
       priceUpdatedAt:updatedAt,
-      priceSource
+      priceSource,
+      previousClose:hasFreshPrevious?numericPrevious:null,
+      previousCloseDate:hasFreshPrevious?(previousCloseDate||''):null
     };
   });
 
@@ -9617,6 +9787,13 @@ async function manualCurrentPrice(id){
     alert('請輸入正確的價格');
     return false;
   }
+
+  if(!confirmManualPriceDeviation({
+    symbol:tr.symbol,
+    stockName:tr.stockName,
+    oldPrice,
+    newPrice:price
+  }))return false;
 
   if(!confirm(
     `確認更新股價？\n\n`+
@@ -9684,6 +9861,16 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
   if(!Number.isFinite(price)||price<=0){
     alert('價格格式不正確，本次不更新；原有價格保持不變。');
     return {updated:false,invalid:true};
+  }
+
+  const oldPrice=Number(tr.currentPrice||tr.entryPrice||0);
+  if(!confirmManualPriceDeviation({
+    symbol,
+    stockName,
+    oldPrice,
+    newPrice:price
+  })){
+    return {updated:false,cancelled:true};
   }
 
   const result=await syncSameStockCurrentPrice(
@@ -9754,7 +9941,11 @@ async function refreshOne(id){
       symbol,
       newPrice,
       q.source||'網路最新行情',
-      {onlyTuan:isAdmin2()}
+      {
+        onlyTuan:isAdmin2(),
+        previousClose:q.reference,
+        previousCloseDate:q.referenceDate||''
+      }
     );
 
     clearTimeout(cloudRenderTimer);
@@ -9863,7 +10054,9 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
           ok:true,
           price,
           source:q.source||'網路最新行情',
-          mode:q.mode||'latest'
+          mode:q.mode||'latest',
+          reference:q.reference,
+          referenceDate:q.referenceDate||''
         };
       }catch(error){
         return {
@@ -9893,7 +10086,11 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
           item.symbol,
           item.price,
           item.source||'網路最新行情',
-          {onlyTuan:isAdmin2()}
+          {
+            onlyTuan:isAdmin2(),
+            previousClose:item.reference,
+            previousCloseDate:item.referenceDate||''
+          }
         );
         success++;
       }catch(err){

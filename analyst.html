@@ -7831,6 +7831,86 @@ html[data-theme="light"] .performance-table-card .table-analyst-btn:hover{
   }
 }
 
+
+/* v209：視覺化分析「分析單位」按鈕改為淺底深字，避免 % 績效白字看不清楚 */
+html[data-theme="light"] .visual-value-mode-switch button,
+html[data-theme="light"] [data-visual-value-mode]{
+  background:#f5f2ea !important;
+  color:#2f2b25 !important;
+  -webkit-text-fill-color:#2f2b25 !important;
+  border-color:#cfc5b3 !important;
+  text-shadow:none !important;
+  opacity:1 !important;
+}
+
+/* 選取中的 % 績效 / 金額：淡金底＋深色字 */
+html[data-theme="light"] .visual-value-mode-switch button.active,
+html[data-theme="light"] [data-visual-value-mode].active{
+  background:#f1dfab !important;
+  color:#2b2416 !important;
+  -webkit-text-fill-color:#2b2416 !important;
+  border-color:#b99745 !important;
+  box-shadow:0 2px 6px rgba(155,119,42,.12) !important;
+}
+
+/* 按鈕內部元素同步深色 */
+html[data-theme="light"] .visual-value-mode-switch button *,
+html[data-theme="light"] [data-visual-value-mode] *{
+  color:#2f2b25 !important;
+  -webkit-text-fill-color:#2f2b25 !important;
+}
+html[data-theme="light"] .visual-value-mode-switch button.active *,
+html[data-theme="light"] [data-visual-value-mode].active *{
+  color:#2b2416 !important;
+  -webkit-text-fill-color:#2b2416 !important;
+}
+
+/* 分析單位標籤也稍微加深 */
+html[data-theme="light"] .visual-value-mode-label{
+  color:#5b5143 !important;
+}
+
+
+/* v210：手機版新增交易表單更緊湊 */
+@media (max-width:700px){
+  /* 備註改為單一格，會自然排在出場價格旁邊 */
+  #entryCard .formgrid > .note-field{
+    grid-column:auto !important;
+    min-width:0 !important;
+  }
+  #entryCard .note-field textarea{
+    height:40px !important;
+    min-height:40px !important;
+    max-height:72px !important;
+    padding:7px 8px !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
+    resize:vertical !important;
+    box-sizing:border-box !important;
+  }
+
+  /* 儲存／清空不再佔滿整排，縮成第三格內的兩個小按鈕 */
+  #entryCard .formgrid > .form-actions{
+    grid-column:auto !important;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+    align-self:end !important;
+    min-width:0 !important;
+  }
+  #entryCard .form-actions #saveBtn,
+  #entryCard .form-actions #cancelEditBtn{
+    width:100% !important;
+    min-width:0 !important;
+    height:40px !important;
+    min-height:40px !important;
+    padding:4px 3px !important;
+    font-size:12px !important;
+    line-height:1.1 !important;
+    border-radius:9px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -7902,7 +7982,7 @@ html[data-theme="light"] .performance-table-card .table-analyst-btn:hover{
         <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
         <div class="main-admin-form-only"><label>出場日期</label><input id="exitDate" type="date"></div>
         <div><label>出場價格</label><input id="exitPrice" type="number" step="0.01"></div>
-        <div style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
+        <div class="note-field" style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
     </div>
@@ -8190,11 +8270,30 @@ function currentTaipeiHHMM(){
     timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit',hour12:false
   });
 }
+function formatDateSlash(value){
+  const text=String(value??'').trim();
+  if(!text)return '—';
+  if(text==='—'||text==='尚未更新')return text;
+  const m=text.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if(!m)return text;
+  return `${m[1]}/${String(m[2]).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;
+}
+function formatDateTimeSlash(value){
+  const text=String(value??'').trim();
+  if(!text)return '—';
+  if(text==='—'||text==='尚未更新')return text;
+  const m=text.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(.*)$/);
+  if(!m)return text;
+  const date=`${m[1]}/${String(m[2]).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;
+  const suffix=String(m[4]||'').replace(/^\s*,?\s*/,' ').trim();
+  return suffix?`${date} ${suffix}`:date;
+}
 function formatDateWithTime(dateValue,timeValue){
   const d=String(dateValue||'').trim();
   const tm=normalizeHHMM(timeValue);
   if(!d)return tm||'—';
-  return tm?`${d} ${tm}`:d;
+  const formatted=formatDateSlash(d);
+  return tm?`${formatted} ${tm}`:formatted;
 }
 function tradeEntryDateTime(tr){
   return formatDateWithTime(tr?.entryDate,tr?.entryTime);
@@ -8229,7 +8328,7 @@ function priceTrendBadge(tr){
   const cls=up?'up':'down';
   const diffPct=previous>0?diff/previous*100:0;
   const sign=diffPct>0?'+':'';
-  const dateText=tr?.previousCloseDate?`（${esc(tr.previousCloseDate)}）`:'';
+  const dateText=tr?.previousCloseDate?`（${esc(formatDateSlash(tr.previousCloseDate))}）`:'';
   const title=`前一交易日收盤${dateText}：${fmt(previous)}｜${label} ${sign}${diffPct.toFixed(2)}%`;
   return `<span class="price-trend-badge ${cls}" title="${title}">${label}</span>`;
 }
@@ -8408,7 +8507,16 @@ function defaultActivityDate(dateText=today()){
   else if(weekday===0)date.setUTCDate(date.getUTCDate()-2);
   return date.toISOString().slice(0,10);
 }
-const nowText=()=>new Date().toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false});
+const nowText=()=>{
+  const parts=new Intl.DateTimeFormat('en-GB',{
+    timeZone:'Asia/Taipei',
+    year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',
+    hourCycle:'h23'
+  }).formatToParts(new Date());
+  const get=t=>parts.find(p=>p.type===t)?.value||'';
+  return `${get('year')}/${get('month')}/${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
+};
 
 $('#entryDate').value=today(); $('#fMonth').value=''; $('#fFrom').value=''; $('#fTo').value='';
 
@@ -8604,7 +8712,7 @@ async function fetchYahooQuotePagePrice(sym){
 }
 
 function shortMD(d){
-  return d ? String(d).slice(0,10) : '';
+  return d ? formatDateSlash(String(d).slice(0,10)) : '';
 }
 
 
@@ -9071,7 +9179,7 @@ function renderVisualAnalytics(){
     if(!datasets.length)return fail(`目前沒有${metricLabel}可顯示`);
     const opt=visualBaseOptions(false);
     opt.scales.y.ticks.callback=v=>v+'%';
-    visualAnalyticsChart=new Chart(canvas,{type:'line',data:{labels:eventDates,datasets},options:opt});
+    visualAnalyticsChart=new Chart(canvas,{type:'line',data:{labels:eventDates.map(d=>formatDateSlash(d)),datasets},options:opt});
     return;
   }
 
@@ -9359,8 +9467,7 @@ function currentRankConfig(){
 function copyDateOnly(value){
   const text=String(value||'').trim();
   if(!text)return '—';
-  const matched=text.match(/^\d{4}[-/]\d{2}[-/]\d{2}/);
-  return matched ? matched[0] : text.split(/[T\s]/)[0];
+  return formatDateSlash(text);
 }
 
 function buildRankCopyText(){
@@ -9391,7 +9498,7 @@ function getEntryRowsByDate(){
 function buildEntryCopyText(){
   const d=$('#entryQueryDate')?.value || defaultActivityDate();
   const rows=getEntryRowsByDate();
-  const lines=[`【${d} 分析師進場清單】`,''];
+  const lines=[`【${formatDateSlash(d)} 分析師進場清單】`,''];
 
   if(!rows.length){
     lines.push('今日無進場資料');
@@ -9426,7 +9533,7 @@ function exitStatusText(t){
 function buildExitCopyText(){
   const d=$('#exitQueryDate')?.value || defaultActivityDate();
   const rows=getExitRowsByDate();
-  const lines=[`【${d} 分析師出場清單】`,''];
+  const lines=[`【${formatDateSlash(d)} 分析師出場清單】`,''];
 
   if(!rows.length){
     lines.push('今日無出場資料');
@@ -9487,10 +9594,10 @@ function render(){
   const openN=allRows.filter(([,t])=>calc(t).open).length;
   let html='';
   rows.forEach(([id,t])=>{ const c=calc(t);
-    html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer" title="前往 Yahoo 個股資訊">${esc(t.symbol)} ${esc(t.stockName)}</a></td><td>${esc(t.entryDate)}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
+    html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer" title="前往 Yahoo 個股資訊">${esc(t.symbol)} ${esc(t.stockName)}</a></td><td>${esc(formatDateSlash(t.entryDate))}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span class="current-price-line"><span>${fmt(t.currentPrice||t.entryPrice)}</span>${priceTrendBadge(t)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
-</td><td>${esc(t.priceUpdatedAt||'—')}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(t.exitDate||'—')}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${canUpdatePrice(t)&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
+</td><td>${esc(formatDateTimeSlash(t.priceUpdatedAt||'—'))}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(formatDateSlash(t.exitDate||'—'))}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${canUpdatePrice(t)&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
   });
   $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
@@ -9692,10 +9799,10 @@ function renderAnalystTradesModal(name){
         <span class="analyst-trade-status open">持有中</span>
       </div>
       <div class="analyst-trade-grid">
-        <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
+        <span>進場日 <b>${esc(formatDateSlash(tr.entryDate||'—'))}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span>目前價 <span class="current-price-line"><b>${fmt(tr.currentPrice||tr.entryPrice)}</b>${priceTrendBadge(tr)}</span></span>
-        <span>更新時間 <b>${esc(tr.priceUpdatedAt||'—')}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
+        <span>更新時間 <b>${esc(formatDateTimeSlash(tr.priceUpdatedAt||'—'))}</b></span><span>來源 <b>${esc(tr.priceSource||'—')}</b></span>
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
       </div>
       ${adminActions}
@@ -9709,7 +9816,7 @@ function renderAnalystTradesModal(name){
         <span class="analyst-trade-status closed">已結算</span>
       </div>
       <div class="analyst-trade-grid">
-        <span>進場日 <b>${esc(tr.entryDate||'—')}</b></span>
+        <span>進場日 <b>${esc(formatDateSlash(tr.entryDate||'—'))}</b></span>
         <span>進場價 <b>${fmt(tr.entryPrice)}</b></span>
         <span>出場日 <b>${esc(formatExitDateTime(tr))}</b></span>
         <span>出場價 <b>${fmt(tr.exitPrice)}</b></span>
@@ -10342,9 +10449,10 @@ async function settleTrade(id){
   const exitPrice=Number(priceText);
   if(!(exitPrice>0))return alert('請輸入正確的出場價格');
 
-  const dateText=prompt('請輸入出場日期（YYYY-MM-DD）：', today());
-  if(dateText===null)return;
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(dateText))return alert('出場日期格式請使用 YYYY-MM-DD');
+  const dateInput=prompt('請輸入出場日期（YYYY/MM/DD）：', formatDateSlash(today()));
+  if(dateInput===null)return;
+  if(!/^\d{4}[\/-]\d{2}[\/-]\d{2}$/.test(dateInput))return alert('出場日期格式請使用 YYYY/MM/DD');
+  const dateText=dateInput.replaceAll('/','-');
 
   const entryPrice=Number(t.entryPrice)||0;
   const realized=(exitPrice-entryPrice)*sellShares;

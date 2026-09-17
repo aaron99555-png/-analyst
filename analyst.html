@@ -8181,6 +8181,241 @@ html[data-theme="light"] .performance-table-card #tbody .closed-row{
   }
 }
 
+
+/* v222：新增／修改交易整合到「分析師目前持股狀況」視窗 */
+.entry-top-zone{
+  display:none !important;
+}
+#analystTradesModal #entryCard{
+  display:block;
+  width:100% !important;
+  margin:14px 0 0 !important;
+  padding:14px !important;
+  border:1px solid var(--line) !important;
+  box-shadow:none !important;
+  position:static !important;
+  z-index:auto !important;
+}
+#analystTradesModal #entryCard.analyst-modal-entry-hidden{
+  display:none !important;
+}
+#analystTradesModal #entryCard .entry-card-head-actions{
+  display:none !important;
+}
+#analystTradesModal #entryCard .entry-card-title-wrap .status{
+  display:none !important;
+}
+#analystTradesModal .analyst-trade-admin-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+#analystTradesModal .modal-edit-btn{
+  min-width:64px;
+}
+@media(max-width:700px){
+  #analystTradesModal #entryCard{
+    padding:11px !important;
+    margin-top:10px !important;
+    border-radius:14px !important;
+  }
+  #analystTradesModal .analyst-trade-admin-actions{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px !important;
+  }
+  #analystTradesModal .closed .analyst-trade-admin-actions{
+    grid-template-columns:1fr !important;
+  }
+  #analystTradesModal .analyst-trade-admin-actions button{
+    width:100% !important;
+    min-width:0 !important;
+  }
+}
+
+
+/* v223：管理工具預設收合；登入／離開管理者移到一鍵更新旁 */
+.admin-main-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:8px;
+  width:100%;
+}
+.admin-more-wrap{
+  position:relative;
+}
+.admin-more-btn{
+  white-space:nowrap;
+}
+.admin-more-menu{
+  position:absolute;
+  top:calc(100% + 7px);
+  right:0;
+  z-index:1100;
+  min-width:170px;
+  padding:7px;
+  display:grid;
+  gap:6px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.16);
+}
+.admin-more-menu.hidden{
+  display:none !important;
+}
+.admin-more-menu button{
+  width:100%;
+  min-width:0;
+  text-align:left;
+  justify-content:flex-start;
+}
+@media(max-width:700px){
+  .admin-main-toolbar{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .admin-main-toolbar > button,
+  .admin-main-toolbar > .admin-more-wrap,
+  .admin-main-toolbar .admin-more-btn{
+    width:100% !important;
+    min-width:0 !important;
+  }
+  .admin-more-menu{
+    right:0;
+    left:auto;
+    min-width:min(220px,80vw);
+  }
+}
+
+
+/* v224：分析師總績效表－最佳化欄寬、必要時換行、桌機可手動拖曳欄寬 */
+.performance-table-card .table-wrap{
+  overflow:auto !important;
+  max-width:100%;
+}
+.performance-table-card table{
+  width:100%;
+  min-width:1420px;
+  table-layout:fixed !important;
+}
+.performance-table-card th,
+.performance-table-card td{
+  box-sizing:border-box;
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  vertical-align:middle;
+  line-height:1.3;
+  padding:8px 7px !important;
+}
+.performance-table-card th{
+  position:relative;
+  user-select:none;
+}
+.performance-table-card th .col-resizer{
+  position:absolute;
+  top:0;
+  right:-3px;
+  width:7px;
+  height:100%;
+  cursor:col-resize;
+  z-index:8;
+  touch-action:none;
+}
+.performance-table-card th .col-resizer::after{
+  content:"";
+  position:absolute;
+  top:18%;
+  bottom:18%;
+  left:3px;
+  width:1px;
+  background:var(--line);
+  opacity:.8;
+}
+body.table-col-resizing{
+  cursor:col-resize !important;
+  user-select:none !important;
+}
+
+/* 預設欄寬：兼顧閱讀與整體寬度 */
+.performance-table-card th:nth-child(1){width:138px;} /* 分析師 */
+.performance-table-card th:nth-child(2){width:112px;} /* 股票 */
+.performance-table-card th:nth-child(3){width:92px;}  /* 入場日期 */
+.performance-table-card th:nth-child(4){width:82px;}  /* 進場價 */
+.performance-table-card th:nth-child(5){width:82px;}  /* 目前價 */
+.performance-table-card th:nth-child(6){width:108px;} /* 更新日期 */
+.performance-table-card th:nth-child(7){width:72px;}  /* 股數 */
+.performance-table-card th:nth-child(8){width:72px;}  /* 績效 */
+.performance-table-card th:nth-child(9){width:96px;}  /* 目前損益 */
+.performance-table-card th:nth-child(10){width:76px;} /* 停損 */
+.performance-table-card th:nth-child(11){width:76px;} /* 停利 */
+.performance-table-card th:nth-child(12){width:92px;} /* 出場日期 */
+.performance-table-card th:nth-child(13){width:78px;} /* 出場價 */
+.performance-table-card th:nth-child(14){width:100px;}/* 已實現 */
+.performance-table-card th:nth-child(15){width:72px;} /* 狀態 */
+.performance-table-card th:nth-child(16){width:150px;}/* 備註 */
+.performance-table-card th:nth-child(17){width:112px;}/* 操作 */
+
+.performance-table-card td:nth-child(3),
+.performance-table-card td:nth-child(4),
+.performance-table-card td:nth-child(5),
+.performance-table-card td:nth-child(6),
+.performance-table-card td:nth-child(7),
+.performance-table-card td:nth-child(8),
+.performance-table-card td:nth-child(9),
+.performance-table-card td:nth-child(10),
+.performance-table-card td:nth-child(11),
+.performance-table-card td:nth-child(12),
+.performance-table-card td:nth-child(13),
+.performance-table-card td:nth-child(14),
+.performance-table-card td:nth-child(15){
+  text-align:center;
+}
+
+/* 分析師與股票欄可自然換行，但不要被壓成逐字直排 */
+.performance-table-card td:nth-child(1),
+.performance-table-card td:nth-child(2){
+  word-break:normal;
+  overflow-wrap:anywhere;
+}
+
+/* 備註允許較完整換行 */
+.performance-table-card td:nth-child(16){
+  text-align:left;
+  white-space:normal !important;
+  min-width:90px;
+}
+
+/* 操作按鈕在窄欄時自動換列 */
+.performance-table-card td:nth-child(17){
+  white-space:normal !important;
+}
+.performance-table-card td:nth-child(17) button{
+  max-width:100%;
+  white-space:normal !important;
+  line-height:1.15;
+}
+
+/* 手機維持橫向滑動，不強塞進螢幕造成重疊 */
+@media(max-width:700px){
+  .performance-table-card table{
+    min-width:1180px;
+  }
+  .performance-table-card th,
+  .performance-table-card td{
+    padding:6px 5px !important;
+    font-size:11px !important;
+  }
+  .performance-table-card th .col-resizer{
+    display:none;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8212,18 +8447,24 @@ html[data-theme="light"] .performance-table-card #tbody .closed-row{
     <div class="actions">
       <span id="adminRoleBadge" class="admin-role-badge hidden">一般模式</span>
       <div class="price-update-wrap">
-        <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
-<div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
-  <button id="toggleTuanBtn" class="ghost" type="button">團團公開顯示</button>
-  <button id="exportDataBtn" class="ghost">匯出資料</button>
-  <button id="importDataBtn" class="ghost">匯入資料</button>
-  <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
-</div>
+        <div class="admin-main-toolbar">
+          <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
+          <button id="adminBtn" class="primary">管理者登入</button>
+          <button id="logoutBtn" class="hidden">離開管理者</button>
+
+          <div class="admin-more-wrap admin-only main-admin-only hidden" id="adminDataTools">
+            <button id="adminMoreBtn" class="ghost admin-more-btn" type="button" aria-expanded="false">管理工具 ▾</button>
+            <div id="adminMoreMenu" class="admin-more-menu hidden">
+              <button id="toggleTuanBtn" class="ghost" type="button">團團公開顯示</button>
+              <button id="exportDataBtn" class="ghost" type="button">匯出資料</button>
+              <button id="importDataBtn" class="ghost" type="button">匯入資料</button>
+            </div>
+            <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
+          </div>
+        </div>
 
         <div class="price-note"><b>上市：TWSE 官方｜上櫃：TPEx 官方</b>｜官方來源失敗才使用 Yahoo Finance 備援；仍失敗則手動輸入｜<b>相同股票代號會同步更新</b>｜績效與正式結算以已完成收盤價為準</div>
       </div>
-<button id="adminBtn" class="primary">管理者登入</button>
-      <button id="logoutBtn" class="hidden">離開管理者</button>
     </div>
   </div>
 
@@ -8253,7 +8494,7 @@ html[data-theme="light"] .performance-table-card #tbody .closed-row{
 </div>
 <div id="entryCardBody" class="entry-card-body">
       <div class="formgrid">
-        <div><label>分析師</label><select id="analyst"><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>股市期皇后-莊佳螢</option><option>團團</option><option>運達黃培碩</option><option>蔡總蔡明彰</option></select></div>
+        <div><label>分析師</label><select id="analyst" required><option value="" selected disabled>請選擇分析師</option><option>投資總舖師王榮旭</option><option>E神張貽程</option><option>金玉峰雷老闆</option><option>漁夫林睿閎</option><option>艾綸劉育綸</option><option>運達徐紹軒</option><option>阮姨阮慧慈</option><option>郭哲榮投資長</option><option>股市期皇后-莊佳螢</option><option>團團</option><option>運達黃培碩</option><option>蔡總蔡明彰</option></select></div>
         <div><label>股票代號</label><input id="symbol" maxlength="8" placeholder="2330"></div>
         <div><label>股票名稱</label><input id="stockName" placeholder="台積電"></div>
         <div><label>入場日期</label><input id="entryDate" type="date"></div>
@@ -9037,13 +9278,12 @@ function renderTodayExits(){
       </div>
       <div class="today-entry-price-grid exit-grid">
         <div class="today-info-box">
+          <label>進場價</label>
+          <b>${fmt(tr.entryPrice)}</b>
+        </div>
+        <div class="today-info-box">
           <label>出場價</label>
           <b>${fmt(tr.exitPrice)}</b>
-        </div>
-        <div class="today-info-box current">
-          <label>目前價</label>
-          <div class="current-price-line"><b>${fmt(tr.currentPrice||tr.exitPrice||tr.entryPrice)}</b>${priceTrendBadge(tr)}</div>
-          ${todayPriceDelta(tr,tr.entryPrice)}
         </div>
       </div>
       <div class="today-entry-actions">
@@ -10044,8 +10284,32 @@ function tradeIdFromObject(target){
   return candidates.length===1?candidates[0][0]:'';
 }
 
+function ensureEntryCardInAnalystModal(){
+  const card=$('#entryCard');
+  const modalCard=$('#analystTradesModal .analyst-trades-modal-card');
+  if(!card||!modalCard)return null;
+  if(card.parentElement!==modalCard)modalCard.appendChild(card);
+  card.classList.add('analyst-modal-entry-card');
+  return card;
+}
+
+function hideAnalystTradeForm(){
+  const card=$('#entryCard');
+  if(card)card.classList.add('analyst-modal-entry-hidden');
+}
+
+function showAnalystTradeForm(){
+  const card=ensureEntryCardInAnalystModal();
+  if(!card)return;
+  card.classList.remove('hidden','analyst-modal-entry-hidden','entry-card-collapsed');
+  $('#entryCardBody')?.classList.remove('hidden');
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 function renderAnalystTradesModal(name){
   if(!visibleAnalystNames().includes(name))return;
+  ensureEntryCardInAnalystModal();
+  hideAnalystTradeForm();
   currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
   const body=$('#analystTradesBody');
@@ -10079,6 +10343,7 @@ function renderAnalystTradesModal(name){
     const tradeId=tradeIdFromObject(tr);
     const adminActions=isMainAdmin()&&tradeId?`
       <div class="analyst-trade-admin-actions">
+        <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
         <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新目前價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
@@ -10099,7 +10364,13 @@ function renderAnalystTradesModal(name){
     </div>`;
   }).join(''):'<div class="analyst-trade-empty">目前沒有持有中的股票</div>';
 
-  const closedHtml=closedRows.length?closedRows.map(({tr,c})=>`
+  const closedHtml=closedRows.length?closedRows.map(({tr,c})=>{
+    const tradeId=tradeIdFromObject(tr);
+    const adminActions=isMainAdmin()&&tradeId?`
+      <div class="analyst-trade-admin-actions">
+        <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
+      </div>`:'';
+    return `
     <div class="analyst-trade-item closed">
       <div class="analyst-trade-top">
         <a class="stock-link analyst-trade-stock" href="${yahooStockUrl(tr.symbol)}" target="_blank" rel="noopener noreferrer">${stockLabel(tr)}</a>
@@ -10113,8 +10384,10 @@ function renderAnalystTradesModal(name){
         <span>績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b></span>
         <span>已實現 <b class="${c.realized>=0?'pos':'neg'}">${fmtMoney(c.realized)}</b></span>
       </div>
+      ${adminActions}
     </div>
-  `).join(''):'<div class="analyst-trade-empty">目前沒有已結算股票</div>';
+  `;
+  }).join(''):'<div class="analyst-trade-empty">目前沒有已結算股票</div>';
 
   body.innerHTML=`
     <section class="analyst-trade-section">
@@ -10132,6 +10405,7 @@ function renderAnalystTradesModal(name){
 }
 
 function closeAnalystTradesModal(){
+  hideAnalystTradeForm();
   $('#analystTradesModal')?.classList.remove('show');
   document.body.classList.remove('analyst-modal-open');
 }
@@ -10150,13 +10424,13 @@ $('#addTradeFromAnalystModalBtn')?.addEventListener('click',()=>{
     analystEl.value=name;
   }
 
-  const card=$('#entryCard');
-  card?.classList.remove('hidden');
-  closeAnalystTradesModal();
+  showAnalystTradeForm();
+
+  // 已從分析師視窗進入，分析師固定為目前選取者，避免新增到錯誤分析師。
+  if(analystEl)analystEl.disabled=true;
 
   requestAnimationFrame(()=>{
-    card?.scrollIntoView({behavior:'smooth',block:'start'});
-    setTimeout(()=>$('#symbol')?.focus(),320);
+    setTimeout(()=>$('#symbol')?.focus(),180);
   });
 });
 
@@ -10663,6 +10937,11 @@ $('#saveBtn').onclick=async()=>{
     note:$('#note').value.trim(),
     updatedAt:nowText()
   };
+  if(!data.analyst){
+    alert('請先選擇分析師，才能儲存');
+    $('#analyst')?.focus();
+    return;
+  }
   if(!data.symbol||!data.entryDate||!data.entryPrice)return alert('請至少填寫股票代號、入場日期與進場價');
   if(editingId){
     if(!isMainAdmin())return;
@@ -10685,9 +10964,25 @@ $('#saveBtn').onclick=async()=>{
       await update(ref(db,`analystPerformance/trades/${r.key}`),{exitTime:savedTrade.exitTime});
     }
   }
+  const modalAnalyst=currentAnalystModalName;
   clearForm();
+  if($('#analystTradesModal')?.classList.contains('show')){
+    hideAnalystTradeForm();
+    if(modalAnalyst)renderAnalystTradesModal(modalAnalyst);
+  }
 };
-function startEdit(id){const t=trades[id]; if(!t||!isMainAdmin())return; editingId=id; $('#formTitle').textContent='修改交易'; ['analyst','symbol','stockName','entryDate','entryPrice','shares','stopLoss','takeProfit','exitDate','exitPrice','note'].forEach(k=>$('#'+k).value=t[k]??''); $('#entryCard').scrollIntoView({behavior:'smooth'})}
+function startEdit(id){
+  const tr=trades[id];
+  if(!tr||!isMainAdmin())return;
+  editingId=id;
+  currentAnalystModalName=tr.analyst||currentAnalystModalName||'';
+  $('#formTitle').textContent=`修改交易｜${tr.symbol||''} ${tr.stockName||''}`.trim();
+  ['analyst','symbol','stockName','entryDate','entryPrice','shares','stopLoss','takeProfit','exitDate','exitPrice','note']
+    .forEach(k=>{const el=$('#'+k);if(el)el.value=tr[k]??'';});
+  const analystEl=$('#analyst');
+  if(analystEl)analystEl.disabled=true;
+  showAnalystTradeForm();
+}
 function clearForm(){
   editingId=null;
   $('#formTitle').textContent=isAdmin2()?'新增團團交易':'新增交易';
@@ -10695,13 +10990,22 @@ function clearForm(){
   const sn=$('#stockName'); if(sn){delete sn.dataset.manualEdited;sn.classList.remove('stock-name-found','stock-name-missing');}
   $('#shares').value=1000;
   $('#entryDate').value=today();
+  if(!isAdmin2()){
+    $('#analyst').value='';
+    $('#analyst').disabled=false;
+  }
   if(isAdmin2()){
     $('#analyst').value=isAdmin2()?'團團':'';
     $('#analyst').disabled=true;
   }
 
 }
-$('#cancelEditBtn').onclick=clearForm;
+$('#cancelEditBtn').onclick=()=>{
+  clearForm();
+  if($('#analystTradesModal')?.classList.contains('show')){
+    hideAnalystTradeForm();
+  }
+};
 async function deleteTrade(id){
   if(!isMainAdmin())return;
   const tr=trades[id];
@@ -12570,15 +12874,20 @@ document.addEventListener('click',e=>{
 });
 
 document.addEventListener('click',async e=>{
+  const editBtn=e.target?.closest?.('[data-modal-edit]');
   const priceBtn=e.target?.closest?.('[data-modal-price]');
   const settleBtn=e.target?.closest?.('[data-modal-settle]');
-  if(!priceBtn && !settleBtn)return;
+  if(!editBtn && !priceBtn && !settleBtn)return;
 
   e.preventDefault();
   e.stopPropagation();
 
   try{
-    if(priceBtn){
+    if(editBtn){
+      const id=editBtn.dataset.modalEdit;
+      if(!isMainAdmin())return;
+      startEdit(id);
+    }else if(priceBtn){
       const id=priceBtn.dataset.modalPrice;
       const tr=trades[id];
       if(!canUpdatePrice(tr)){
@@ -12874,6 +13183,95 @@ document.addEventListener('click',e=>{
 setTimeout(initGoogleFinanceSettings,0);
 
 applyEntryCardState();
+
+// v223：管理工具預設收起；點擊才顯示團團公開、匯入、匯出。
+function closeAdminMoreMenu(){
+  const menu=$('#adminMoreMenu');
+  const btn=$('#adminMoreBtn');
+  menu?.classList.add('hidden');
+  btn?.setAttribute('aria-expanded','false');
+  if(btn)btn.textContent='管理工具 ▾';
+}
+
+$('#adminMoreBtn')?.addEventListener('click',e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  const menu=$('#adminMoreMenu');
+  const btn=$('#adminMoreBtn');
+  if(!menu||!btn)return;
+  const willOpen=menu.classList.contains('hidden');
+  menu.classList.toggle('hidden',!willOpen);
+  btn.setAttribute('aria-expanded',willOpen?'true':'false');
+  btn.textContent=willOpen?'管理工具 ▴':'管理工具 ▾';
+});
+
+document.addEventListener('click',e=>{
+  if(!e.target?.closest?.('#adminDataTools'))closeAdminMoreMenu();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeAdminMoreMenu();
+});
+
+
+// v224：分析師總績效表欄寬可拖曳調整，並記住本機設定。
+function initPerformanceTableColumnResize(){
+  const table=document.querySelector('.performance-table-card table');
+  if(!table)return;
+  const headers=[...table.querySelectorAll('thead th')];
+  if(!headers.length)return;
+
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem('performanceTableColumnWidths')||'{}')||{};}catch(e){}
+
+  headers.forEach((th,index)=>{
+    const key=String(index);
+    if(Number(saved[key])>=55)th.style.width=`${Number(saved[key])}px`;
+
+    if(th.querySelector('.col-resizer'))return;
+    const handle=document.createElement('span');
+    handle.className='col-resizer';
+    handle.title='拖曳調整欄寬';
+    th.appendChild(handle);
+
+    handle.addEventListener('pointerdown',e=>{
+      if(window.innerWidth<=700)return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const startX=e.clientX;
+      const startWidth=th.getBoundingClientRect().width;
+      document.body.classList.add('table-col-resizing');
+      handle.setPointerCapture?.(e.pointerId);
+
+      const move=ev=>{
+        const width=Math.max(55,Math.min(360,startWidth+(ev.clientX-startX)));
+        th.style.width=`${Math.round(width)}px`;
+      };
+      const up=ev=>{
+        handle.removeEventListener('pointermove',move);
+        handle.removeEventListener('pointerup',up);
+        handle.removeEventListener('pointercancel',up);
+        document.body.classList.remove('table-col-resizing');
+        const width=Math.round(th.getBoundingClientRect().width);
+        try{
+          const current=JSON.parse(localStorage.getItem('performanceTableColumnWidths')||'{}')||{};
+          current[key]=width;
+          localStorage.setItem('performanceTableColumnWidths',JSON.stringify(current));
+        }catch(e){}
+        try{handle.releasePointerCapture?.(ev.pointerId);}catch(e){}
+      };
+
+      handle.addEventListener('pointermove',move);
+      handle.addEventListener('pointerup',up);
+      handle.addEventListener('pointercancel',up);
+    });
+  });
+}
+
+window.addEventListener('DOMContentLoaded',()=>setTimeout(initPerformanceTableColumnResize,0));
+setTimeout(initPerformanceTableColumnResize,200);
+
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>

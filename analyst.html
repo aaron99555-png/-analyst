@@ -8019,6 +8019,104 @@ html[data-theme="light"] #toggleTuanBtn:disabled{
   cursor:wait !important;
 }
 
+
+/* v216：分析師快速選單移至頁面最上方 */
+.analyst-quick-top-card{
+  margin:10px 0 14px !important;
+  padding:12px 14px !important;
+}
+.analyst-quick-top-card .analyst-quick-inline{
+  margin:0 !important;
+  padding:0 !important;
+  border-top:0 !important;
+}
+.analyst-quick-top-card .analyst-quick-inline-head{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:baseline !important;
+  gap:10px !important;
+  margin-bottom:9px !important;
+}
+.analyst-quick-top-card .analyst-quick-inline-head h3{
+  margin:0 !important;
+  font-size:14px !important;
+}
+.analyst-quick-top-card .analyst-quick-inline-head span{
+  font-size:11px !important;
+}
+.analyst-quick-top-card .analyst-quick-menu{
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:7px !important;
+  width:100% !important;
+  margin:0 !important;
+  overflow:visible !important;
+}
+.analyst-quick-top-card .analyst-quick-menu-btn{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:42px !important;
+  height:auto !important;
+  padding:6px 9px !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  column-gap:6px !important;
+  border-radius:10px !important;
+}
+.analyst-quick-top-card .analyst-quick-name{
+  min-width:0 !important;
+  font-size:11px !important;
+  line-height:1.15 !important;
+  font-weight:850 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+  text-align:left !important;
+}
+.analyst-quick-top-card .analyst-quick-count{
+  justify-self:end !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:34px !important;
+  height:20px !important;
+  padding:0 6px !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+  border-radius:999px !important;
+}
+@media (max-width:1000px) and (min-width:701px){
+  .analyst-quick-top-card .analyst-quick-menu{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  }
+}
+@media (max-width:700px){
+  .analyst-quick-top-card{
+    margin:8px 0 10px !important;
+    padding:10px !important;
+  }
+  .analyst-quick-top-card .analyst-quick-inline-head{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:2px !important;
+    margin-bottom:8px !important;
+  }
+  .analyst-quick-top-card .analyst-quick-menu{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+  .analyst-quick-top-card .analyst-quick-menu-btn{
+    min-height:42px !important;
+    padding:6px 7px !important;
+    column-gap:5px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8066,6 +8164,17 @@ html[data-theme="light"] #toggleTuanBtn:disabled{
   </div>
 
   
+
+  <section class="card analyst-quick-top-card">
+    <div class="analyst-quick-inline">
+      <div class="analyst-quick-inline-head">
+        <h3>分析師快速選單</h3>
+        <span>點選分析師即可快速查看目前持股</span>
+      </div>
+      <div class="analyst-quick-filter analyst-quick-menu" id="analystQuickFilter"></div>
+    </div>
+  </section>
+
 <div class="entry-top-zone">
 <section class="card span12 admin-only hidden" id="entryCard">
       <div class="section-title entry-card-head">
@@ -8120,13 +8229,6 @@ html[data-theme="light"] #toggleTuanBtn:disabled{
         <div><label>狀態</label><select id="fStatus"><option value="">全部</option><option value="open">持有中</option><option value="closed">已結算</option></select></div>
         <div><label>股票代號 / 名稱</label><input id="fKeyword" placeholder="例如 2330 / 台積電"></div>
         <div class="form-actions"><button id="clearFilterBtn" class="ghost">清除篩選</button></div>
-      </div>
-      <div class="analyst-quick-inline">
-        <div class="analyst-quick-inline-head">
-          <h3>分析師快速選單</h3>
-          <span>點選即可查看目前持股</span>
-        </div>
-        <div class="analyst-quick-filter analyst-quick-menu" id="analystQuickFilter"></div>
       </div>
     </section>
 
@@ -11485,7 +11587,10 @@ function openBulkFailedPriceModal(items){
               item.symbol,
               item.price,
               '盤後行情抓取失敗－批次手動輸入',
-              {onlyTuan:isAdmin2()}
+              {
+                onlyTuan:isAdmin2(),
+                targetIds:item.targetIds||[]
+              }
             );
             manualSuccess++;
           }catch(error){
@@ -11606,63 +11711,146 @@ async function offerStopLossSettlement(tradeIds,currentPrice){
   return breached.length;
 }
 
-async function syncSameStockCurrentPrice(symbol,price,source,{onlyTuan=false,previousClose=null,previousCloseDate=''}={}){
+async function updateFirebaseWithRetry(targetRef,patch,maxAttempts=2){
+  let lastError=null;
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    try{
+      await update(targetRef,patch);
+      return true;
+    }catch(err){
+      lastError=err;
+      if(attempt<maxAttempts){
+        await new Promise(resolve=>setTimeout(resolve,280*attempt));
+      }
+    }
+  }
+  throw lastError||new Error('Firebase 寫入失敗');
+}
+
+async function syncSameStockCurrentPrice(
+  symbol,
+  price,
+  source,
+  {
+    onlyTuan=false,
+    previousClose=null,
+    previousCloseDate='',
+    targetIds=null
+  }={}
+){
   const normalized=String(symbol||'').trim().toUpperCase();
   const numericPrice=Number(price);
   const numericPrevious=Number(previousClose);
   const hasFreshPrevious=Number.isFinite(numericPrevious)&&numericPrevious>0;
+
   if(!normalized)throw new Error('股票代號不存在');
   if(!Number.isFinite(numericPrice)||numericPrice<=0)throw new Error('價格格式異常');
 
   const updatedAt=nowText();
   const priceSource=source||'手動確認';
 
-  const sameStockIds=Object.entries(trades||{})
-    .filter(([tid,tr])=>{
-      if(!tr)return false;
-      return String(tr.symbol||'').trim().toUpperCase()===normalized
-        && calc(tr).open
-        && (!onlyTuan || tr.analyst==='團團');
-    })
-    .map(([tid])=>tid);
+  // v216：若一鍵更新在抓價前已鎖定交易 ID，寫入時優先直接使用該批 ID，
+  // 避免抓價完成後又重新掃描資料，因 Firebase 即時同步／畫面重繪造成「抓到價但找不到可更新資料」。
+  let sameStockIds=[];
+  if(Array.isArray(targetIds) && targetIds.length){
+    sameStockIds=[...new Set(targetIds.map(String))]
+      .filter(tid=>{
+        const tr=trades?.[tid];
+        if(!tr)return false;
+        if(String(tr.symbol||'').trim().toUpperCase()!==normalized)return false;
+        if(!calc(tr).open)return false;
+        if(onlyTuan && tr.analyst!=='團團')return false;
+        return true;
+      });
+  }
 
-  if(!sameStockIds.length)throw new Error('找不到可更新的持有中資料');
+  // targetIds 若因跨裝置同步變動而全部失效，再用原邏輯補抓一次。
+  if(!sameStockIds.length){
+    sameStockIds=Object.entries(trades||{})
+      .filter(([tid,tr])=>{
+        if(!tr)return false;
+        return String(tr.symbol||'').trim().toUpperCase()===normalized
+          && calc(tr).open
+          && (!onlyTuan || tr.analyst==='團團');
+      })
+      .map(([tid])=>tid);
+  }
 
-  // 同一股票改用「一次性多路徑更新」寫入 Firebase，
-  // 避免逐筆 update 其中一筆卡住，造成看起來沒有更新。
-  const patch={};
+  if(!sameStockIds.length){
+    throw new Error('已取得股價，但找不到仍可更新的持有中資料');
+  }
+
+  const commonPatch={
+    currentPrice:numericPrice,
+    priceUpdatedAt:updatedAt,
+    priceSource,
+    previousClose:hasFreshPrevious?numericPrevious:null,
+    previousCloseDate:hasFreshPrevious?(previousCloseDate||''):null
+  };
+
+  // 先嘗試一次性多路徑更新。
+  const bulkPatch={};
   sameStockIds.forEach(tid=>{
-    patch[`${tid}/currentPrice`]=numericPrice;
-    patch[`${tid}/priceUpdatedAt`]=updatedAt;
-    patch[`${tid}/priceSource`]=priceSource;
-    // 只有網路行情有帶「前一交易日收盤」時才顯示漲跌標籤；
-    // 手動輸入會清除舊比較基準，避免拿過期昨收誤判。
-    patch[`${tid}/previousClose`]=hasFreshPrevious?numericPrevious:null;
-    patch[`${tid}/previousCloseDate`]=hasFreshPrevious?(previousCloseDate||''):null;
+    Object.entries(commonPatch).forEach(([key,value])=>{
+      bulkPatch[`${tid}/${key}`]=value;
+    });
   });
 
-  await update(ref(db,'analystPerformance/trades'),patch);
+  let successIds=[];
+  let failedWrites=[];
 
-  // Firebase 寫入成功後，立即同步本機資料並重畫。
-  sameStockIds.forEach(tid=>{
+  try{
+    await updateFirebaseWithRetry(ref(db,'analystPerformance/trades'),bulkPatch,2);
+    successIds=[...sameStockIds];
+  }catch(bulkError){
+    console.warn('同股批次寫入失敗，改採逐筆寫入',normalized,bulkError);
+
+    // v216：批次寫入失敗時自動降級逐筆寫入。
+    // 這樣即使某一筆資料有異常，也不會讓同股票其他分析師全部更新失敗。
+    for(const tid of sameStockIds){
+      try{
+        await updateFirebaseWithRetry(
+          ref(db,`analystPerformance/trades/${tid}`),
+          commonPatch,
+          2
+        );
+        successIds.push(tid);
+      }catch(err){
+        failedWrites.push({
+          id:tid,
+          analyst:trades?.[tid]?.analyst||'',
+          reason:String(err?.message||err||'Firebase 寫入失敗')
+        });
+      }
+    }
+  }
+
+  if(!successIds.length){
+    const detail=failedWrites.length
+      ? failedWrites.map(x=>`${x.analyst||x.id}：${x.reason}`).join('；')
+      : 'Firebase 寫入失敗';
+    throw new Error(`已抓到 ${numericPrice}，但寫入失敗：${detail}`);
+  }
+
+  // 只有真正寫入成功的 ID 才同步本機。
+  successIds.forEach(tid=>{
     if(!trades[tid])return;
     trades[tid]={
       ...trades[tid],
-      currentPrice:numericPrice,
-      priceUpdatedAt:updatedAt,
-      priceSource,
-      previousClose:hasFreshPrevious?numericPrevious:null,
-      previousCloseDate:hasFreshPrevious?(previousCloseDate||''):null
+      ...commonPatch
     };
   });
 
   clearTimeout(cloudRenderTimer);
   render();
 
-  const stopLossTriggered=await offerStopLossSettlement(sameStockIds,numericPrice);
+  const stopLossTriggered=await offerStopLossSettlement(successIds,numericPrice);
 
   return {
-    count:sameStockIds.length,
+    count:successIds.length,
+    attemptedCount:sameStockIds.length,
+    failedCount:failedWrites.length,
+    failedWrites,
     updatedAt,
     price:numericPrice,
     stopLossTriggered
@@ -11949,12 +12137,17 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
     const uniqueMap=new Map();
     openEntries.forEach(([id,tr])=>{
       const symbol=String(tr.symbol||'').trim().toUpperCase();
-      if(symbol && !uniqueMap.has(symbol)){
+      if(!symbol)return;
+
+      if(!uniqueMap.has(symbol)){
         uniqueMap.set(symbol,{
           id,
           symbol,
-          stockName:String(tr.stockName||'').trim()
+          stockName:String(tr.stockName||'').trim(),
+          targetIds:[id]
         });
+      }else{
+        uniqueMap.get(symbol).targetIds.push(id);
       }
     });
 
@@ -11996,24 +12189,45 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
     let manualSuccess=0;
     let skipped=0;
     let failed=0;
+    const writeIssues=[];
 
     // 先寫入網路抓價成功的股票。
-    for(const item of results.filter(x=>x?.ok)){
+    const fetchedOk=results.filter(x=>x?.ok);
+    for(let i=0;i<fetchedOk.length;i++){
+      const item=fetchedOk[i];
       try{
-        btn.textContent=`寫入 ${success+1}/${results.filter(x=>x?.ok).length}`;
-        await syncSameStockCurrentPrice(
+        btn.textContent=`寫入 ${i+1}/${fetchedOk.length}`;
+        const writeResult=await syncSameStockCurrentPrice(
           item.symbol,
           item.price,
           item.source||'網路最新行情',
           {
             onlyTuan:isAdmin2(),
             previousClose:item.reference,
-            previousCloseDate:item.referenceDate||''
+            previousCloseDate:item.referenceDate||'',
+            targetIds:item.targetIds||[]
           }
         );
+
         success++;
+
+        if(writeResult.failedCount>0){
+          writeIssues.push({
+            symbol:item.symbol,
+            stockName:item.stockName||'',
+            price:item.price,
+            reason:`部分寫入失敗 ${writeResult.failedCount}/${writeResult.attemptedCount} 筆：`+
+              writeResult.failedWrites.map(x=>`${x.analyst||x.id} ${x.reason}`).join('；')
+          });
+        }
       }catch(err){
         failed++;
+        writeIssues.push({
+          symbol:item.symbol,
+          stockName:item.stockName||'',
+          price:item.price,
+          reason:String(err?.message||err||'寫入失敗')
+        });
         console.error('一鍵更新寫入失敗',item.symbol,err);
       }
     }
@@ -12043,13 +12257,21 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
         (failed?`｜失敗 ${failed} 檔`:'');
     }
 
+    const issueText=writeIssues.length
+      ? `\n\n⚠️ 已抓到股價但寫入異常：\n`+
+        writeIssues.map(x=>
+          `${x.symbol}${x.stockName?' '+x.stockName:''}｜抓到 ${fmt(x.price)}\n${x.reason}`
+        ).join('\n\n')
+      : '';
+
     alert(
       `✅ 一鍵更新完成\n\n`+
-      `盤後自動更新：${success} 檔\n`+
+      `網路抓價並更新：${success} 檔\n`+
       `手動更新：${manualSuccess} 檔\n`+
       `本次共更新：${updatedTotal} 檔`+
       (skipped?`\n取消／略過：${skipped} 檔`:'')+
-      (failed?`\n寫入失敗：${failed} 檔`:'')
+      (failed?`\n完全寫入失敗：${failed} 檔`:'')+
+      issueText
     );
 
   }catch(err){

@@ -8796,6 +8796,12 @@ const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 const tradesRef=ref(db,'analystPerformance/trades');
 const tuanPublicVisibilityRef=ref(db,'analystPerformance/settings/showTuanPublic');
+const firebaseConnectedRef=ref(db,'.info/connected');
+onValue(firebaseConnectedRef,snap=>{
+  const connected=snap.val()===true;
+  document.documentElement.dataset.firebaseConnected=connected?'true':'false';
+  console.log(connected?'Firebase Realtime Database 已連線':'Firebase Realtime Database 尚未連線');
+},err=>console.error('Firebase 連線狀態監測失敗：',err));
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
@@ -12278,10 +12284,8 @@ async function writeManualOrFetchedPrice(id,item){
     item.source||'手動確認',
     {
       onlyTuan:isAdmin2(),
-      targetIds:[id]
-      strictTargetIds:true,,
-      strictTargetIds:true
-    }
+      targetIds:[id],
+      strictTargetIds:true,}
   );
 }
 
@@ -12333,10 +12337,8 @@ async function manualCurrentPrice(id){
       isAdmin2()?'管理員2手動更新':'管理員1手動更新',
       {
         onlyTuan:isAdmin2(),
-        targetIds:[id]
-      strictTargetIds:true,,
-        strictTargetIds:true
-      }
+        targetIds:[id],
+        strictTargetIds:true,}
     );
 
     // syncSameStockCurrentPrice 已更新 Firebase + 本機資料，
@@ -12407,10 +12409,8 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
     '盤後行情抓取失敗－管理員手動輸入',
     {
       onlyTuan:isAdmin2(),
-      targetIds:[id]
-      strictTargetIds:true,,
-      strictTargetIds:true
-    }
+      targetIds:[id],
+      strictTargetIds:true,}
   );
 
   clearTimeout(cloudRenderTimer);
@@ -12477,10 +12477,8 @@ async function refreshOne(id){
         onlyTuan:isAdmin2(),
         previousClose:q.reference,
         previousCloseDate:q.referenceDate||'',
-        targetIds:[id]
-      strictTargetIds:true,,
-        strictTargetIds:true
-      }
+        targetIds:[id],
+        strictTargetIds:true,}
     );
 
     clearTimeout(cloudRenderTimer);
@@ -12571,9 +12569,7 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
           id,
           symbol,
           stockName:String(tr.stockName||'').trim(),
-          targetIds:[id]
-        
-      strictTargetIds:true,});
+          targetIds:[id]});
       }else{
         uniqueMap.get(symbol).targetIds.push(id);
       }

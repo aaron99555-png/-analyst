@@ -8117,6 +8117,70 @@ html[data-theme="light"] #toggleTuanBtn:disabled{
   }
 }
 
+
+/* v217：分析師總績效表－未結算與已結算分區 */
+.performance-table-card #tbody .performance-group-row td{
+  padding:8px 10px !important;
+  border-top:1px solid var(--line) !important;
+  border-bottom:1px solid var(--line) !important;
+}
+.performance-table-card .performance-group-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.01em;
+}
+.performance-table-card .performance-group-label b{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:48px;
+  padding:3px 9px;
+  border-radius:999px;
+  font-size:11px;
+}
+html[data-theme="light"] .performance-table-card .open-group td{
+  background:#eef5fb !important;
+}
+html[data-theme="light"] .performance-table-card .open-group .performance-group-label{
+  color:#315a78 !important;
+}
+html[data-theme="light"] .performance-table-card .open-group .performance-group-label b{
+  background:#dceaf5 !important;
+  color:#315a78 !important;
+}
+html[data-theme="light"] .performance-table-card .closed-group td{
+  background:#f1eee8 !important;
+}
+html[data-theme="light"] .performance-table-card .closed-group .performance-group-label{
+  color:#665f54 !important;
+}
+html[data-theme="light"] .performance-table-card .closed-group .performance-group-label b{
+  background:#e3ddd3 !important;
+  color:#5d574e !important;
+}
+
+/* 已結算資料稍微降低視覺權重，仍保持可讀 */
+html[data-theme="light"] .performance-table-card #tbody .closed-row{
+  background:#fbfaf7 !important;
+}
+
+@media(max-width:700px){
+  .performance-table-card #tbody .performance-group-row td{
+    padding:7px 8px !important;
+  }
+  .performance-table-card .performance-group-label{
+    font-size:12px !important;
+  }
+  .performance-table-card .performance-group-label b{
+    min-width:42px !important;
+    font-size:10px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8535,7 +8599,7 @@ function priceTrendBadge(tr){
   if(Math.abs(diff)<=epsilon)return '';
 
   const up=diff>0;
-  const label=up?'上漲📈':'下跌📉';
+  const label=up?'上漲':'下跌';
   const cls=up?'up':'down';
   const diffPct=previous>0?diff/previous*100:0;
   const sign=diffPct>0?'+':'';
@@ -9802,14 +9866,30 @@ function render(){
   const rows=performanceTableRows(allRows);
   $('#countText').textContent=`${rows.length} 筆`;
   const openN=allRows.filter(([,t])=>calc(t).open).length;
-  let html='';
-  rows.forEach(([id,t])=>{ const c=calc(t);
-    html+=`<tr><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer" title="前往 Yahoo 個股資訊">${esc(t.symbol)} ${esc(t.stockName)}</a></td><td>${esc(formatDateSlash(t.entryDate))}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
+
+  const rowHtml=([id,t])=>{
+    const c=calc(t);
+    return `<tr class="performance-data-row ${c.open?'open-row':'closed-row'}"><td><button class="table-analyst-btn" type="button" data-rank-analyst="${esc(t.analyst)}">${esc(t.analyst)}</button></td><td class="stock"><a class="stock-link" href="${yahooStockUrl(t.symbol)}" target="_blank" rel="noopener noreferrer" title="前往 Yahoo 個股資訊">${esc(t.symbol)} ${esc(t.stockName)}</a></td><td>${esc(formatDateSlash(t.entryDate))}</td><td>${fmt(t.entryPrice)}</td><td class="current-price-cell">
   <span class="current-price-line"><span>${fmt(t.currentPrice||t.entryPrice)}</span>${priceTrendBadge(t)}</span>
   ${isMainAdmin()?`<button class="mini manual-price-btn" data-manual-price="${id}" title="手動輸入目前價">✎</button>`:''}
 </td><td>${esc(formatDateTimeSlash(t.priceUpdatedAt||'—'))}</td><td>${fmt(t.shares)}</td><td class="${c.perf>=0?'pos':'neg'}"><b>${pct(c.perf)}</b></td><td class="${c.unreal>=0?'pos':'neg'}">${fmtMoney(c.unreal)}</td><td>${fmt(t.stopLoss)}</td><td>${fmt(t.takeProfit)}</td><td>${esc(formatDateSlash(t.exitDate||'—'))}</td><td>${t.exitPrice?fmt(t.exitPrice):'—'}</td><td class="${c.realized>=0?'pos':'neg'}">${t.exitPrice?fmtMoney(c.realized):'—'}</td><td><span class="pill ${c.open?'open':'closed'}">${c.open?'持有中':'已結算'}</span></td><td title="${esc(t.note||'')}">${esc((t.note||'').slice(0,18))}</td><td class="admin-col ${isAdmin?'':'hidden'}"><div class="row-actions">${canUpdatePrice(t)&&c.open?`<button class="mini" data-up="${id}">更新目前價</button>`:''}${canSettleTrade(t)&&c.open?`<button class="mini primary" data-settle="${id}">結算</button>`:''}${isMainAdmin()?`<button class="mini" data-edit="${id}">修改</button><button class="mini danger" data-del="${id}">刪除</button>`:''}</div></td></tr>`;
-  });
-  $('#tbody').innerHTML=html||`<tr><td colspan="18" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
+  };
+
+  const openRows=rows.filter(([,t])=>calc(t).open);
+  const closedRows=rows.filter(([,t])=>!calc(t).open);
+  let html='';
+
+  if(openRows.length){
+    html+=`<tr class="performance-group-row open-group"><td colspan="17"><div class="performance-group-label"><span>未結算／持有中</span><b>${openRows.length} 筆</b></div></td></tr>`;
+    html+=openRows.map(rowHtml).join('');
+  }
+
+  if(closedRows.length){
+    html+=`<tr class="performance-group-row closed-group"><td colspan="17"><div class="performance-group-label"><span>已結算</span><b>${closedRows.length} 筆</b></div></td></tr>`;
+    html+=closedRows.map(rowHtml).join('');
+  }
+
+  $('#tbody').innerHTML=html||`<tr><td colspan="17" class="muted" style="text-align:center;padding:28px">查無資料</td></tr>`;
   setMetric('#mOpen',openN,false);
   setMetric('#mClosed',allRows.length-openN,false);
   renderRank(); renderVisualAnalytics(); bindRows();

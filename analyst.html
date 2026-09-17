@@ -8416,6 +8416,22 @@ body.table-col-resizing{
   }
 }
 
+
+/* v225：新增／修改交易改成獨立浮動視窗 */
+#tradeFormModal{z-index:1400!important;background:rgba(0,0,0,.58)!important;backdrop-filter:blur(3px);padding:20px}
+#tradeFormModal .trade-form-modal-card{width:min(980px,calc(100vw - 40px))!important;max-width:980px!important;max-height:90vh!important;overflow:auto!important;padding:18px!important;border-radius:18px!important}
+.trade-form-modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.trade-form-modal-top h3{margin:0;font-size:18px}
+#tradeFormModalBody #entryCard{display:block!important;width:100%!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;position:static!important;background:transparent!important}
+#tradeFormModalBody #entryCard .entry-card-head{display:none!important}
+#tradeFormModalBody #entryCard .entry-card-body{display:block!important}
+body.trade-form-modal-open{overflow:hidden!important}
+#analystTradesModal #entryCard{display:none!important}
+@media(max-width:700px){
+  #tradeFormModal{padding:10px!important;align-items:flex-end!important}
+  #tradeFormModal .trade-form-modal-card{width:100%!important;max-width:none!important;max-height:92vh!important;padding:14px!important;border-radius:20px 20px 0 0!important}
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8665,6 +8681,16 @@ body.table-col-resizing{
   </div>
 </div>
 
+
+<div class="modal" id="tradeFormModal">
+  <div class="modal-card trade-form-modal-card">
+    <div class="trade-form-modal-top">
+      <h3 id="tradeFormModalTitle">新增交易</h3>
+      <button id="closeTradeFormModal" class="ghost" type="button">關閉</button>
+    </div>
+    <div id="tradeFormModalBody"></div>
+  </div>
+</div>
 
 <div class="modal" id="analystTradesModal">
   <div class="modal-card analyst-trades-modal-card">
@@ -10284,32 +10310,34 @@ function tradeIdFromObject(target){
   return candidates.length===1?candidates[0][0]:'';
 }
 
-function ensureEntryCardInAnalystModal(){
+function ensureEntryCardInTradeModal(){
   const card=$('#entryCard');
-  const modalCard=$('#analystTradesModal .analyst-trades-modal-card');
-  if(!card||!modalCard)return null;
-  if(card.parentElement!==modalCard)modalCard.appendChild(card);
-  card.classList.add('analyst-modal-entry-card');
+  const host=$('#tradeFormModalBody');
+  if(!card||!host)return null;
+  if(card.parentElement!==host)host.appendChild(card);
+  card.classList.add('trade-modal-entry-card');
   return card;
 }
 
 function hideAnalystTradeForm(){
-  const card=$('#entryCard');
-  if(card)card.classList.add('analyst-modal-entry-hidden');
+  $('#tradeFormModal')?.classList.remove('show');
+  document.body.classList.remove('trade-form-modal-open');
 }
 
 function showAnalystTradeForm(){
-  const card=ensureEntryCardInAnalystModal();
-  if(!card)return;
+  const card=ensureEntryCardInTradeModal();
+  const modal=$('#tradeFormModal');
+  if(!card||!modal)return;
   card.classList.remove('hidden','analyst-modal-entry-hidden','entry-card-collapsed');
   $('#entryCardBody')?.classList.remove('hidden');
-  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const title=$('#tradeFormModalTitle');
+  if(title)title.textContent=editingId?'修改交易':'新增交易';
+  modal.classList.add('show');
+  document.body.classList.add('trade-form-modal-open');
 }
 
 function renderAnalystTradesModal(name){
   if(!visibleAnalystNames().includes(name))return;
-  ensureEntryCardInAnalystModal();
-  hideAnalystTradeForm();
   currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
   const body=$('#analystTradesBody');
@@ -10405,7 +10433,6 @@ function renderAnalystTradesModal(name){
 }
 
 function closeAnalystTradesModal(){
-  hideAnalystTradeForm();
   $('#analystTradesModal')?.classList.remove('show');
   document.body.classList.remove('analyst-modal-open');
 }
@@ -10966,9 +10993,9 @@ $('#saveBtn').onclick=async()=>{
   }
   const modalAnalyst=currentAnalystModalName;
   clearForm();
-  if($('#analystTradesModal')?.classList.contains('show')){
-    hideAnalystTradeForm();
-    if(modalAnalyst)renderAnalystTradesModal(modalAnalyst);
+  if($('#tradeFormModal')?.classList.contains('show'))hideAnalystTradeForm();
+  if($('#analystTradesModal')?.classList.contains('show') && modalAnalyst){
+    renderAnalystTradesModal(modalAnalyst);
   }
 };
 function startEdit(id){
@@ -11002,9 +11029,7 @@ function clearForm(){
 }
 $('#cancelEditBtn').onclick=()=>{
   clearForm();
-  if($('#analystTradesModal')?.classList.contains('show')){
-    hideAnalystTradeForm();
-  }
+  if($('#tradeFormModal')?.classList.contains('show'))hideAnalystTradeForm();
 };
 async function deleteTrade(id){
   if(!isMainAdmin())return;
@@ -12253,7 +12278,8 @@ async function writeManualOrFetchedPrice(id,item){
     item.source||'手動確認',
     {
       onlyTuan:isAdmin2(),
-      targetIds:[id],
+      targetIds:[id]
+      strictTargetIds:true,,
       strictTargetIds:true
     }
   );
@@ -12307,7 +12333,8 @@ async function manualCurrentPrice(id){
       isAdmin2()?'管理員2手動更新':'管理員1手動更新',
       {
         onlyTuan:isAdmin2(),
-        targetIds:[id],
+        targetIds:[id]
+      strictTargetIds:true,,
         strictTargetIds:true
       }
     );
@@ -12380,7 +12407,8 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
     '盤後行情抓取失敗－管理員手動輸入',
     {
       onlyTuan:isAdmin2(),
-      targetIds:[id],
+      targetIds:[id]
+      strictTargetIds:true,,
       strictTargetIds:true
     }
   );
@@ -12449,7 +12477,8 @@ async function refreshOne(id){
         onlyTuan:isAdmin2(),
         previousClose:q.reference,
         previousCloseDate:q.referenceDate||'',
-        targetIds:[id],
+        targetIds:[id]
+      strictTargetIds:true,,
         strictTargetIds:true
       }
     );
@@ -12543,7 +12572,8 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
           symbol,
           stockName:String(tr.stockName||'').trim(),
           targetIds:[id]
-        });
+        
+      strictTargetIds:true,});
       }else{
         uniqueMap.get(symbol).targetIds.push(id);
       }
@@ -12895,8 +12925,25 @@ document.addEventListener('click',async e=>{
         return;
       }
       await refreshOne(id);
-      if(currentAnalystModalName){
-        renderAnalystTradesModal(currentAnalystModalName);
+      // 單筆更新只處理這一筆，不重新跳出或重建其他個股視窗內容。
+      const updated=trades[id];
+      if(updated){
+        const item=priceBtn.closest('.analyst-trade-item');
+        if(item){
+          const grid=item.querySelector('.analyst-trade-grid');
+          if(grid){
+            const spans=[...grid.querySelectorAll(':scope > span')];
+            const currentSpan=spans.find(el=>el.textContent.trim().startsWith('目前價'));
+            const timeSpan=spans.find(el=>el.textContent.trim().startsWith('更新時間'));
+            const sourceSpan=spans.find(el=>el.textContent.trim().startsWith('來源'));
+            const perfSpan=spans.find(el=>el.textContent.trim().startsWith('績效'));
+            const c=calc(updated);
+            if(currentSpan)currentSpan.innerHTML=`目前價 <span class="current-price-line"><b>${fmt(updated.currentPrice||updated.entryPrice)}</b>${priceTrendBadge(updated)}</span>`;
+            if(timeSpan)timeSpan.innerHTML=`更新時間 <b>${esc(formatDateTimeSlash(updated.priceUpdatedAt||'—'))}</b>`;
+            if(sourceSpan)sourceSpan.innerHTML=`來源 <b>${esc(updated.priceSource||'—')}</b>`;
+            if(perfSpan)perfSpan.innerHTML=`績效 <b class="${c.perf>=0?'pos':'neg'}">${pct(c.perf)}</b>`;
+          }
+        }
       }
     }else if(settleBtn){
       const id=settleBtn.dataset.modalSettle;
@@ -13271,6 +13318,20 @@ function initPerformanceTableColumnResize(){
 
 window.addEventListener('DOMContentLoaded',()=>setTimeout(initPerformanceTableColumnResize,0));
 setTimeout(initPerformanceTableColumnResize,200);
+
+
+// v225：新增／修改交易獨立浮動視窗
+function closeTradeFormModal(){
+  hideAnalystTradeForm();
+  clearForm();
+}
+$('#closeTradeFormModal')?.addEventListener('click',closeTradeFormModal);
+$('#tradeFormModal')?.addEventListener('click',e=>{
+  if(e.target?.id==='tradeFormModal')closeTradeFormModal();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && $('#tradeFormModal')?.classList.contains('show'))closeTradeFormModal();
+});
 
 </script>
 

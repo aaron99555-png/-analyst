@@ -10487,11 +10487,15 @@ function analystExternalLink(name){
     '股市期皇后-莊佳螢':'https://www.youtube.com/channel/UCIoSO49Mhgh2iy_MOWfSl6w',
     '漁夫林睿閎':'https://www.youtube.com/@-john4000',
     '艾綸劉育綸':'https://www.youtube.com/@Alansays',
-    'E神張貽程':'https://www.youtube.com/@m168'
+    'E神張貽程':'https://www.youtube.com/@m168',
+    'GD何基鼎':'https://www.youtube.com/@gd1788',
+    '郭哲榮投資長':'https://www.youtube.com/@s178',
+    '金玉峰雷老闆':'https://www.youtube.com/@remus_boss',
+    '阮姨阮慧慈':'https://www.youtube.com/@power88888',
+    '運達黃培碩':'https://www.youtube.com/@huangpeishuo',
+    '運達徐紹軒':'https://www.youtube.com/@%E5%BE%90%E7%B4%B9%E8%BB%92%E5%88%86%E6%9E%90%E5%B8%AB'
   };
-  const url=links[name];
-  if(!url)return '';
-  return `<a class="analyst-external-link" href="${url}" target="_blank" rel="noopener noreferrer" title="前往 YouTube 頻道" aria-label="前往${esc(name)} YouTube 頻道">↗</a>`;
+  return links[name]||'';
 }
 
 function renderRank(){

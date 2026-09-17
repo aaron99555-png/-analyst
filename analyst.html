@@ -10523,7 +10523,6 @@ function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&l
 function bindRows(){
   $$('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
   $$('[data-del]').forEach(b=>b.onclick=()=>deleteTrade(b.dataset.del));
-  $$('[data-up]').forEach(b=>b.onclick=()=>refreshOne(b.dataset.up));
   $$('[data-settle]').forEach(b=>b.onclick=()=>settleTrade(b.dataset.settle));
 }
 
@@ -11815,7 +11814,8 @@ async function syncSameStockCurrentPrice(
     onlyTuan=false,
     previousClose=null,
     previousCloseDate='',
-    targetIds=null
+    targetIds=null,
+    strictTargetIds=false
   }={}
 ){
   const normalized=String(symbol||'').trim().toUpperCase();
@@ -11844,8 +11844,9 @@ async function syncSameStockCurrentPrice(
       });
   }
 
-  // targetIds 若因跨裝置同步變動而全部失效，再用原邏輯補抓一次。
-  if(!sameStockIds.length){
+  // 單筆更新使用 strictTargetIds=true：只更新指定交易，不再自動擴散到其他同代號部位。
+  // 一鍵更新 / 快速依股票代號更新仍可沿用同代號同步模式。
+  if(!sameStockIds.length && !strictTargetIds){
     sameStockIds=Object.entries(trades||{})
       .filter(([tid,tr])=>{
         if(!tr)return false;
@@ -11857,7 +11858,9 @@ async function syncSameStockCurrentPrice(
   }
 
   if(!sameStockIds.length){
-    throw new Error('已取得股價，但找不到仍可更新的持有中資料');
+    throw new Error(strictTargetIds
+      ? '已取得股價，但這筆交易目前無法更新'
+      : '已取得股價，但找不到仍可更新的持有中資料');
   }
 
   const commonPatch={
@@ -11944,7 +11947,11 @@ async function writeManualOrFetchedPrice(id,item){
     tr.symbol,
     item.price,
     item.source||'手動確認',
-    {onlyTuan:isAdmin2()}
+    {
+      onlyTuan:isAdmin2(),
+      targetIds:[id],
+      strictTargetIds:true
+    }
   );
 }
 
@@ -11994,7 +12001,11 @@ async function manualCurrentPrice(id){
       tr.symbol,
       price,
       isAdmin2()?'管理員2手動更新':'管理員1手動更新',
-      {onlyTuan:isAdmin2()}
+      {
+        onlyTuan:isAdmin2(),
+        targetIds:[id],
+        strictTargetIds:true
+      }
     );
 
     // syncSameStockCurrentPrice 已更新 Firebase + 本機資料，
@@ -12008,15 +12019,14 @@ async function manualCurrentPrice(id){
 
     if($('#lastRefresh')){
       $('#lastRefresh').textContent=
-        `價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(price)}｜同步 ${result.count} 筆`;
+        `價格更新：${result.updatedAt}｜${tr.symbol} ${fmt(oldPrice)} → ${fmt(price)}｜本筆完成`;
     }
 
     alert(
       `✅ 股價更新完成\n\n`+
       `${tr.symbol} ${tr.stockName||''}\n`+
       `${fmt(oldPrice)} → ${fmt(price)}\n`+
-      `更新時間：${result.updatedAt}`+
-      (result.count>1?`\n同股同步：${result.count} 筆`:'')
+      `更新時間：${result.updatedAt}`
     );
 
     return true;
@@ -12064,7 +12074,11 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
     symbol,
     price,
     '盤後行情抓取失敗－管理員手動輸入',
-    {onlyTuan:isAdmin2()}
+    {
+      onlyTuan:isAdmin2(),
+      targetIds:[id],
+      strictTargetIds:true
+    }
   );
 
   clearTimeout(cloudRenderTimer);
@@ -12073,15 +12087,14 @@ async function promptManualPriceAfterFetchFailure(id,fetchError){
 
   if($('#lastRefresh')){
     $('#lastRefresh').textContent=
-      `價格更新：${result.updatedAt}｜${symbol} → ${fmt(price)}｜手動輸入｜同步 ${result.count} 筆`;
+      `價格更新：${result.updatedAt}｜${symbol} → ${fmt(price)}｜手動輸入｜本筆完成`;
   }
 
   alert(
     `✅ 已改用手動價格更新\n\n`+
     `${symbol} ${stockName}\n`+
     `目前價：${fmt(price)}\n`+
-    `更新時間：${result.updatedAt}\n`+
-    `同代號同步：${result.count} 筆`
+    `更新時間：${result.updatedAt}`
   );
 
   return {updated:true,manual:true,...result};
@@ -12123,7 +12136,7 @@ async function refreshOne(id){
       throw new Error('網路行情沒有回傳有效價格');
     }
 
-    // 只有抓取成功才寫入；同代號所有「持有中」部位一起更新。
+    // 只有抓取成功才寫入；單筆更新只更新目前選取的這一筆交易。
     const result=await syncSameStockCurrentPrice(
       symbol,
       newPrice,
@@ -12131,7 +12144,9 @@ async function refreshOne(id){
       {
         onlyTuan:isAdmin2(),
         previousClose:q.reference,
-        previousCloseDate:q.referenceDate||''
+        previousCloseDate:q.referenceDate||'',
+        targetIds:[id],
+        strictTargetIds:true
       }
     );
 
@@ -12141,7 +12156,7 @@ async function refreshOne(id){
 
     if($('#lastRefresh')){
       $('#lastRefresh').textContent=
-        `價格更新：${result.updatedAt}｜${symbol} → ${fmt(newPrice)}｜${q.source||'網路最新行情'}｜同步 ${result.count} 筆`;
+        `價格更新：${result.updatedAt}｜${symbol} → ${fmt(newPrice)}｜${q.source||'網路最新行情'}｜本筆完成`;
     }
 
     alert(
@@ -12149,8 +12164,7 @@ async function refreshOne(id){
       `${symbol} ${stockName}\n`+
       `目前價：${fmt(newPrice)}\n`+
       `來源：${q.source||'網路最新行情'}${q.tradeDate?`｜資料日 ${q.tradeDate}`:''}\n`+
-      `更新時間：${result.updatedAt}\n`+
-      `同代號同步：${result.count} 筆`
+      `更新時間：${result.updatedAt}`
     );
 
   }catch(fetchError){
@@ -12809,8 +12823,9 @@ document.addEventListener('click', async (e)=>{
     if(upId){
       e.preventDefault();
       e.stopPropagation();
-      if(!isMainAdmin()){
-        alert('更新股價功能僅限管理員1使用');
+      const tr=trades?.[upId];
+      if(!canUpdatePrice(tr)){
+        alert('你沒有這筆資料的更新目前價權限');
         return;
       }
       await refreshOne(upId);
@@ -12854,34 +12869,6 @@ document.addEventListener('click',e=>{
 });
 
 
-// v114：股價更新按鈕最後一道保險。
-// 若其他事件委派失效，仍能直接執行單筆更新。
-document.addEventListener('click',async e=>{
-  const btn=e.target?.closest?.('[data-up]');
-  if(!btn)return;
-  if(btn.dataset.priceClickRunning==='1')return;
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  if(!isMainAdmin()){
-    alert('更新股價功能僅限主管理員使用');
-    return;
-  }
-
-  const id=btn.getAttribute('data-up');
-  if(!id)return;
-
-  btn.dataset.priceClickRunning='1';
-  try{
-    await refreshOne(id);
-  }catch(err){
-    console.error('單筆股價更新失敗',err);
-    alert('更新股價失敗：'+(err?.message||'未知錯誤'));
-  }finally{
-    delete btn.dataset.priceClickRunning;
-  }
-},false);
 
 
 setTimeout(initGoogleFinanceSettings,0);

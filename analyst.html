@@ -8052,7 +8052,7 @@ html[data-theme="light"] #toggleTuanBtn:disabled{
       <div class="price-update-wrap">
         <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
 <div class="admin-only main-admin-only hidden admin-data-tools" id="adminDataTools">
-  <button id="toggleTuanBtn" class="ghost" type="button">顯示團團（一般使用者）</button>
+  <button id="toggleTuanBtn" class="ghost" type="button">團團公開顯示</button>
   <button id="exportDataBtn" class="ghost">匯出資料</button>
   <button id="importDataBtn" class="ghost">匯入資料</button>
   <input id="importDataFile" type="file" accept=".json,application/json" class="hidden">
@@ -8488,14 +8488,15 @@ const ADMIN_PASSWORD='51685168';
 const ADMIN2_PASSWORD='16888';
 const isMainAdmin=()=>isAdmin&&adminRole==='main';
 const isAdmin2=()=>isAdmin&&adminRole==='admin2';
+const canManageTuanPublicVisibility=()=>isMainAdmin();
 const canUpdatePrice=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 const canSettleTrade=t=>isMainAdmin()||(isAdmin2()&&t?.analyst==='團團');
 
 const PUBLIC_ANALYSTS=['投資總舖師王榮旭','E神張貽程','金玉峰雷老闆','漁夫林睿閎','艾綸劉育綸','運達徐紹軒','阮姨阮慧慈','郭哲榮投資長','運達黃培碩','蔡總蔡明彰','GD何基鼎','股市期皇后-莊佳螢'];
 const ALL_ANALYSTS=[...PUBLIC_ANALYSTS,'團團'];
 
-// v214：團團公開顯示改為 Firebase 全站設定。
-// 管理者1、管理者2永遠可見；一般使用者依 showTuanPublic 決定是否可見。
+// v215：團團公開顯示為 Firebase 全站設定。
+// 僅管理者1可切換；管理者2無權修改。管理者1、管理者2仍可查看團團資料；一般使用者依 showTuanPublic 決定是否可見。
 let publicShowTuan=false;
 
 function visibleAnalystNames(){
@@ -8511,11 +8512,11 @@ function canViewTrade(t){
 function updateTuanToggleUI(){
   const btn=$('#toggleTuanBtn');
   if(!btn)return;
-  btn.classList.toggle('hidden',!isMainAdmin());
-  btn.textContent=publicShowTuan?'隱藏團團（一般使用者）':'顯示團團（一般使用者）';
+  btn.classList.toggle('hidden',!canManageTuanPublicVisibility());
+  btn.textContent=publicShowTuan?'團團公開：開啟':'團團公開：關閉';
   btn.title=publicShowTuan
-    ? '目前一般使用者可看到團團資料；點擊後改為隱藏'
-    : '目前一般使用者看不到團團資料；點擊後改為公開';
+    ? '僅管理者1可控制。目前一般使用者可看到團團；點擊後關閉公開顯示'
+    : '僅管理者1可控制。目前一般使用者看不到團團；點擊後開啟公開顯示';
   btn.setAttribute('aria-pressed',publicShowTuan?'true':'false');
 }
 function refreshAnalystVisibilityOptions(){
@@ -10439,7 +10440,7 @@ $('#doLogin').onclick=()=>{
 $('#logoutBtn').onclick=()=>setAdmin(false,'');
 
 $('#toggleTuanBtn')?.addEventListener('click',async()=>{
-  if(!isMainAdmin())return;
+  if(!canManageTuanPublicVisibility())return;
 
   const next=!publicShowTuan;
   const btn=$('#toggleTuanBtn');

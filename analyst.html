@@ -8432,6 +8432,39 @@ body.trade-form-modal-open{overflow:hidden!important}
   #tradeFormModal .trade-form-modal-card{width:100%!important;max-width:none!important;max-height:92vh!important;padding:14px!important;border-radius:20px 20px 0 0!important}
 }
 
+
+/* v229：分析師 YouTube 連結只顯示小圖示，不呈現完整網址 */
+.analyst-external-link{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  width:22px !important;
+  min-width:22px !important;
+  height:22px !important;
+  padding:0 !important;
+  margin-left:4px;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  font-size:0 !important;
+  line-height:1 !important;
+  vertical-align:middle;
+  border-radius:6px;
+  text-decoration:none !important;
+}
+.analyst-external-link::before{
+  content:"▶";
+  display:block;
+  font-size:11px !important;
+  line-height:1 !important;
+}
+.analyst-youtube-icon{
+  font-size:11px !important;
+  line-height:1 !important;
+}
+.analyst-youtube-link::before{
+  content:none !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

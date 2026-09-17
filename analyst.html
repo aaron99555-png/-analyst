@@ -8465,6 +8465,22 @@ body.trade-form-modal-open{overflow:hidden!important}
   content:none !important;
 }
 
+
+/* v230：修正 YouTube 連結，函式直接輸出小圖示連結，不再輸出網址文字 */
+.analyst-youtube-link{
+  width:22px !important;
+  min-width:22px !important;
+  height:22px !important;
+  font-size:0 !important;
+  overflow:hidden !important;
+}
+.analyst-youtube-link::before{content:none !important;}
+.analyst-youtube-link .analyst-youtube-icon{
+  display:block !important;
+  font-size:11px !important;
+  line-height:1 !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -10528,7 +10544,9 @@ function analystExternalLink(name){
     '運達黃培碩':'https://www.youtube.com/@huangpeishuo',
     '運達徐紹軒':'https://www.youtube.com/@%E5%BE%90%E7%B4%B9%E8%BB%92%E5%88%86%E6%9E%90%E5%B8%AB'
   };
-  return links[name]||'';
+  const url=links[name];
+  if(!url)return '';
+  return `<a class="analyst-external-link analyst-youtube-link" href="${url}" target="_blank" rel="noopener noreferrer" title="前往 ${esc(name)} YouTube 頻道" aria-label="${esc(name)} YouTube 頻道"><span class="analyst-youtube-icon">▶</span></a>`;
 }
 
 function renderRank(){

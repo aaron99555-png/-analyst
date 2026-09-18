@@ -8662,6 +8662,19 @@ body.trade-form-modal-open #analystTradesModal{
 /* v245：一般使用者不顯示新增股票按鈕 */
 #addTradeFromAnalystModalBtn.hidden{display:none !important;}
 
+
+/* v246：桌機版分析師快速選單加大 */
+@media (min-width:701px){
+ .analyst-quick-inline-head h3{font-size:20px!important;font-weight:800!important}
+ .analyst-quick-inline-head span{font-size:15px!important;line-height:1.45!important}
+ #analystQuickFilter button,.analyst-quick-menu button,#analystQuickFilter .analyst-quick-btn{
+   font-size:19px!important;font-weight:800!important;line-height:1.35!important;
+   min-height:48px!important;padding:10px 14px!important
+ }
+ #analystQuickFilter button .count,#analystQuickFilter button [class*="count"]{
+   font-size:17px!important;font-weight:900!important
+ }
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

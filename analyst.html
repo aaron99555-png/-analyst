@@ -1773,7 +1773,7 @@ body{
 }
 
 
-/* v82：管理員快速更新股價 */
+/* v82：管理員 */
 .quick-price-card{border-color:rgba(212,175,55,.42) !important;}
 .quick-price-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;}
 .quick-price-form > div{min-width:0;}
@@ -1788,7 +1788,7 @@ body{
 }
 
 
-/* v83：快速更新股價固定於分析師總績效正上方 */
+/* v83：固定於分析師總績效正上方 */
 @media(min-width:701px){
   #quickPriceCard{
     order:19 !important;
@@ -6434,7 +6434,7 @@ html[data-theme="light"] .price-trend-badge.down{
   }
   .visual-chart-wrap{height:280px !important;min-height:280px !important;}
 
-  /* 快速更新股價：兩欄輸入 + 下方滿版按鈕 */
+  /* ：兩欄輸入 + 下方滿版按鈕 */
   .quick-price-form{
     display:grid !important;
     grid-template-columns:1fr 1fr !important;
@@ -8596,6 +8596,17 @@ body.trade-form-modal-open #analystTradesModal{
 .performance-rank-card [class*="rank-mode"] button:first-child,
 .performance-rank-card [class*="rank-tab"] button:first-child{margin-left:0 !important;}
 
+
+/* v242：移除功能 */
+#quickPriceUpdate,
+.quick-price-update,
+.quick-price-wrap,
+.quick-update-card,
+[id*="quickPrice"],
+[class*="quick-price"]{
+  display:none !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8808,22 +8819,10 @@ body.trade-form-modal-open #analystTradesModal{
 
 <section class="card span12 admin-only hidden quick-price-card" id="quickPriceCard">
   <div class="section-title">
-    <h2>快速更新股價</h2>
+    <h2></h2>
     <span class="status">管理員專用｜輸入股票代號與目前價即可同步更新持有中部位</span>
   </div>
-  <div class="quick-price-form">
-    <div>
-      <label>股票代號</label>
-      <input id="quickPriceSymbol" type="text" inputmode="numeric" maxlength="10" placeholder="例如 2330">
-    </div>
-    <div>
-      <label>目前價</label>
-      <input id="quickPriceValue" type="number" step="0.01" min="0" placeholder="輸入目前價">
-    </div>
-    <div class="quick-price-action">
-      <button id="quickPriceUpdateBtn" class="primary" type="button">更新股價</button>
-    </div>
-  </div>
+  
   <div id="quickPriceHint" class="quick-price-hint">輸入股票代號後，會顯示目前持有中的對應部位。</div>
 </section>
 
@@ -13191,7 +13190,7 @@ async function quickUpdateCurrentPrice(){
     $('#lastRefresh').textContent=`價格更新：${result.updatedAt}｜${symbol} → ${fmt(result.price)}｜同步 ${result.count} 筆`;
 
   }catch(err){
-    console.error('快速更新股價失敗',err);
+    console.error('失敗',err);
     alert('更新失敗：'+(err?.message||'未知錯誤'));
   }finally{
     if(btn){

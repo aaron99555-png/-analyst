@@ -8658,6 +8658,10 @@ body.trade-form-modal-open #analystTradesModal{
   }
 }
 
+
+/* v245：一般使用者不顯示新增股票按鈕 */
+#addTradeFromAnalystModalBtn.hidden{display:none !important;}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -10549,6 +10553,7 @@ function showAnalystTradeForm(){
 
 function renderAnalystTradesModal(name){
   const canManageThisAnalyst=isMainAdmin() || (isAdmin2() && name==='團團');
+  const canAddTradeHere=canManageThisAnalyst;
   if(!visibleAnalystNames().includes(name))return;
   currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
@@ -10574,7 +10579,7 @@ function renderAnalystTradesModal(name){
 
   const modalAddBtn=$('#addTradeFromAnalystModalBtn');
   if(modalAddBtn){
-    modalAddBtn.classList.toggle('hidden',!canManageThisAnalyst);
+    modalAddBtn.classList.toggle('hidden',!canAddTradeHere);
     modalAddBtn.dataset.analyst=name||'';
   }
 

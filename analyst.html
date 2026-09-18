@@ -8771,6 +8771,13 @@ body.trade-form-modal-open #analystTradesModal{
   cursor:pointer!important;
 }
 
+
+/* v252：績效排行榜日期列置於上方 */
+.ranking-date-nav-v251.ranking-date-nav-top-v252{
+  margin:8px 0 12px 0!important;
+  width:min(325px,100%)!important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -13913,6 +13920,43 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(installRankingDatePickerV251,700);
 });
 new MutationObserver(()=>installRankingDatePickerV251()).observe(document.body,{childList:true,subtree:true});
+
+
+// v252：將績效排行榜日期選擇器移到排行榜最上方
+function moveRankingDatePickerToTopV252(){
+  const nav=$('#rankingDateNavV251');
+  if(!nav)return;
+
+  // 優先找績效排行榜卡片
+  let card=nav.closest('.performance-rank-card');
+  if(!card){
+    const title=[...document.querySelectorAll('h1,h2,h3,h4,strong,div')]
+      .find(el=>(el.textContent||'').trim()==='績效排行榜');
+    card=title?.closest('.card,section')||title?.parentElement;
+  }
+  if(!card)return;
+
+  // 找標題/上方工具列，日期列放在其後、排行期間與切換鈕之前
+  const title=[...card.querySelectorAll('h1,h2,h3,h4,strong,div')]
+    .find(el=>(el.textContent||'').trim()==='績效排行榜');
+
+  if(title){
+    const header=title.closest('.card-head,.section-head,.rank-head,.header')||title.parentElement;
+    if(header && header!==card){
+      header.insertAdjacentElement('afterend',nav);
+    }else{
+      title.insertAdjacentElement('afterend',nav);
+    }
+  }else{
+    card.insertBefore(nav,card.firstChild);
+  }
+  nav.classList.add('ranking-date-nav-top-v252');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(moveRankingDatePickerToTopV252,180);
+  setTimeout(moveRankingDatePickerToTopV252,750);
+});
+new MutationObserver(()=>moveRankingDatePickerToTopV252()).observe(document.body,{childList:true,subtree:true});
 
 </script>
 

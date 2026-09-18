@@ -8481,6 +8481,15 @@ body.trade-form-modal-open{overflow:hidden!important}
   line-height:1 !important;
 }
 
+
+/* v231：所有跳出視窗從畫面最上端顯示 */
+.modal,.modal.show,#tradeFormModal{align-items:flex-start!important;justify-content:center!important;padding-top:12px!important;overflow-y:auto!important}
+.modal>.modal-card,.modal>[class*="modal-card"],#tradeFormModal .trade-form-modal-card{margin-top:0!important;max-height:calc(100vh - 24px)!important;overflow-y:auto!important}
+.trade-note-quick{display:flex;gap:7px;margin:5px 0 7px}
+.trade-note-choice{min-width:82px;padding:7px 12px!important}
+.trade-note-choice.active{background:#f1dfab!important;color:#2b2416!important;-webkit-text-fill-color:#2b2416!important;border-color:#c9ad63!important}
+@media(max-width:700px){.modal,.modal.show,#tradeFormModal{align-items:flex-start!important;padding:6px!important}.modal>.modal-card,.modal>[class*="modal-card"],#tradeFormModal .trade-form-modal-card{margin-top:0!important;max-height:calc(100vh - 12px)!important}}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8569,7 +8578,9 @@ body.trade-form-modal-open{overflow:hidden!important}
         <div><label>停利價</label><input id="takeProfit" type="number" step="0.01"></div>
         <div class="main-admin-form-only"><label>出場日期</label><input id="exitDate" type="date"></div>
         <div><label>出場價格</label><input id="exitPrice" type="number" step="0.01"></div>
-        <div class="note-field" style="grid-column:span 2"><label>備註</label><textarea id="note" placeholder="操作邏輯、提醒事項…"></textarea></div>
+        <div class="note-field" style="grid-column:span 2"><label>備註</label>
+<div class="trade-note-quick"><button type="button" class="ghost trade-note-choice" data-trade-note="加碼單">加碼單</button><button type="button" class="ghost trade-note-choice" data-trade-note="攤提單">攤提單</button></div>
+<textarea id="note" placeholder="可選擇加碼單／攤提單，或自行輸入備註"></textarea></div>
         <div class="form-actions"><button id="saveBtn" class="primary">儲存</button><button id="cancelEditBtn" class="ghost">清空</button></div>
       </div>
     </div>
@@ -13383,6 +13394,24 @@ $('#tradeFormModal')?.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape' && $('#tradeFormModal')?.classList.contains('show'))closeTradeFormModal();
 });
+
+
+// v231：備註快速選擇
+function syncTradeNoteChoice(){
+  const value=String($('#note')?.value||'').trim();
+  $$('.trade-note-choice').forEach(btn=>btn.classList.toggle('active',value===btn.dataset.tradeNote));
+}
+document.addEventListener('click',e=>{
+  const btn=e.target?.closest?.('.trade-note-choice');
+  if(!btn)return;
+  e.preventDefault();
+  const note=$('#note'); if(!note)return;
+  const choice=String(btn.dataset.tradeNote||'').trim();
+  note.value=String(note.value||'').trim()===choice?'':choice;
+  syncTradeNoteChoice();
+  note.dispatchEvent(new Event('input',{bubbles:true}));
+});
+$('#note')?.addEventListener('input',syncTradeNoteChoice);
 
 </script>
 

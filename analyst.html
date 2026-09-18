@@ -8538,6 +8538,31 @@ body.trade-form-modal-open #analystTradesModal{
   font-size:calc(1em + 1px) !important;
 }
 
+
+/* v238：桌機 100% 縮放時，總績效排行損益金額完整顯示 */
+@media (min-width: 701px){
+  .performance-rank-card .rank-item,
+  .performance-rank-card [class*="rank-row"],
+  .performance-rank-card [class*="rank-item"]{
+    overflow:visible !important;
+  }
+  .performance-rank-card .rank-value,
+  .performance-rank-card .rank-amount,
+  .performance-rank-card [class*="profit"],
+  .performance-rank-card [class*="amount"]{
+    white-space:nowrap !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    min-width:max-content !important;
+  }
+}
+
+/* v238：分析師快速選單再放大一號（相較 v237 共放大 2px） */
+.analyst-quick-menu button,
+#analystQuickFilter button{
+  font-size:calc(1em + 2px) !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

@@ -8607,6 +8607,25 @@ body.trade-form-modal-open #analystTradesModal{
   display:none !important;
 }
 
+
+/* v243：同分析師重複持有同檔股票的新進場標示 */
+.additional-position-badge{
+  display:inline-flex !important;
+  align-items:center;
+  margin-left:6px;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#f1dfab !important;
+  color:#2b2416 !important;
+  -webkit-text-fill-color:#2b2416 !important;
+  border:1px solid #c9ad63;
+  font-size:11px !important;
+  font-weight:800 !important;
+  line-height:1.2;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -13520,6 +13539,29 @@ function canAdmin2ManageTuanTrade(tr){
 // v234：管理者2的交易管理權限只限團團
 function canManageAnalystTradeByRole(analystName){
   return isMainAdmin() || (isAdmin2() && analystName==='團團');
+}
+
+
+// v243：同一分析師若原本已持有同一檔未結算股票，新進場單在股名旁標示（加碼/攤提）
+function isAdditionalOpenPosition(tradeId,tr){
+  if(!tr || !tr.analyst || !tr.symbol)return false;
+  const thisEntry=String(tr.entryDate||'');
+  return Object.entries(trades||{}).some(([id,other])=>{
+    if(String(id)===String(tradeId) || !other)return false;
+    if(other.analyst!==tr.analyst)return false;
+    if(String(other.symbol||'').trim().toUpperCase()!==String(tr.symbol||'').trim().toUpperCase())return false;
+    if(!calc(other).open)return false;
+
+    // 必須是「原本就持有」：較早進場；同日則以資料順序存在另一筆未結算視為加碼/攤提。
+    const otherEntry=String(other.entryDate||'');
+    return !thisEntry || !otherEntry || otherEntry<=thisEntry;
+  });
+}
+
+function additionalPositionBadge(tradeId,tr){
+  return isAdditionalOpenPosition(tradeId,tr)
+    ? '<span class="additional-position-badge">加碼/攤提</span>'
+    : '';
 }
 
 </script>

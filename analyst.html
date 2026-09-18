@@ -8490,6 +8490,47 @@ body.trade-form-modal-open{overflow:hidden!important}
 .trade-note-choice.active{background:#f1dfab!important;color:#2b2416!important;-webkit-text-fill-color:#2b2416!important;border-color:#c9ad63!important}
 @media(max-width:700px){.modal,.modal.show,#tradeFormModal{align-items:flex-start!important;padding:6px!important}.modal>.modal-card,.modal>[class*="modal-card"],#tradeFormModal .trade-form-modal-card{margin-top:0!important;max-height:calc(100vh - 12px)!important}}
 
+
+/* v236：新增進場股票視窗永遠顯示在所有視窗最上層 */
+#tradeFormModal{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:2147483647 !important;
+  display:none;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  overflow-y:auto !important;
+  padding:8px !important;
+  padding-top:8px !important;
+  background:rgba(0,0,0,.62) !important;
+}
+#tradeFormModal.show{
+  display:flex !important;
+}
+#tradeFormModal .trade-form-modal-card{
+  position:relative !important;
+  z-index:2147483647 !important;
+  margin:0 auto !important;
+  width:min(980px,calc(100vw - 16px)) !important;
+  max-height:calc(100vh - 16px) !important;
+  overflow-y:auto !important;
+  transform:none !important;
+}
+body.trade-form-modal-open #analystTradesModal{
+  pointer-events:none !important;
+}
+@media(max-width:700px){
+  #tradeFormModal{
+    padding:4px !important;
+    padding-top:4px !important;
+  }
+  #tradeFormModal .trade-form-modal-card{
+    width:calc(100vw - 8px) !important;
+    max-height:calc(100vh - 8px) !important;
+    border-radius:14px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -10379,6 +10420,10 @@ function showAnalystTradeForm(){
   const card=ensureEntryCardInTradeModal();
   const modal=$('#tradeFormModal');
   if(!card||!modal)return;
+  // 移到 body 最後端，確保永遠蓋在「目前持股狀況」等所有浮動視窗之上。
+  if(modal.parentElement!==document.body || modal!==document.body.lastElementChild){
+    document.body.appendChild(modal);
+  }
   card.classList.remove('hidden','analyst-modal-entry-hidden','entry-card-collapsed');
   $('#entryCardBody')?.classList.remove('hidden');
   const title=$('#tradeFormModalTitle');

@@ -8684,6 +8684,93 @@ body.trade-form-modal-open #analystTradesModal{
 
 .rank-date-arrow-wrap{display:inline-flex!important;align-items:center!important;gap:5px!important}
 .rank-date-arrow{width:30px!important;min-width:30px!important;height:34px!important;padding:0!important;font-size:22px!important;font-weight:800!important}
+
+/* v249：績效排行榜日期左右箭頭－高可見度 */
+.ranking-date-nav-v249{
+ display:inline-flex!important;align-items:center!important;gap:5px!important;
+ flex-wrap:nowrap!important;vertical-align:middle!important;
+}
+.ranking-date-arrow-v249{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:34px!important;min-width:34px!important;height:34px!important;padding:0!important;
+ border:1px solid #b9aa8d!important;border-radius:8px!important;
+ background:#f1dfab!important;color:#2b2416!important;-webkit-text-fill-color:#2b2416!important;
+ font-size:15px!important;font-weight:900!important;line-height:1!important;
+ cursor:pointer!important;visibility:visible!important;opacity:1!important;
+}
+.ranking-date-arrow-v249:hover{background:#e7cc82!important}
+
+
+/* v250：截圖中的「排行期間」直接顯示左右箭頭 */
+.ranking-period-arrows-v250{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  margin-left:10px!important;
+  vertical-align:middle!important;
+}
+.ranking-period-btn-v250{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:32px!important;
+  min-width:32px!important;
+  height:30px!important;
+  padding:0!important;
+  border:1px solid #c9ad63!important;
+  border-radius:8px!important;
+  background:#f1dfab!important;
+  color:#2b2416!important;
+  -webkit-text-fill-color:#2b2416!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+}
+.ranking-period-btn-v250:hover{background:#e6cc84!important}
+
+
+/* v251：績效排行榜日期選擇器，比照進場／出場股票 */
+.ranking-date-nav-v251{
+  margin-top:10px!important;
+  width:min(325px,100%)!important;
+}
+.ranking-date-row-v251{
+  display:grid!important;
+  grid-template-columns:50px minmax(150px,1fr) 50px!important;
+  gap:6px!important;
+  align-items:center!important;
+}
+.ranking-date-shift-v251{
+  height:48px!important;
+  border:1px solid #d1bea0!important;
+  border-radius:11px!important;
+  background:#fffdf9!important;
+  color:#241c12!important;
+  -webkit-text-fill-color:#241c12!important;
+  font-size:22px!important;
+  font-weight:900!important;
+  cursor:pointer!important;
+}
+.ranking-date-picker-v251{
+  height:48px!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  font-size:15px!important;
+  border-radius:10px!important;
+}
+.ranking-today-v251{
+  width:100%!important;
+  height:43px!important;
+  margin-top:7px!important;
+  border:1px solid #d1bea0!important;
+  border-radius:10px!important;
+  background:#fffdf9!important;
+  color:#241c12!important;
+  -webkit-text-fill-color:#241c12!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -13660,6 +13747,173 @@ function installRankingDateArrows(){
  });
 }
 document.addEventListener('DOMContentLoaded',()=>{installRankingDateArrows();setTimeout(installRankingDateArrows,300);});
+
+// v249：修正績效排行榜日期箭頭，支援動態渲染與實際日期欄位
+function installPerformanceRankingDateArrowsV249(){
+  const all=[...document.querySelectorAll('input[type="date"]')];
+  all.forEach(input=>{
+    if(input.dataset.rankArrowsV249==='1')return;
+    const id=(input.id||'').toLowerCase();
+    const name=(input.name||'').toLowerCase();
+    const cls=(input.className||'').toString().toLowerCase();
+    const parentText=(input.closest('.card,section,div')?.textContent||'');
+    const isRanking =
+      id.includes('rank') || id.includes('filterstart') || id.includes('filterend') ||
+      name.includes('rank') || cls.includes('rank') ||
+      parentText.includes('績效排行榜');
+    if(!isRanking)return;
+
+    input.dataset.rankArrowsV249='1';
+    const wrap=document.createElement('div');
+    wrap.className='ranking-date-nav-v249';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+
+    const prev=document.createElement('button');
+    prev.type='button'; prev.className='ranking-date-arrow-v249'; prev.textContent='◀';
+    prev.title='往前一天';
+    const next=document.createElement('button');
+    next.type='button'; next.className='ranking-date-arrow-v249'; next.textContent='▶';
+    next.title='往後一天';
+    wrap.insertBefore(prev,input); wrap.appendChild(next);
+
+    prev.addEventListener('click',()=>shiftRankingDate(input,-1));
+    next.addEventListener('click',()=>shiftRankingDate(input,1));
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  installPerformanceRankingDateArrowsV249();
+  setTimeout(installPerformanceRankingDateArrowsV249,100);
+  setTimeout(installPerformanceRankingDateArrowsV249,600);
+});
+new MutationObserver(()=>installPerformanceRankingDateArrowsV249())
+  .observe(document.body,{childList:true,subtree:true});
+
+
+// v250：績效排行榜「排行期間」左右切換
+function shiftRankingPeriodV250(days){
+  const from=$('#fFrom'), to=$('#fTo');
+  if(!from || !to)return;
+
+  function shifted(value){
+    const d=value ? new Date(value+'T12:00:00') : new Date();
+    if(Number.isNaN(d.getTime()))return value;
+    d.setDate(d.getDate()+days);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  // 全部期間時，左右鍵先切成今天的單日區間；已有區間則整段前後平移一天。
+  if(!from.value && !to.value){
+    const today=shifted('');
+    from.value=today;
+    to.value=today;
+  }else{
+    if(from.value)from.value=shifted(from.value);
+    if(to.value)to.value=shifted(to.value);
+  }
+  from.dispatchEvent(new Event('change',{bubbles:true}));
+  to.dispatchEvent(new Event('change',{bubbles:true}));
+  from.dispatchEvent(new Event('input',{bubbles:true}));
+  to.dispatchEvent(new Event('input',{bubbles:true}));
+}
+
+function installRankingPeriodArrowsV250(){
+  if(document.querySelector('.ranking-period-arrows-v250'))return;
+  const nodes=[...document.querySelectorAll('*')];
+  const label=nodes.find(el=>{
+    const txt=(el.textContent||'').trim();
+    return /^排行期間\s*[：:]/.test(txt) && el.children.length<=4;
+  });
+  if(!label)return;
+
+  const nav=document.createElement('span');
+  nav.className='ranking-period-arrows-v250';
+  nav.innerHTML='<button type="button" class="ranking-period-btn-v250" data-dir="-1" title="排行期間往前一天">◀</button><button type="button" class="ranking-period-btn-v250" data-dir="1" title="排行期間往後一天">▶</button>';
+  label.appendChild(nav);
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      shiftRankingPeriodV250(Number(btn.dataset.dir));
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  installRankingPeriodArrowsV250();
+  setTimeout(installRankingPeriodArrowsV250,150);
+  setTimeout(installRankingPeriodArrowsV250,700);
+});
+new MutationObserver(()=>installRankingPeriodArrowsV250()).observe(document.body,{childList:true,subtree:true});
+
+
+// v251：績效排行榜日期選擇器（比照進場／出場股票）
+function formatRankDateV251(date){
+  return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+}
+function setRankingSingleDateV251(value){
+  const from=$('#fFrom'), to=$('#fTo');
+  if(!from || !to)return;
+  from.value=value;
+  to.value=value;
+  ['input','change'].forEach(type=>{
+    from.dispatchEvent(new Event(type,{bubbles:true}));
+    to.dispatchEvent(new Event(type,{bubbles:true}));
+  });
+}
+function shiftRankingSingleDateV251(days){
+  const picker=$('#rankingQueryDateV251');
+  if(!picker)return;
+  const d=picker.value?new Date(picker.value+'T12:00:00'):new Date();
+  if(Number.isNaN(d.getTime()))return;
+  d.setDate(d.getDate()+days);
+  picker.value=formatRankDateV251(d);
+  setRankingSingleDateV251(picker.value);
+}
+function installRankingDatePickerV251(){
+  if($('#rankingDateNavV251'))return;
+
+  // 找到「排行期間」文字所在區域
+  const nodes=[...document.querySelectorAll('*')];
+  const period=nodes.find(el=>{
+    const s=(el.textContent||'').trim();
+    return /^排行期間\s*[：:]/.test(s) && el.children.length<=4;
+  });
+  if(!period)return;
+
+  // 移除 v250 舊的小箭頭
+  period.querySelector('.ranking-period-arrows-v250')?.remove();
+
+  const nav=document.createElement('div');
+  nav.id='rankingDateNavV251';
+  nav.className='ranking-date-nav-v251';
+
+  const today=formatRankDateV251(new Date());
+  nav.innerHTML=`
+    <div class="ranking-date-row-v251">
+      <button type="button" class="ranking-date-shift-v251" id="rankingPrevDateV251">‹</button>
+      <input id="rankingQueryDateV251" class="date-picker-box ranking-date-picker-v251" type="date" value="${today}" aria-label="績效排行榜日期">
+      <button type="button" class="ranking-date-shift-v251" id="rankingNextDateV251">›</button>
+    </div>
+    <button type="button" class="ranking-today-v251" id="rankingTodayV251">回到今天</button>
+  `;
+  period.insertAdjacentElement('afterend',nav);
+
+  $('#rankingPrevDateV251')?.addEventListener('click',()=>shiftRankingSingleDateV251(-1));
+  $('#rankingNextDateV251')?.addEventListener('click',()=>shiftRankingSingleDateV251(1));
+  $('#rankingQueryDateV251')?.addEventListener('change',e=>setRankingSingleDateV251(e.target.value));
+  $('#rankingTodayV251')?.addEventListener('click',()=>{
+    const picker=$('#rankingQueryDateV251');
+    picker.value=formatRankDateV251(new Date());
+    setRankingSingleDateV251(picker.value);
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  installRankingDatePickerV251();
+  setTimeout(installRankingDatePickerV251,150);
+  setTimeout(installRankingDatePickerV251,700);
+});
+new MutationObserver(()=>installRankingDatePickerV251()).observe(document.body,{childList:true,subtree:true});
+
 </script>
 
 <div class="data-footer-note">資料整理：萊恩會漲｜如有錯誤或遺漏請告知</div>

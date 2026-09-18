@@ -8923,22 +8923,7 @@ function todayPriceDelta(tr,basePrice){
 }
 
 function priceTrendBadge(tr){
-  const current=Number(tr?.currentPrice);
-  const previous=Number(tr?.previousClose);
-  if(!(current>0)||!(previous>0))return '';
-
-  const diff=current-previous;
-  const epsilon=Math.max(0.000001,Math.abs(previous)*1e-9);
-  if(Math.abs(diff)<=epsilon)return '';
-
-  const up=diff>0;
-  const label=up?'上漲':'下跌';
-  const cls=up?'up':'down';
-  const diffPct=previous>0?diff/previous*100:0;
-  const sign=diffPct>0?'+':'';
-  const dateText=tr?.previousCloseDate?`（${esc(formatDateSlash(tr.previousCloseDate))}）`:'';
-  const title=`前一交易日收盤${dateText}：${fmt(previous)}｜${label} ${sign}${diffPct.toFixed(2)}%`;
-  return `<span class="price-trend-badge ${cls}" title="${title}">${label}</span>`;
+  return '';
 }
 function sharedConsensusInfo(count){
   const n=Number(count)||0;

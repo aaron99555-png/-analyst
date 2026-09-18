@@ -8580,6 +8580,22 @@ body.trade-form-modal-open #analystTradesModal{
   }
 }
 
+
+/* v240：總績效排行切換選項貼齊最左側 */
+.performance-rank-card .rank-mode-switch,
+.performance-rank-card .rank-tabs,
+.performance-rank-card [class*="rank-mode"],
+.performance-rank-card [class*="rank-tab"]{
+  justify-content:flex-start !important;
+  text-align:left !important;
+  margin-left:0 !important;
+  margin-right:auto !important;
+}
+.performance-rank-card .rank-mode-switch button:first-child,
+.performance-rank-card .rank-tabs button:first-child,
+.performance-rank-card [class*="rank-mode"] button:first-child,
+.performance-rank-card [class*="rank-tab"] button:first-child{margin-left:0 !important;}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8612,7 +8628,7 @@ body.trade-form-modal-open #analystTradesModal{
       <span id="adminRoleBadge" class="admin-role-badge hidden">一般模式</span>
       <div class="price-update-wrap">
         <div class="admin-main-toolbar">
-          <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新目前價</button>
+          <button id="refreshAllBtn" class="refresh-hero admin-only hidden">⟳ 一鍵更新盤後價</button>
           <button id="adminBtn" class="primary">管理者登入</button>
           <button id="logoutBtn" class="hidden">離開管理者</button>
 
@@ -11020,7 +11036,7 @@ function setAdmin(v,role=''){
 
   const bulkBtn=$('#refreshAllBtn');
   if(bulkBtn){
-    bulkBtn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
+    bulkBtn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新盤後價';
   }
 
   const roleBadge=$('#adminRoleBadge');
@@ -11034,7 +11050,7 @@ function updatePriceModeUI(){
   const btn=$('#refreshAllBtn');
   const note=document.querySelector('.price-note');
   if(btn){
-    btn.textContent='⟳ 一鍵更新目前價';
+    btn.textContent='⟳ 一鍵更新盤後價';
   }
   if(note){
     note.innerHTML=isMainAdmin()
@@ -12847,11 +12863,11 @@ $('#refreshAllBtn')?.addEventListener('click',async(e)=>{
     );
 
   }catch(err){
-    console.error('一鍵更新目前價失敗',err);
+    console.error('一鍵更新盤後價失敗',err);
     alert(`一鍵更新失敗：${err?.message||'未知錯誤'}`);
   }finally{
     btn.disabled=false;
-    btn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新目前價';
+    btn.textContent=isAdmin2()?'⟳ 一鍵更新團團持股':'⟳ 一鍵更新盤後價';
   }
 });
 

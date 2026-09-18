@@ -8563,6 +8563,23 @@ body.trade-form-modal-open #analystTradesModal{
   font-size:calc(1em + 2px) !important;
 }
 
+
+/* v239：分析師快速選單－分析師名字再加大 */
+.analyst-quick-menu button,
+#analystQuickFilter button,
+#analystQuickFilter .analyst-quick-btn{
+  font-size:17px !important;
+  font-weight:700 !important;
+  line-height:1.3 !important;
+}
+@media(max-width:700px){
+  .analyst-quick-menu button,
+  #analystQuickFilter button,
+  #analystQuickFilter .analyst-quick-btn{
+    font-size:16px !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

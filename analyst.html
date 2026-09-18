@@ -10388,6 +10388,7 @@ function showAnalystTradeForm(){
 }
 
 function renderAnalystTradesModal(name){
+  const canManageThisAnalyst=isMainAdmin() || (isAdmin2() && name==='團團');
   if(!visibleAnalystNames().includes(name))return;
   currentAnalystModalName=name||'';
   const modal=$('#analystTradesModal');
@@ -10413,16 +10414,16 @@ function renderAnalystTradesModal(name){
 
   const modalAddBtn=$('#addTradeFromAnalystModalBtn');
   if(modalAddBtn){
-    modalAddBtn.classList.toggle('hidden',!isMainAdmin());
+    modalAddBtn.classList.toggle('hidden',!canManageThisAnalyst);
     modalAddBtn.dataset.analyst=name||'';
   }
 
   const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
   const openHtml=openRows.length?openRows.map(({tr,c})=>{
     const tradeId=tradeIdFromObject(tr);
-    const adminActions=(isMainAdmin()||(isAdmin2()&&tr.analyst==='團團'))&&tradeId?`
+    const adminActions=canManageThisAnalyst&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
+        ${isMainAdmin()?`<button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>`:''}
         <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新目前價</button>
         <button type="button" class="primary modal-settle-btn" data-modal-settle="${esc(tradeId)}">結算</button>
       </div>`:'';
@@ -10445,9 +10446,9 @@ function renderAnalystTradesModal(name){
 
   const closedHtml=closedRows.length?closedRows.map(({tr,c})=>{
     const tradeId=tradeIdFromObject(tr);
-    const adminActions=(isMainAdmin()||(isAdmin2()&&tr.analyst==='團團'))&&tradeId?`
+    const adminActions=canManageThisAnalyst&&tradeId?`
       <div class="analyst-trade-admin-actions">
-        <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
+        ${isMainAdmin()?`<button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>`:''}
       </div>`:'';
     return `
     <div class="analyst-trade-item closed">
@@ -11059,7 +11060,7 @@ $('#saveBtn').onclick=async()=>{
 };
 function startEdit(id){
   const tr=trades[id];
-  if(!tr||(!isMainAdmin()&&!(isAdmin2()&&tr.analyst==='團團')))return;
+  if(!tr||!isMainAdmin())return;
   editingId=id;
   currentAnalystModalName=tr.analyst||currentAnalystModalName||'';
   $('#formTitle').textContent=`修改交易｜${tr.symbol||''} ${tr.stockName||''}`.trim();
@@ -13404,6 +13405,12 @@ $('#note')?.addEventListener('input',syncTradeNoteChoice);
 // v233：管理者2僅可管理「團團」交易（新增、修改、更新目前價、結算）。
 function canAdmin2ManageTuanTrade(tr){
   return isAdmin2() && tr?.analyst==='團團';
+}
+
+
+// v234：管理者2的交易管理權限只限團團
+function canManageAnalystTradeByRole(analystName){
+  return isMainAdmin() || (isAdmin2() && analystName==='團團');
 }
 
 </script>

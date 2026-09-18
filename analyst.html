@@ -10420,7 +10420,7 @@ function renderAnalystTradesModal(name){
   const stockLabel=tr=>`${esc(tr.symbol||'')} ${esc(tr.stockName||'')}`.trim();
   const openHtml=openRows.length?openRows.map(({tr,c})=>{
     const tradeId=tradeIdFromObject(tr);
-    const adminActions=isMainAdmin()&&tradeId?`
+    const adminActions=(isMainAdmin()||(isAdmin2()&&tr.analyst==='團團'))&&tradeId?`
       <div class="analyst-trade-admin-actions">
         <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
         <button type="button" class="ghost modal-price-btn" data-modal-price="${esc(tradeId)}">更新目前價</button>
@@ -10445,7 +10445,7 @@ function renderAnalystTradesModal(name){
 
   const closedHtml=closedRows.length?closedRows.map(({tr,c})=>{
     const tradeId=tradeIdFromObject(tr);
-    const adminActions=isMainAdmin()&&tradeId?`
+    const adminActions=(isMainAdmin()||(isAdmin2()&&tr.analyst==='團團'))&&tradeId?`
       <div class="analyst-trade-admin-actions">
         <button type="button" class="ghost modal-edit-btn" data-modal-edit="${esc(tradeId)}">修改</button>
       </div>`:'';
@@ -10489,10 +10489,12 @@ function closeAnalystTradesModal(){
 }
 
 $('#addTradeFromAnalystModalBtn')?.addEventListener('click',()=>{
-  if(!isMainAdmin())return;
+  if(!isMainAdmin()&&!isAdmin2())return;
 
-  const name=String(currentAnalystModalName||$('#addTradeFromAnalystModalBtn')?.dataset.analyst||'').trim();
+  let name=String(currentAnalystModalName||$('#addTradeFromAnalystModalBtn')?.dataset.analyst||'').trim();
+  if(isAdmin2())name='團團';
   if(!name)return;
+  if(isAdmin2() && name!=='團團')return;
 
   clearForm();
 
@@ -10504,7 +10506,7 @@ $('#addTradeFromAnalystModalBtn')?.addEventListener('click',()=>{
 
   showAnalystTradeForm();
 
-  // 已從分析師視窗進入，分析師固定為目前選取者，避免新增到錯誤分析師。
+  // 管理者2固定只能新增團團；管理者1固定為目前選取的分析師。
   if(analystEl)analystEl.disabled=true;
 
   requestAnimationFrame(()=>{
@@ -11057,7 +11059,7 @@ $('#saveBtn').onclick=async()=>{
 };
 function startEdit(id){
   const tr=trades[id];
-  if(!tr||!isMainAdmin())return;
+  if(!tr||(!isMainAdmin()&&!(isAdmin2()&&tr.analyst==='團團')))return;
   editingId=id;
   currentAnalystModalName=tr.analyst||currentAnalystModalName||'';
   $('#formTitle').textContent=`修改交易｜${tr.symbol||''} ${tr.stockName||''}`.trim();
@@ -13397,6 +13399,12 @@ document.addEventListener('click',e=>{
   note.dispatchEvent(new Event('input',{bubbles:true}));
 });
 $('#note')?.addEventListener('input',syncTradeNoteChoice);
+
+
+// v233：管理者2僅可管理「團團」交易（新增、修改、更新目前價、結算）。
+function canAdmin2ManageTuanTrade(tr){
+  return isAdmin2() && tr?.analyst==='團團';
+}
 
 </script>
 

@@ -8682,6 +8682,27 @@ body.trade-form-modal-open #analystTradesModal{
 .holdings-edit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(70,55,25,.13)!important}
 .holdings-edit-icon{font-size:15px!important;line-height:1!important}
 @media(max-width:700px){.analyst-trade-admin-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}.analyst-trade-admin-actions button{width:100%!important}}
+
+/* v248：進場／出場股票管理按鈕美化 */
+.today-entry-actions .today-edit-btn,
+.today-entry-actions .today-price-btn{
+  font-weight:800 !important;
+  border-radius:9px !important;
+  min-height:31px !important;
+}
+.today-entry-actions .today-edit-btn{
+  background:#f4ead0 !important;
+  border-color:#d1b86f !important;
+  color:#302719 !important;
+  -webkit-text-fill-color:#302719 !important;
+}
+.today-entry-actions .today-price-btn{
+  background:#eef1f3 !important;
+  border-color:#b9c1c8 !important;
+  color:#26323b !important;
+  -webkit-text-fill-color:#26323b !important;
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -9546,7 +9567,10 @@ function renderTodayExits(){
       <div class="today-entry-actions">
         <span class="today-perf ${calc(tr).perf>=0?'pos':'neg'}">績效 <b>${pct(calc(tr).perf)}</b></span>
         <button class="mini ghost copy-perf-btn" type="button" data-copy-exit-perf="${id}">複製績效</button>
-        ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
+        ${isMainAdmin()?`
+          <button class="mini ghost today-edit-btn" type="button" data-today-edit="${id}">✎ 修改</button>
+          <button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>
+        `:''}
       </div>
     </div>
   `).join('');
@@ -9683,7 +9707,11 @@ function renderTodayEntries(){
         </div>
       </div>
       <div class="today-entry-actions">
-        ${isMainAdmin()?`<button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>`:''}
+        ${isMainAdmin()?`
+          <button class="mini ghost today-edit-btn" type="button" data-today-edit="${id}">✎ 修改</button>
+          ${calc(tr).open?`<button class="mini ghost today-price-btn" type="button" data-today-price="${id}">↻ 更新股價</button>`:''}
+          <button class="mini danger today-delete-btn" data-del="${id}" title="刪除此筆">刪除</button>
+        `:''}
       </div>
     </div>
   `).join('');
@@ -13620,6 +13648,38 @@ function additionalPositionBadge(tradeId,tr){
     ? '<span class="additional-position-badge">加碼/攤提</span>'
     : '';
 }
+
+
+// v248：管理者1可直接從進場／出場股票修改；未結算進場股票可更新股價
+document.addEventListener('click',async e=>{
+  const editBtn=e.target?.closest?.('[data-today-edit]');
+  if(editBtn){
+    e.preventDefault();
+    if(!isMainAdmin())return;
+    const id=String(editBtn.dataset.todayEdit||'');
+    if(id && trades?.[id])startEdit(id);
+    return;
+  }
+
+  const priceBtn=e.target?.closest?.('[data-today-price]');
+  if(priceBtn){
+    e.preventDefault();
+    if(!isMainAdmin())return;
+    const id=String(priceBtn.dataset.todayPrice||'');
+    const tr=trades?.[id];
+    if(!tr || !calc(tr).open)return;
+    const original=priceBtn.innerHTML;
+    priceBtn.disabled=true;
+    priceBtn.textContent='更新中…';
+    try{
+      await refreshOne(id);
+      renderTodayEntries();
+    }finally{
+      priceBtn.disabled=false;
+      priceBtn.innerHTML=original;
+    }
+  }
+});
 
 </script>
 

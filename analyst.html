@@ -8703,6 +8703,25 @@ body.trade-form-modal-open #analystTradesModal{
   -webkit-text-fill-color:#26323b !important;
 }
 
+
+/* v249 最下方表格：最右欄內容不超出儲存格 */
+.performance-table-card .table-wrap{overflow-x:auto!important}
+.performance-table-card table{table-layout:fixed!important}
+.performance-table-card th,.performance-table-card td{
+ box-sizing:border-box!important;max-width:100%!important;overflow:hidden!important;
+ white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important
+}
+.performance-table-card th:last-child,.performance-table-card td:last-child{
+ overflow:hidden!important;white-space:normal!important;overflow-wrap:anywhere!important;
+ word-break:break-word!important;padding-left:6px!important;padding-right:6px!important
+}
+.performance-table-card td:last-child>*,.performance-table-card th:last-child>*{
+ max-width:100%!important;box-sizing:border-box!important
+}
+.performance-table-card td:last-child button,.performance-table-card td:last-child a{
+ max-width:100%!important;min-width:0!important;white-space:normal!important;
+ overflow:hidden!important;text-overflow:ellipsis!important
+}
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。

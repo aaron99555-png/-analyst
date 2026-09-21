@@ -8722,6 +8722,69 @@ body.trade-form-modal-open #analystTradesModal{
  max-width:100%!important;min-width:0!important;white-space:normal!important;
  overflow:hidden!important;text-overflow:ellipsis!important
 }
+
+/* v250：重複建檔確認視窗 */
+#duplicateTradeModal{z-index:2147483647 !important}
+.duplicate-trade-card{max-width:440px !important}
+.duplicate-trade-card h3{margin:0 0 12px;font-size:19px}
+.duplicate-trade-message{display:grid;gap:7px;font-size:15px;line-height:1.5}
+.duplicate-trade-warning{margin-top:5px;padding:10px 12px;border-radius:10px;background:#fff3cd;color:#5b4711;-webkit-text-fill-color:#5b4711;font-weight:700}
+.duplicate-trade-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+/* v250：手機版所有跳出視窗依螢幕寬高自動縮放 */
+@media(max-width:700px){
+  .modal,
+  .modal.show,
+  #tradeFormModal,
+  #duplicateTradeModal{
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100vh !important;
+    padding:8px !important;
+    padding-top:max(8px,env(safe-area-inset-top)) !important;
+    padding-bottom:max(8px,env(safe-area-inset-bottom)) !important;
+    box-sizing:border-box !important;
+    align-items:flex-start !important;
+    justify-content:center !important;
+    overflow-y:auto !important;
+  }
+  .modal>.modal-card,
+  .modal>[class*="modal-card"],
+  #tradeFormModal .trade-form-modal-card,
+  #duplicateTradeModal .duplicate-trade-card{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    max-height:calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    margin:0 !important;
+    padding:14px !important;
+    box-sizing:border-box !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    border-radius:14px !important;
+  }
+  .modal input,.modal select,.modal textarea,
+  #tradeFormModal input,#tradeFormModal select,#tradeFormModal textarea{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+  }
+  .modal .form-grid,
+  #tradeFormModal .form-grid{
+    grid-template-columns:1fr !important;
+  }
+  .modal button{
+    max-width:100% !important;
+  }
+  .duplicate-trade-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+  }
+}
+
 </style>
 <script>
 // 獨立於雲端連線初始化，軟鍵盤或網址列改變高度時仍能調整視窗。
@@ -8989,6 +9052,17 @@ body.trade-form-modal-open #analystTradesModal{
   </div>
 </div>
 
+
+<div id="duplicateTradeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="duplicateTradeTitle">
+  <div class="modal-card duplicate-trade-card">
+    <h3 id="duplicateTradeTitle">⚠️ 確認是否重複建檔</h3>
+    <div id="duplicateTradeMessage" class="duplicate-trade-message"></div>
+    <div class="duplicate-trade-actions">
+      <button id="duplicateTradeCancel" type="button" class="ghost">取消</button>
+      <button id="duplicateTradeConfirm" type="button" class="primary">確認仍要新增</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="loginModal"><div class="modal-card"><h3 style="margin-top:0">管理者登入</h3><label>管理者密碼</label><input id="adminPwd" type="password" placeholder="請輸入密碼"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="closeLogin">取消</button><button id="doLogin" class="primary">登入</button></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js">
@@ -11262,6 +11336,12 @@ $('#saveBtn').onclick=async()=>{
     return;
   }
   if(!data.symbol||!data.entryDate||!data.entryPrice)return alert('請至少填寫股票代號、入場日期與進場價');
+
+  if(!editingId){
+    const allowDuplicate=await confirmDuplicateTrade(data);
+    if(!allowDuplicate)return;
+  }
+
   if(editingId){
     if(!isMainAdmin())return;
     const before=trades[editingId]||{};
@@ -13699,6 +13779,51 @@ document.addEventListener('click',async e=>{
     }
   }
 });
+
+
+// v250：同一天、同一分析師、同一股票新增時，先跳出重複建檔確認
+function confirmDuplicateTrade(data){
+  const symbol=String(data?.symbol||'').trim().toUpperCase();
+  const analyst=String(data?.analyst||'').trim();
+  const entryDate=String(data?.entryDate||'').trim();
+  const duplicate=Object.entries(trades||{}).find(([id,tr])=>{
+    if(!tr)return false;
+    return String(tr.analyst||'').trim()===analyst
+      && String(tr.symbol||'').trim().toUpperCase()===symbol
+      && String(tr.entryDate||'').trim()===entryDate;
+  });
+  if(!duplicate)return Promise.resolve(true);
+
+  const [,tr]=duplicate;
+  const modal=$('#duplicateTradeModal');
+  const msg=$('#duplicateTradeMessage');
+  if(!modal||!msg)return Promise.resolve(window.confirm('同一天、同一分析師已建有相同股票，是否仍要新增？'));
+
+  msg.innerHTML=`
+    <div class="duplicate-trade-stock"><b>${esc(analyst)}</b></div>
+    <div><b>${esc(symbol)} ${esc(data.stockName||tr.stockName||'')}</b></div>
+    <div>進場日期：<b>${esc(formatDateSlash(entryDate))}</b></div>
+    <div class="duplicate-trade-warning">同一天已有相同股票紀錄，請確認是否為重複建檔。</div>
+  `;
+
+  modal.classList.remove('hidden');
+  modal.classList.add('show');
+  document.body.appendChild(modal);
+
+  return new Promise(resolve=>{
+    const yes=$('#duplicateTradeConfirm');
+    const no=$('#duplicateTradeCancel');
+    const finish=value=>{
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      yes.onclick=null; no.onclick=null;
+      resolve(value);
+    };
+    yes.onclick=()=>finish(true);
+    no.onclick=()=>finish(false);
+    modal.onclick=e=>{if(e.target===modal)finish(false);};
+  });
+}
 
 </script>
 
